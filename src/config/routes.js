@@ -1,5 +1,5 @@
-import Home from "../screens/Home";
-import Login from "../screens/Login";
+import Home from "../screens/Home.tsx";
+import Login from "../screens/Login.tsx";
 
 const routes = [
   {

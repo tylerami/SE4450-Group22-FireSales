@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { signInWithPopup } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import { auth, Providers } from "../../config/firebase";
@@ -26,7 +26,7 @@ const AuthContainer = (props) => {
   };
 
   return (
-    <Center height={"auto"}>
+    <Center>
       <Button
         startIcon={<GoogleIcon />}
         size="large"
