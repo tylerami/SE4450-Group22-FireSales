@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { Button } from "@mui/material";
 import { signOut } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import { auth } from "../../config/firebase";
@@ -21,9 +20,9 @@ const Logout = ({ navigateTo = "/login" }) => {
 
   return (
     <div>
-      <Button disabled={disabled} onClick={logout}>
+      {/* <Button disabled={disabled} onClick={logout} style={{ color: "white" }}>
         Logout
-      </Button>
+      </Button> */}
     </div>
   );
 };

@@ -1,18 +1,18 @@
 import React, { useEffect } from "react";
-import Logout from "../components/auth/Logout";
-import Center from "../components/utils/Center";
 import SalesSubmissionForm from "../components/sales/SalesSubmissionForm";
+// import { Box } from "@mui/material";
+import NavigationBar from "../components/nav/navigationBar";
 
 const Home = (props) => {
   useEffect(() => {}, []);
 
   return (
-    <Center>
-
-      <SalesSubmissionForm/>
-
-      <Logout />
-    </Center>
+    //<Box width="100%">
+    <>
+      <NavigationBar username="tylerami" onLogout={() => {}}></NavigationBar>
+      <SalesSubmissionForm />{" "}
+    </>
+    // </Box>
   );
 };
 

@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { CircularProgress } from "@mui/material";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { auth } from "./config/firebase";
 import routes from "./config/routes";
@@ -21,12 +20,8 @@ function App() {
     });
   }, []);
 
-  if (loading)
-    return (
-      <Center>
-        <CircularProgress />
-      </Center>
-    );
+  // add loading indicator
+  if (loading) return <Center></Center>;
 
   return (
     <BrowserRouter basename={process.env.PUBLIC_URL}>

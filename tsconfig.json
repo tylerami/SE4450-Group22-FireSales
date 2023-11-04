@@ -1,14 +1,30 @@
 {
-    "compilerOptions": {
-        "target": "es6", // specify ECMAScript target version
-        "module": "commonjs", // specify module code generation
-        "strict": true, // enable all strict type-checking options
-        "esModuleInterop": true, // enable emit interoperability between CommonJS and ES Modules via creation of namespace objects for all imports
-        "skipLibCheck": true, // skip type checking of declaration files
-        "noImplicitAny": false,
-        "jsx": "react",
-        "forceConsistentCasingInFileNames": true // ensure that casing is consistent in file names
-    },
-    "include": ["src/**/*"], // specify files to include
-    "exclude": ["node_modules", "**/*.spec.ts"] // specify files to exclude
+  "compilerOptions": {
+    "target": "es6",
+    "module": "esnext",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "noImplicitAny": false,
+    "jsx": "preserve",
+    "forceConsistentCasingInFileNames": true,
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "allowJs": true,
+    "allowSyntheticDefaultImports": true,
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true
+  },
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "**/*.spec.ts"
+  ]
 }
