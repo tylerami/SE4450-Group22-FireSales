@@ -11,6 +11,7 @@ import {
   Text,
   Icon,
   Circle,
+  Flex,
 } from "@chakra-ui/react";
 import { FiUser } from "react-icons/fi";
 
@@ -60,7 +61,6 @@ const SalesTeamTable: React.FC<SalesTeamTableProps> = ({
   rows = defaultRows,
 }) => {
   const colTitles = [
-    "",
     "Name",
     "Conversions",
     "Revenue",
@@ -69,7 +69,7 @@ const SalesTeamTable: React.FC<SalesTeamTableProps> = ({
   ];
 
   return (
-    <Table variant="simple" alignSelf={"center"} width={"100%"}>
+    <Table size="sm" variant="simple" alignSelf={"center"} width={"100%"}>
       <Thead>
         <Tr>
           {colTitles.map((title, index) => (
@@ -79,9 +79,9 @@ const SalesTeamTable: React.FC<SalesTeamTableProps> = ({
       </Thead>
       <Tbody>
         {rows.map((row, index) => (
-          <Tr key={index} height={"5em"}>
+          <Tr textAlign={"center"} key={index} height={"5em"}>
             <Td textAlign="center">
-              <Box display="flex" alignItems="center">
+              <Flex>
                 {row.profilePictureSrc ? (
                   <Image
                     borderRadius="full"
@@ -91,19 +91,18 @@ const SalesTeamTable: React.FC<SalesTeamTableProps> = ({
                     mr={2}
                   />
                 ) : (
-                  <Circle p={6} background={"black"}>
-                    <Icon color={"white"} fontSize={"2em"} as={FiUser} />
+                  <Circle size="40px" bg="gray.200" mr="2">
+                    <Icon as={FiUser} />
                   </Circle>
                 )}
-              </Box>
+
+                <Text ml={2} textAlign={"left"}>
+                  {row.name}
+                </Text>
+              </Flex>
             </Td>
-            <Td textAlign="center">{row.name}</Td>
-            <Td textAlign="center" isNumeric>
-              {row.conversions}
-            </Td>
-            <Td textAlign="center" isNumeric>
-              ${row.revenue.toLocaleString()}
-            </Td>
+            <Td textAlign={"center"}>{row.conversions}</Td>
+            <Td textAlign="center">${row.revenue.toLocaleString()}</Td>
             <Td
               textAlign="center"
               color={

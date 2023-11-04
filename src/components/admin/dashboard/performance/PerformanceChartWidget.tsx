@@ -12,11 +12,10 @@ import {
   IconButton,
 } from "@chakra-ui/react";
 import { ChevronDownIcon } from "@chakra-ui/icons";
-import PerformanceTable from "./PerformanceTable";
 
 type Props = object;
 
-const PerformanceTableWidget = (props: Props) => {
+const PerformanceChartWidget = (props: Props) => {
   return (
     <Flex
       p={26}
@@ -42,10 +41,10 @@ const PerformanceTableWidget = (props: Props) => {
           </MenuList>
         </Menu>
       </Flex>
-      <Box h={20}></Box>
-      <PerformanceTable></PerformanceTable>
+      <Box h={4}></Box>
+      <GroupedBarChart></GroupedBarChart>
     </Flex>
   );
 };
 
-export default PerformanceTableWidget;
+export default PerformanceChartWidget;

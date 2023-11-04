@@ -36,27 +36,29 @@ function App() {
   if (loading) return <Center></Center>;
 
   return (
-    <BrowserRouter basename={process.env.PUBLIC_URL}>
-      <ChakraProvider>
-        <Routes>
-          {routes.map((route, index) => (
-            <Route
-              key={index}
-              path={route.path}
-              element={
-                route.protected ? (
-                  <AuthChecker>
+    <Box h={"100vh"} background="red">
+      <BrowserRouter basename={process.env.PUBLIC_URL}>
+        <ChakraProvider>
+          <Routes>
+            {routes.map((route, index) => (
+              <Route
+                key={index}
+                path={route.path}
+                element={
+                  route.protected ? (
+                    <AuthChecker>
+                      <route.component />
+                    </AuthChecker>
+                  ) : (
                     <route.component />
-                  </AuthChecker>
-                ) : (
-                  <route.component />
-                )
-              }
-            />
-          ))}
-        </Routes>
-      </ChakraProvider>
-    </BrowserRouter>
+                  )
+                }
+              />
+            ))}
+          </Routes>
+        </ChakraProvider>
+      </BrowserRouter>
+    </Box>
 
     // <ChakraProvider theme={theme}>
     //   <Box textAlign="center" fontSize="xl">

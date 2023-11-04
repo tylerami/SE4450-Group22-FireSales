@@ -1,6 +1,5 @@
 import { Box, Flex, Heading } from "@chakra-ui/react";
 import React from "react";
-import GroupedBarChart from "./GroupedBarChart";
 
 import {
   Menu,
@@ -12,10 +11,11 @@ import {
   IconButton,
 } from "@chakra-ui/react";
 import { ChevronDownIcon } from "@chakra-ui/icons";
+import ClientsSummaryTable from "./ClientsSummaryTable";
 
 type Props = object;
 
-const PerformanceChartWidget = (props: Props) => {
+const ClientsSummaryTableWidget = (props: Props) => {
   return (
     <Flex
       p={26}
@@ -26,7 +26,7 @@ const PerformanceChartWidget = (props: Props) => {
     >
       <Flex justifyContent={"space-between"}>
         <Heading as="h1" fontSize={"1.2em"} fontWeight={700}>
-          Monthly Performance Snapshot
+          Client Performance Snapshot
         </Heading>
 
         <Menu>
@@ -41,10 +41,10 @@ const PerformanceChartWidget = (props: Props) => {
           </MenuList>
         </Menu>
       </Flex>
-      <Box h={20}></Box>
-      <GroupedBarChart></GroupedBarChart>
+      <Box h={4}></Box>
+      <ClientsSummaryTable></ClientsSummaryTable>
     </Flex>
   );
 };
 
-export default PerformanceChartWidget;
+export default ClientsSummaryTableWidget;

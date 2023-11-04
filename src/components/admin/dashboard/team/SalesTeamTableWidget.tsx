@@ -1,6 +1,6 @@
 import { Box, Flex, Heading } from "@chakra-ui/react";
 import React from "react";
-import GroupedBarChart from "./GroupedBarChart";
+import GroupedBarChart from "../performance/GroupedBarChart";
 
 import {
   Menu,
@@ -22,6 +22,7 @@ const SalesTeamTableWidget = (props: Props) => {
       p={26}
       minHeight={"100%"}
       borderRadius={"20px"}
+      minWidth={"35em"}
       width={"95%"}
       flexDirection={"column"}
       boxShadow={"3px 4px 12px rgba(0, 0, 0, 0.2)"}
@@ -44,7 +45,7 @@ const SalesTeamTableWidget = (props: Props) => {
         </Menu>
       </Flex>
 
-      <Box h={20}></Box>
+      <Box h={4}></Box>
 
       <SimpleTable />
       <Box h={20}></Box>

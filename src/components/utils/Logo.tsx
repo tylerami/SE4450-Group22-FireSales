@@ -7,10 +7,12 @@ type Props = {
 };
 
 const Logo = ({ size = "2em" }: Props) => {
+  const sizeNumber = Number(size.slice(0, -2));
+
   return (
-    <Flex mt={10} alignItems={"center"}>
+    <Flex alignItems={"center"}>
       <IoMdFlame color="red" size={size} />
-      <Box w={10}></Box>
+      <Box w={sizeNumber * 0.8}></Box>
       <Heading fontWeight={700} fontSize={size} color="black" opacity={0.7}>
         FireSales
       </Heading>

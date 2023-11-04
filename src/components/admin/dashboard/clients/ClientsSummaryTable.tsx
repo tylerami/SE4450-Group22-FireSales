@@ -11,6 +11,7 @@ import {
   Text,
   Icon,
   Circle,
+  Flex,
 } from "@chakra-ui/react";
 import { FiUser } from "react-icons/fi";
 
@@ -25,7 +26,7 @@ type TableRowData = {
 };
 
 // Define the props for the component
-type PerformanceTableProps = {
+type CleintsSummaryTableProps = {
   rows?: TableRowData[];
 };
 
@@ -49,7 +50,7 @@ const defaultRows: TableRowData[] = [
   // Add more rows as per the actual data you want to represent.
 ];
 
-const PerformanceTable: React.FC<PerformanceTableProps> = ({
+const CleintsSummaryTable: React.FC<CleintsSummaryTableProps> = ({
   rows = defaultRows,
 }) => {
   return (
@@ -72,15 +73,16 @@ const PerformanceTable: React.FC<PerformanceTableProps> = ({
         {rows.map((row, index) => (
           <Tr key={index} height={"5em"}>
             <Td>
-              <Box display="flex" alignItems="center">
+              <Flex display="flex" gap={2} alignItems="center">
                 <Circle size="40px" bg="gray.200" mr="2">
                   <Icon as={FiUser} />
                 </Circle>
+
                 <Box>
                   <Text fontWeight="semibold">{row.name}</Text>
                   <Text fontSize="sm">{row.partnershipDate}</Text>
                 </Box>
-              </Box>
+              </Flex>
             </Td>
             <Td textAlign="center" isNumeric>
               ${row.revenue.toLocaleString()}
@@ -91,7 +93,7 @@ const PerformanceTable: React.FC<PerformanceTableProps> = ({
             <Td
               textAlign="center"
               isNumeric
-              color={row.accountsReceivable === "$-" ? "gray.500" : "green.500"}
+              color={row.accountsReceivable === "$-" ? "red.500" : "green.500"}
             >
               {row.accountsReceivable}
             </Td>
@@ -102,4 +104,4 @@ const PerformanceTable: React.FC<PerformanceTableProps> = ({
   );
 };
 
-export default PerformanceTable;
+export default CleintsSummaryTable;
