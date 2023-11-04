@@ -18,23 +18,20 @@ const SideNavBar = (props: Props) => {
   return (
     <Flex
       width="20em"
-      p={20}
+      p={16}
       flexDirection={"column"}
       alignItems={"center"}
-      justifyContent={"start"}
+      justifyContent={"space-between"}
       height={"100%"}
       background={"rgba(237, 125, 49, 0.26)"}
     >
-      <Box h={30}></Box>
-
-      <Flex alignItems={"center"}>
+      <Flex mt={10} alignItems={"center"}>
         <IoMdFlame color="red" size="2.5em" />
         <Box w={10}></Box>
         <Heading fontWeight={700} fontSize={"2rem"} color="black" opacity={0.7}>
           FireSales
         </Heading>
       </Flex>
-
       <SideNavBarButton
         buttonText="Dashboard"
         Icon={AiOutlineDashboard}
@@ -42,40 +39,31 @@ const SideNavBar = (props: Props) => {
       ></SideNavBarButton>
 
       <SideNavBarButton
-        buttonText="Dashboard"
-        Icon={MdDashboard}
-        active={false}
-      ></SideNavBarButton>
-
-      <SideNavBarButton
         buttonText="Analytics"
         Icon={BiAnalyse}
         active={false}
       ></SideNavBarButton>
-
       <SideNavBarButton
         buttonText="Clients"
         Icon={IoPeopleOutline}
         active={false}
       ></SideNavBarButton>
-
       <SideNavBarButton
         buttonText="Sales Team"
         Icon={GiCash}
         active={false}
       ></SideNavBarButton>
-
       <SideNavBarButton
         buttonText="Settings"
         Icon={MdSettings}
         active={false}
       ></SideNavBarButton>
-
       <SideNavBarButton
         buttonText="Sign Out"
         Icon={RiLogoutBoxRLine}
         active={false}
       ></SideNavBarButton>
+      <Box height={1000} maxHeight={"30%"}></Box>
     </Flex>
   );
 };

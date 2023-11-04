@@ -23,7 +23,6 @@ const SideNavBarButton: React.FC<SideNavBarButtonProps> = ({
       align="center"
       p={10}
       pl={20}
-      m={20}
       w={"80%"}
       background={bgColor}
       borderRadius="10px"
@@ -35,7 +34,7 @@ const SideNavBarButton: React.FC<SideNavBarButtonProps> = ({
     >
       <Icon color={iconColor} size="2em" />
       <Box w={30}></Box>
-      <Heading as="h4" fontWeight={"600"} color={color} ml="4">
+      <Heading opacity={0.8} as="h5" fontWeight={"600"} color={color} ml="4">
         {buttonText}
       </Heading>
       <Box w={10}></Box>

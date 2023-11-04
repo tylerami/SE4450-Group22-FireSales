@@ -1,10 +1,10 @@
-import Home from "../screens/Home.tsx";
+import AdminHome from "../screens/AdminHome.tsx";
 import Login from "../screens/Login.tsx";
 
 const routes = [
   {
     path: "",
-    component: Home,
+    component: AdminHome,
     name: "Home Page",
     protected: true,
   },
