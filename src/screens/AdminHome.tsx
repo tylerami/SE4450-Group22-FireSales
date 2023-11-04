@@ -9,8 +9,6 @@ import PerformanceTableWidget from "../components/admin/PerformanceTableWidget";
 import SalesTeamTableWidget from "../components/admin/SalesTeamTableWidget";
 
 const AdminHome = (props) => {
-  useEffect(() => {}, []);
-
   return (
     <Flex
       height="100vh"

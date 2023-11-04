@@ -3,6 +3,18 @@ import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import { auth, Providers } from "../../config/firebase";
 import Center from "../utils/Center";
+import {
+  Box,
+  Flex,
+  Heading,
+  Icon,
+  Input,
+  InputGroup,
+  InputRightElement,
+  Stack,
+  Text,
+} from "@chakra-ui/react";
+import { FiEye } from "react-icons/fi";
 
 const LoginContainer = (props) => {
   const navigate = useNavigate();
@@ -40,56 +52,40 @@ const LoginContainer = (props) => {
   };
 
   return (
-    <></>
-    // <Box width={"40em"}>
-    //   <Typography variant="h4" sx={{ mb: 2 }}>
-    //     Login
-    //   </Typography>
-    //   <Typography sx={{ mt: 2 }} color={"red"}>
-    //     {errorMessage}
-    //   </Typography>
-    //   <Box sx={{ mt: 2 }}>
-    //     <TextField
-    //       label="Email"
-    //       variant="outlined"
-    //       fullWidth
-    //       value={email}
-    //       onChange={(e) => setEmail(e.target.value)}
-    //     />
-    //   </Box>
-    //   <Box sx={{ mt: 2 }}>
-    //     <TextField
-    //       label="Password"
-    //       variant="outlined"
-    //       fullWidth
-    //       type="password"
-    //       value={password}
-    //       onChange={(e) => setPassword(e.target.value)}
-    //     />
-    //   </Box>
-    //   <Box sx={{ mt: 2 }}>
-    //     <Button
-    //       fullWidth
-    //       variant="contained"
-    //       disabled={disabled}
-    //       onClick={signInManually}
-    //     >
-    //       Login
-    //     </Button>
-    //     <Box height={12} />
-    //     <Button
-    //       fullWidth
-    //       startIcon={<GoogleIcon />}
-    //       size="large"
-    //       disabled={disabled}
-    //       variant="contained"
-    //       onClick={signInWithGoogle}
-    //     >
-    //       Sign In With Google
-    //     </Button>
-    //   </Box>
-    // </Box>
-    //);
+    <Flex
+      width={"30em"}
+      height={"60%"}
+      alignItems={"center"}
+      flexDirection={"column"}
+      background={"white"}
+    >
+      <Heading>Sign In</Heading>
+      <Box h={6} />
+
+      <Flex>
+        <Text>Don't have an account yet?</Text>
+        <Text>Sign up here</Text>
+      </Flex>
+
+      <Box h={20} />
+
+      <Flex width={"100%"} flexDirection={"column"}>
+        <Input variant={"outline"} placeholder="Email"></Input>
+      </Flex>
+
+      <Flex width={"100%"} flexDirection={"column"}>
+        <InputGroup>
+          <Input
+            variant={"outline"}
+            type="password"
+            placeholder="Password"
+          ></Input>
+          <InputRightElement>
+            <Icon as={FiEye} />
+          </InputRightElement>
+        </InputGroup>
+      </Flex>
+    </Flex>
   );
 };
 

@@ -7,14 +7,20 @@ import SideNavBarButton from "./SideNavBarButton";
 import { MdDashboard } from "react-icons/md";
 import { AiOutlineDashboard } from "react-icons/ai";
 import { BiAnalyse } from "react-icons/bi";
-import { IoPeopleOutline } from "react-icons/io5";
+import { IoMdPeople } from "react-icons/io";
 import { GiCash } from "react-icons/gi";
 import { MdSettings } from "react-icons/md";
 import { RiLogoutBoxRLine } from "react-icons/ri";
+import { signOut } from "firebase/auth";
+import { auth } from "../../config/firebase";
+import { useNavigate } from "react-router-dom";
+import Logo from "../utils/Logo";
 
-type Props = {};
+type Props = object;
 
 const SideNavBar = (props: Props) => {
+  const navigate = useNavigate();
+
   return (
     <Flex
       width="20em"
@@ -25,13 +31,7 @@ const SideNavBar = (props: Props) => {
       height={"100%"}
       background={"rgba(237, 125, 49, 0.26)"}
     >
-      <Flex mt={10} alignItems={"center"}>
-        <IoMdFlame color="red" size="2.5em" />
-        <Box w={10}></Box>
-        <Heading fontWeight={700} fontSize={"2rem"} color="black" opacity={0.7}>
-          FireSales
-        </Heading>
-      </Flex>
+      <Logo></Logo>
       <SideNavBarButton
         buttonText="Dashboard"
         Icon={AiOutlineDashboard}
@@ -45,7 +45,7 @@ const SideNavBar = (props: Props) => {
       ></SideNavBarButton>
       <SideNavBarButton
         buttonText="Clients"
-        Icon={IoPeopleOutline}
+        Icon={IoMdPeople}
         active={false}
       ></SideNavBarButton>
       <SideNavBarButton
@@ -61,6 +61,11 @@ const SideNavBar = (props: Props) => {
       <SideNavBarButton
         buttonText="Sign Out"
         Icon={RiLogoutBoxRLine}
+        onClick={() =>
+          signOut(auth).then(() => {
+            navigate("/login");
+          })
+        }
         active={false}
       ></SideNavBarButton>
       <Box height={1000} maxHeight={"30%"}></Box>

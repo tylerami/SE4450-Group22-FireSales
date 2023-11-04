@@ -13,7 +13,7 @@ import {
 } from "@chakra-ui/react";
 import { ChevronDownIcon } from "@chakra-ui/icons";
 
-type Props = {};
+type Props = object;
 
 const PerformanceChartWidget = (props: Props) => {
   return (

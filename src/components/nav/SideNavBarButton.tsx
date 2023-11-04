@@ -6,12 +6,14 @@ interface SideNavBarButtonProps {
   active: boolean;
   buttonText: string;
   Icon: IconType;
+  onClick?: () => void;
 }
 
 const SideNavBarButton: React.FC<SideNavBarButtonProps> = ({
   active,
   buttonText,
   Icon,
+  onClick,
 }) => {
   // Define colors based on the `active` prop
   const bgColor = active ? "#ED7D31" : "transparent";
@@ -24,6 +26,7 @@ const SideNavBarButton: React.FC<SideNavBarButtonProps> = ({
       p={10}
       pl={20}
       w={"80%"}
+      onClick={onClick}
       background={bgColor}
       borderRadius="10px"
       justifyContent={"start"}

@@ -14,7 +14,7 @@ import {
 import { ChevronDownIcon } from "@chakra-ui/icons";
 import SimpleTable from "./SalesTeamTable";
 
-type Props = {};
+type Props = object;
 
 const SalesTeamTableWidget = (props: Props) => {
   return (

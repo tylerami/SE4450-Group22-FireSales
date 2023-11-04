@@ -14,7 +14,7 @@ import {
 import { ChevronDownIcon } from "@chakra-ui/icons";
 import PerformanceTable from "./PerformanceTable";
 
-type Props = {};
+type Props = object;
 
 const PerformanceTableWidget = (props: Props) => {
   return (

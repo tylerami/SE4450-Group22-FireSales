@@ -1,5 +1,5 @@
-import AdminHome from "../screens/AdminHome.tsx";
-import Login from "../screens/Login.tsx";
+import AdminHome from "../screens/AdminHome";
+import AuthPage from "../screens/AuthPage";
 
 const routes = [
   {
@@ -10,7 +10,7 @@ const routes = [
   },
   {
     path: "/login",
-    component: Login,
+    component: AuthPage,
     name: "Login Screen",
     protected: false,
   },
