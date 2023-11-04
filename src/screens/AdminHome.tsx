@@ -64,11 +64,11 @@ const AdminHome = (props) => {
           overflowX={"hidden"}
           flex="1"
         >
-          <Flex px={8} py={6} align="center" wrap="wrap">
-            <Heading fontSize="1.8em" mr={2}>
+          <Flex px={8} py={2} pt={8}>
+            <Heading size="lg" mr={2} fontWeight={400}>
               Welcome,
             </Heading>
-            <Heading fontSize="1.8em" fontWeight={700} color="#ED7D31">
+            <Heading size="lg" fontWeight={400} color="#ED7D31">
               Tyler
             </Heading>
           </Flex>

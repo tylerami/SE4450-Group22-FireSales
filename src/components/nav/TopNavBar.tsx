@@ -11,8 +11,12 @@ import {
   InputGroup,
   InputRightElement,
   InputLeftElement,
+  Circle,
+  Image,
 } from "@chakra-ui/react";
 import { FiSearch, FiUser } from "react-icons/fi";
+
+const profilePictureSrc = null;
 
 interface TopNavBarProps {
   pageName: string;
@@ -35,7 +39,6 @@ const TopNavBar: React.FC<TopNavBarProps> = ({
       boxShadow={"0px 4px 6px rgba(0, 0, 0, 0.1)"}
       flex={1} // Add this line
     >
-      <Box w={5}></Box>
       {/* Left-aligned Page Name */}
       <Heading size="lg">{pageName}</Heading>
 
@@ -51,11 +54,23 @@ const TopNavBar: React.FC<TopNavBarProps> = ({
       </InputGroup>
 
       {/* Right-aligned Profile section */}
-      <Flex background={"red"}>
+      <Flex mr={8}>
         {profileImageSrc && (
           <Avatar name={userName} src={profileImageSrc} size="sm" />
         )}
-        {!profileImageSrc && <Icon as={FiUser} />}
+        {profilePictureSrc ? (
+          <Image
+            borderRadius="full"
+            boxSize="40px"
+            src={profilePictureSrc}
+            mr={4}
+          />
+        ) : (
+          <Circle size="40px" bg="gray.200" mr={4}>
+            <Icon as={FiUser} />
+          </Circle>
+        )}
+
         <Box textAlign="right">
           <Text fontWeight="bold">{userName}</Text>
           <Text fontSize="sm" color="gray.500">
