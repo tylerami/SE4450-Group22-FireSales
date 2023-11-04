@@ -40,6 +40,7 @@ const LoginContainer = (props) => {
   };
 
   return (
+    <></>
     // <Box width={"40em"}>
     //   <Typography variant="h4" sx={{ mb: 2 }}>
     //     Login
@@ -88,7 +89,8 @@ const LoginContainer = (props) => {
     //     </Button>
     //   </Box>
     // </Box>
-  //);
+    //);
+  );
 };
 
 export default LoginContainer;
