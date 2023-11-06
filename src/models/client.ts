@@ -1,24 +1,21 @@
-
-
-
 export class Client {
-    clientId: string;
-    name: string;
-    relationshipId: string;
-    createdAt: Date;
-    isActive: boolean;
+  id: string;
+  name: string;
+  affiliateAgreementId: string;
+  createdAt: Date;
+  isActive: boolean;
 
-    constructor(
-        clientId: string,
-        name: string,
-        relationshipId: string,
-        createdAt: Date,
-        isActive: boolean
-    ) {
-        this.clientId = clientId;
-        this.name = name;
-        this.relationshipId = relationshipId;
-        this.createdAt = createdAt;
-        this.isActive = isActive;
-    }
+  constructor(
+    id: string,
+    name: string,
+    affiliateAgreementId: string,
+    createdAt: Date,
+    isActive: boolean
+  ) {
+    this.id = id;
+    this.name = name;
+    this.affiliateAgreementId = affiliateAgreementId;
+    this.createdAt = createdAt;
+    this.isActive = isActive;
+  }
 }
