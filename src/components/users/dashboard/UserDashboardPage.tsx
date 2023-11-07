@@ -24,9 +24,11 @@ const UserDashboardPage = (props: Props) => {
         gap={6}
         alignItems={"center"}
       >
-        <Box h={4}></Box>
-        <UserPerformanceWidget></UserPerformanceWidget>
+        <Box h={2}></Box>
         <ReferralLinkWidget></ReferralLinkWidget>
+        <UserPerformanceWidget></UserPerformanceWidget>
+
+        <Box h={20}></Box>
       </Flex>
     </React.Fragment>
   );

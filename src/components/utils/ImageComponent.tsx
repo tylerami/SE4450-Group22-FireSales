@@ -1,22 +1,24 @@
 import React, { useState, useEffect } from "react";
 import { getImageUrl } from "../../services/ImageService";
-import { Box, Spinner } from "@chakra-ui/react";
+import { Box, Flex, Image, Spinner } from "@chakra-ui/react";
 
 interface ImageComponentProps {
   imagePath: string;
   height?: string;
   width?: string;
+  maxWidth?: string;
+  maxHeight?: string;
+  minHeight?: string;
+  minWidth?: string;
 }
 
 const ImageComponent: React.FC<ImageComponentProps> = ({
   imagePath,
-  height,
-  width,
-}: {
-  imagePath: string;
-  height?: string;
-  width?: string;
-}) => {
+  height = "100%",
+  width = "100%",
+  maxWidth = "100%",
+  maxHeight = "100%",
+}: ImageComponentProps) => {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
@@ -37,6 +39,9 @@ const ImageComponent: React.FC<ImageComponentProps> = ({
     <Box
       height={height}
       w={width}
+      maxWidth={maxWidth}
+      maxHeight={maxHeight}
+      minHeight={maxHeight}
       margin="auto"
       display="flex"
       justifyContent={"center"}
@@ -45,7 +50,12 @@ const ImageComponent: React.FC<ImageComponentProps> = ({
       {isLoading || !imageUrl ? (
         <Spinner size="xl" />
       ) : (
-        <img src={imageUrl} alt="Not found" />
+        <Image
+          maxHeight={"100%"}
+          maxWidth={"100%"}
+          src={imageUrl}
+          alt="Not found"
+        />
       )}
     </Box>
   );

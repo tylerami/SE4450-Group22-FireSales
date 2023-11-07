@@ -42,17 +42,6 @@ const TopNavBar: React.FC<TopNavBarProps> = ({
       {/* Left-aligned Page Name */}
       <Heading size="lg">{pageName}</Heading>
 
-      <InputGroup maxWidth="30em">
-        <InputLeftElement>
-          <Icon _hover={{ color: "#434343" }} as={FiSearch} />
-        </InputLeftElement>
-        <Input
-          focusBorderColor="#ED7D31"
-          variant={"filled"}
-          placeholder="Search..."
-        ></Input>
-      </InputGroup>
-
       {/* Right-aligned Profile section */}
       <Flex mr={8}>
         {profileImageSrc && (

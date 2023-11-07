@@ -1,13 +1,5 @@
-import React, { useEffect } from "react";
-import SalesSubmissionForm from "../../components/sales/SalesSubmissionForm";
-import NavigationBar from "../../components/nav/TopNavBar";
-import {
-  Box,
-  Flex,
-  Heading,
-  Stack,
-  useBreakpointValue,
-} from "@chakra-ui/react";
+import React from "react";
+import { Box, Flex, Heading } from "@chakra-ui/react";
 import AdminSideNavBar from "../../components/nav/AdminSideNavBar";
 import TopNavBar from "../../components/nav/TopNavBar";
 import SalesTeamTableWidget from "../../components/admin/dashboard/team/SalesTeamTableWidget";

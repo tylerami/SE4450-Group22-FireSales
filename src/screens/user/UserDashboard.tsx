@@ -5,6 +5,7 @@ import UserSideNavBar from "../../components/nav/UserSideNavBar";
 import UserDashboardPage from "../../components/users/dashboard/UserDashboardPage";
 import { useGlobalState } from "../../components/utils/GlobalState";
 import RecordConversionsPage from "../../components/users/conversions/RecordConversionsPage";
+import UserSettingsPage from "../../components/users/settings/UserSettingsPage";
 
 type Props = {};
 
@@ -13,7 +14,20 @@ const UserDashboard = (props: Props) => {
 
   const { activeTabIndex } = useGlobalState();
 
-  const contentTabs = [<UserDashboardPage />, <RecordConversionsPage />];
+  const contentTabs = [
+    {
+      name: "Dashboard",
+      content: <UserDashboardPage />,
+    },
+    {
+      name: "Conversion Logging",
+      content: <RecordConversionsPage />,
+    },
+    {
+      name: "Settings",
+      content: <UserSettingsPage></UserSettingsPage>,
+    },
+  ];
 
   return (
     <Flex
@@ -37,7 +51,7 @@ const UserDashboard = (props: Props) => {
       {/* Main content area - padding left equals the width of the SideNavBar */}
       <Flex
         pl={sideNavWidth}
-        w={`100vw`} // Width minus sidebar width
+        w={`100vw`} // Width minus sidear width
         direction="column"
         h="100vh"
         overflowY="auto" // Scrollable vertically if content overflows
@@ -45,7 +59,7 @@ const UserDashboard = (props: Props) => {
         {/* Top Navigation Bar - spans the width minus the sidebar */}
         <Box w="full">
           <TopNavBar
-            pageName={activeTabIndex === 0 ? "Dashboard" : "Conversion Logging"}
+            pageName={contentTabs[activeTabIndex].name}
             userName="Ruan Badenhorst"
             userRole="Salesperson"
             profileImageSrc={null}
@@ -60,7 +74,7 @@ const UserDashboard = (props: Props) => {
           overflowX={"hidden"}
           flex="1"
         >
-          {contentTabs[activeTabIndex]}
+          {contentTabs[activeTabIndex].content}
         </Flex>
       </Flex>
     </Flex>

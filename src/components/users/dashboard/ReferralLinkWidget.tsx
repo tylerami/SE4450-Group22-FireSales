@@ -4,7 +4,7 @@
 
 // - area to upload new sales
 // - my conversion history
-import { Box, Flex, Heading } from "@chakra-ui/react";
+import { Box, Flex, Heading, Text, useBreakpointValue } from "@chakra-ui/react";
 import React, { useState } from "react";
 
 import {
@@ -19,11 +19,31 @@ import {
 import { ChevronDownIcon } from "@chakra-ui/icons";
 import ImageComponent from "../../utils/ImageComponent";
 
-const sportsbooks = ["pointsbet", "betano", "bet99"];
+const sportsbooks: string[] = ["pointsbet", "betano", "bet99"];
 
 type Props = {};
 
 const ReferralLinkWidget = (props: Props) => {
+  const sportsbooksRows: string[][] = [];
+
+  const absoluteMaxRows: number =
+    useBreakpointValue({
+      base: 2,
+      md: 3,
+      lg: 4,
+      xl: 4,
+      "2xl": 4,
+    }) ?? 3;
+
+  let maxCols =
+    sportsbooks.length <= absoluteMaxRows
+      ? sportsbooks.length
+      : Math.min(Math.ceil(sportsbooks.length / 2), absoluteMaxRows);
+  for (let i = 0; i < sportsbooks.length; i += maxCols) {
+    const row = sportsbooks.slice(i, i + maxCols);
+    sportsbooksRows.push(row);
+  }
+
   return (
     <Flex
       p={26}
@@ -37,15 +57,17 @@ const ReferralLinkWidget = (props: Props) => {
         My Referral Links:
       </Heading>
 
-      <Flex w="100%" justifyContent={"space-evenly"}>
-        {sportsbooks.map((sportsbook, i) => (
-          <SportsbookLinkButton
-            key={i}
-            sportsbookId={sportsbook}
-            link={"https://www.google.com"}
-          />
-        ))}
-      </Flex>
+      {sportsbooksRows.map((sportsbooksRow, i) => (
+        <Flex key={i} w="100%" gap={8} justifyContent={"space-evenly"}>
+          {sportsbooksRow.map((sportsbook, j) => (
+            <SportsbookLinkButton
+              key={j}
+              sportsbookId={sportsbook}
+              link={"https://www.google.com"}
+            />
+          ))}
+        </Flex>
+      ))}
     </Flex>
   );
 };
@@ -57,6 +79,11 @@ const SportsbookLinkButton = ({
   sportsbookId: string;
   link: string;
 }) => {
+  const copyLabel = useBreakpointValue({
+    base: "Copy",
+    xl: "Copy to Clipboard",
+  });
+
   const [isCopied, setIsCopied] = useState(false);
 
   const handleCopyToClipboard = () => {
@@ -66,32 +93,55 @@ const SportsbookLinkButton = ({
 
   return (
     <Flex
-      direction={"column"}
+      direction={{ base: "column", "2xl": "row" }}
       borderRadius={"12px"}
-      p={4}
-      gap={3}
-      w="20em"
+      p={6}
+      gap={6}
+      width={"full"}
       cursor={"pointer"}
       transition={"all 0.2s ease-in-out"}
       _hover={{ background: "#FFE6D7" }}
       border="1px solid #D2D2D2"
     >
       <ImageComponent
-        height="50%"
-        width="10em"
+        maxHeight="5em"
+        maxWidth="10em"
         imagePath={`/sportsbooks/logos/${sportsbookId}-logo-dark.png`}
       />
-      <Button
-        size="lg"
-        colorScheme="orange"
-        onClick={() => window.open(link, "_blank")}
+      <Flex
+        direction={"column"}
+        alignItems="center"
+        gap={2}
+        width="100%"
+        maxWidth={{ base: "100%", "2xl": "60%" }}
+        justifyContent={"space-evenly"}
       >
-        Sign Up Now
-      </Button>
-
-      <Button onClick={handleCopyToClipboard}>
-        {isCopied ? "Copied!" : "Copy to clipboard"}
-      </Button>
+        {" "}
+        {/* bet and commission requirements/info */}
+        <Flex>
+          <Text>Min. Bet: </Text>
+          <Text mx={1} fontWeight={700}>
+            $80
+          </Text>
+        </Flex>
+        <Flex>
+          <Text>Commission: </Text>
+          <Text mx={1} fontWeight={700}>
+            $50
+          </Text>
+        </Flex>
+        {/* buttons */}
+        <Button
+          width={"full"}
+          colorScheme="orange"
+          onClick={() => window.open(link, "_blank")}
+        >
+          Sign Up Now
+        </Button>
+        <Button width={"full"} onClick={handleCopyToClipboard}>
+          {isCopied ? "Copied!" : copyLabel}
+        </Button>
+      </Flex>
     </Flex>
   );
 };
