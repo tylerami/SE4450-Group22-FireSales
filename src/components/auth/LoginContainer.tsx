@@ -29,6 +29,7 @@ const LoginContainer = ({ goToRegister = () => {} }) => {
     setDisabled(true);
     signInWithPopup(auth, Providers.google)
       .then(() => {
+        console.log("logged in");
         setDisabled(false);
         console.info("TODO: navigate to authenticated screen");
         navigate("/");

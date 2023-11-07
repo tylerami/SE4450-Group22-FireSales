@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
-import SalesSubmissionForm from "../components/sales/SalesSubmissionForm";
-import NavigationBar from "../components/nav/TopNavBar";
+import SalesSubmissionForm from "../../components/sales/SalesSubmissionForm";
+import NavigationBar from "../../components/nav/TopNavBar";
 import {
   Box,
   Flex,
@@ -8,11 +8,11 @@ import {
   Stack,
   useBreakpointValue,
 } from "@chakra-ui/react";
-import SideNavBar from "../components/nav/SideNavBar";
-import TopNavBar from "../components/nav/TopNavBar";
-import SalesTeamTableWidget from "../components/admin/dashboard/team/SalesTeamTableWidget";
-import PerformanceChartWidget from "../components/admin/dashboard/performance/PerformanceChartWidget";
-import ClientsSummaryTableWidget from "../components/admin/dashboard/clients/ClientsSummaryTableWidget";
+import AdminSideNavBar from "../../components/nav/AdminSideNavBar";
+import TopNavBar from "../../components/nav/TopNavBar";
+import SalesTeamTableWidget from "../../components/admin/dashboard/team/SalesTeamTableWidget";
+import PerformanceChartWidget from "../../components/admin/dashboard/performance/PerformanceChartWidget";
+import ClientsSummaryTableWidget from "../../components/admin/dashboard/clients/ClientsSummaryTableWidget";
 
 const AdminHome = (props) => {
   // Assuming the SideNavBar has a fixed width for simplicity
@@ -34,7 +34,7 @@ const AdminHome = (props) => {
         w={sideNavWidth}
         overflowY="auto" // Scrollable vertically if content overflows
       >
-        <SideNavBar />
+        <AdminSideNavBar />
       </Box>
 
       {/* Main content area - padding left equals the width of the SideNavBar */}
@@ -50,7 +50,7 @@ const AdminHome = (props) => {
           <TopNavBar
             pageName="Dashboard"
             userName="Tyler Amirault"
-            userRole="The Creator"
+            userRole="Admin"
             profileImageSrc={null}
           />
         </Box>

@@ -17,6 +17,7 @@ import {
   Input,
   Heading,
 } from "@chakra-ui/react";
+import { GlobalStateProvider } from "./components/utils/GlobalState";
 
 function App() {
   const [loading, setLoading] = useState(true);
@@ -38,25 +39,27 @@ function App() {
   return (
     <Box h={"100vh"} background="red">
       <BrowserRouter basename={process.env.PUBLIC_URL}>
-        <ChakraProvider>
-          <Routes>
-            {routes.map((route, index) => (
-              <Route
-                key={index}
-                path={route.path}
-                element={
-                  route.protected ? (
-                    <AuthChecker>
+        <GlobalStateProvider>
+          <ChakraProvider>
+            <Routes>
+              {routes.map((route, index) => (
+                <Route
+                  key={index}
+                  path={route.path}
+                  element={
+                    route.protected ? (
+                      <AuthChecker>
+                        <route.component />
+                      </AuthChecker>
+                    ) : (
                       <route.component />
-                    </AuthChecker>
-                  ) : (
-                    <route.component />
-                  )
-                }
-              />
-            ))}
-          </Routes>
-        </ChakraProvider>
+                    )
+                  }
+                />
+              ))}
+            </Routes>
+          </ChakraProvider>
+        </GlobalStateProvider>
       </BrowserRouter>
     </Box>
 

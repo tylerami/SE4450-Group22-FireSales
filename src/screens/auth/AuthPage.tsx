@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import Center from "../components/utils/Center";
-import LoginContainer from "../components/auth/LoginContainer";
-import RegistrationContainer from "../components/auth/RegistrationContainer";
+import Center from "../../components/utils/Center";
+import LoginContainer from "../../components/auth/LoginContainer";
+import RegistrationContainer from "../../components/auth/RegistrationContainer";
 import { Box, Flex } from "@chakra-ui/react";
-import Logo from "../components/utils/Logo";
+import Logo from "../../components/utils/Logo";
 
 const AuthPage = (props) => {
   // getting and setting URL params

@@ -29,7 +29,7 @@ const SalesTeamTableWidget = (props: Props) => {
     >
       <Flex justifyContent={"space-between"}>
         <Heading as="h1" fontSize={"1.2em"} fontWeight={700}>
-          Monthly Performance Snapshot
+          Sales Team Performance Snapshot
         </Heading>
 
         <Menu>

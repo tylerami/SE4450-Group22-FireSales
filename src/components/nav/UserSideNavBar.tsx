@@ -9,47 +9,37 @@ import { AiOutlineDashboard } from "react-icons/ai";
 import { BiAnalyse } from "react-icons/bi";
 import { IoMdPeople } from "react-icons/io";
 import { FaRegHandshake } from "react-icons/fa";
-import { MdSettings } from "react-icons/md";
+import { MdSettings, MdTrendingUp } from "react-icons/md";
 import { RiLogoutBoxRLine } from "react-icons/ri";
 import { signOut } from "firebase/auth";
 import { auth } from "../../config/firebase";
 import { useNavigate } from "react-router-dom";
 import Logo from "../utils/Logo";
 import { set } from "lodash";
+import { useGlobalState } from "../utils/GlobalState";
 
 type Props = object;
 
-const SideNavBar = (props: Props) => {
+const UserSideNavBar = (props: Props) => {
   const navigate = useNavigate();
 
-  const [tabIndex, setTabIndex] = useState(0);
+  const { activeTabIndex, setActiveTabIndex } = useGlobalState();
 
   const tabs = [
     {
       name: "Dashboard",
-
       icon: AiOutlineDashboard,
-      onClick: () => setTabIndex(0),
+      onClick: () => setActiveTabIndex(0),
     },
     {
-      name: "Analytics",
-      icon: BiAnalyse,
-      onClick: () => setTabIndex(1),
-    },
-    {
-      name: "Clients",
-      icon: FaRegHandshake,
-      onClick: () => setTabIndex(2),
-    },
-    {
-      name: "Sales Team",
-      icon: IoMdPeople,
-      onClick: () => setTabIndex(3),
+      name: "Conversions",
+      icon: MdTrendingUp,
+      onClick: () => setActiveTabIndex(1),
     },
     {
       name: "Settings",
       icon: MdSettings,
-      onClick: () => setTabIndex(4),
+      onClick: () => setActiveTabIndex(2),
     },
     {
       name: "Sign Out",
@@ -80,7 +70,7 @@ const SideNavBar = (props: Props) => {
       <Flex
         width={"100%"}
         h="100%"
-        maxHeight={"30em"}
+        maxHeight={"20em"}
         alignItems={"center"}
         flexDirection={"column"}
         justifyContent={"space-evenly"}
@@ -89,7 +79,7 @@ const SideNavBar = (props: Props) => {
           <React.Fragment key={index}>
             <Box h={6} />
             <SideNavBarButton
-              active={index === tabIndex}
+              active={index === activeTabIndex}
               buttonText={tab.name}
               Icon={tab.icon}
               onClick={tab.onClick}
@@ -104,4 +94,4 @@ const SideNavBar = (props: Props) => {
   );
 };
 
-export default SideNavBar;
+export default UserSideNavBar;
