@@ -28,12 +28,12 @@ import {
   IconButton,
 } from "@chakra-ui/react";
 import { ChevronDownIcon } from "@chakra-ui/icons";
-import ImageComponent from "../../utils/ImageComponent";
-import UserPerformanceChart from "./UserPerformanceChart";
+import UserPerformanceSummaryChart from "./UserPerformanceSummaryChart";
+import ImageComponent from "../../../utils/ImageComponent";
 
 type Props = {};
 
-const UserPerformanceWidget = (props: Props) => {
+const UserPerformanceSummaryWIdget = (props: Props) => {
   const balanceOwed = 10000;
 
   const performanceMetrics = [
@@ -131,7 +131,7 @@ const UserPerformanceWidget = (props: Props) => {
         alignSelf="center"
         height="full"
       >
-        <UserPerformanceChart></UserPerformanceChart>
+        <UserPerformanceSummaryChart />
       </Flex>
 
       <Box h={6}></Box>
@@ -225,4 +225,4 @@ function formatMoney(amount: number): string {
   return formatter.format(amount);
 }
 
-export default UserPerformanceWidget;
+export default UserPerformanceSummaryWIdget;

@@ -23,7 +23,7 @@ const SalesTeamTableWidget = (props: Props) => {
       minHeight={"100%"}
       borderRadius={"20px"}
       minWidth={"35em"}
-      width={"95%"}
+      width={"100%"}
       flexDirection={"column"}
       boxShadow={"3px 4px 12px rgba(0, 0, 0, 0.2)"}
     >

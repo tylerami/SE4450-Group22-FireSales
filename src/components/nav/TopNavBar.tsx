@@ -40,32 +40,30 @@ const TopNavBar: React.FC<TopNavBarProps> = ({
       flex={1} // Add this line
     >
       {/* Left-aligned Page Name */}
-      <Heading size="lg">{pageName}</Heading>
+      <Box w="20em">
+        <Heading mx={2} size="lg">
+          {pageName}
+        </Heading>
+      </Box>
 
       {/* Right-aligned Profile section */}
-      <Flex mr={8}>
-        {profileImageSrc && (
-          <Avatar name={userName} src={profileImageSrc} size="sm" />
-        )}
-        {profilePictureSrc ? (
-          <Image
-            borderRadius="full"
-            boxSize="40px"
-            src={profilePictureSrc}
-            mr={4}
-          />
-        ) : (
-          <Circle size="40px" bg="gray.200" mr={4}>
-            <Icon as={FiUser} />
-          </Circle>
-        )}
-
-        <Box textAlign="right">
+      <Flex mx={8}>
+        <Box mx={4} textAlign="right">
           <Text fontWeight="bold">{userName}</Text>
           <Text fontSize="sm" color="gray.500">
             {userRole}
           </Text>
         </Box>
+        {profileImageSrc && (
+          <Avatar name={userName} src={profileImageSrc} size="sm" />
+        )}
+        {profilePictureSrc ? (
+          <Image borderRadius="full" boxSize="40px" src={profilePictureSrc} />
+        ) : (
+          <Circle size="40px" bg="gray.200" mr={4}>
+            <Icon as={FiUser} />
+          </Circle>
+        )}
       </Flex>
     </Flex>
   );

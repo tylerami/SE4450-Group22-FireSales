@@ -58,15 +58,9 @@ const CleintsSummaryTable: React.FC<CleintsSummaryTableProps> = ({
       <Thead>
         <Tr>
           <Th textAlign="center">Client</Th>
-          <Th textAlign="center" isNumeric>
-            Revenue
-          </Th>
-          <Th textAlign="center" isNumeric>
-            Sales{" "}
-          </Th>
-          <Th textAlign="center" isNumeric>
-            Accounts Receivable
-          </Th>
+          <Th textAlign="center">Revenue</Th>
+          <Th textAlign="center">Sales </Th>
+          <Th textAlign="center">Accounts Receivable</Th>
         </Tr>
       </Thead>
       <Tbody>
@@ -84,15 +78,10 @@ const CleintsSummaryTable: React.FC<CleintsSummaryTableProps> = ({
                 </Box>
               </Flex>
             </Td>
-            <Td textAlign="center" isNumeric>
-              ${row.revenue.toLocaleString()}
-            </Td>
-            <Td textAlign="center" isNumeric>
-              {row.salesGenerated}
-            </Td>
+            <Td textAlign="center">${row.revenue.toLocaleString()}</Td>
+            <Td textAlign="center">{row.salesGenerated}</Td>
             <Td
               textAlign="center"
-              isNumeric
               color={row.accountsReceivable === "$-" ? "red.500" : "green.500"}
             >
               {row.accountsReceivable}

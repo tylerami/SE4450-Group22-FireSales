@@ -1,11 +1,11 @@
 import React from "react";
 import { Box, Flex } from "@chakra-ui/react";
-import TopNavBar from "../../components/nav/TopNavBar";
-import UserSideNavBar from "../../components/nav/UserSideNavBar";
-import UserDashboardPage from "../../components/users/dashboard/UserDashboardPage";
-import { useGlobalState } from "../../components/utils/GlobalState";
-import RecordConversionsPage from "../../components/users/conversions/RecordConversionsPage";
-import UserSettingsPage from "../../components/users/settings/UserSettingsPage";
+import TopNavBar from "../nav/TopNavBar";
+import UserSideNavBar from "../nav/UserSideNavBar";
+import UserDashboardPage from "./dashboard/UserDashboardPage";
+import { useGlobalState } from "../utils/GlobalState";
+import RecordConversionsPage from "./conversions/RecordConversionsPage";
+import UserSettingsPage from "./settings/UserSettingsPage";
 
 type Props = {};
 
@@ -25,7 +25,7 @@ const UserDashboard = (props: Props) => {
     },
     {
       name: "Settings",
-      content: <UserSettingsPage></UserSettingsPage>,
+      content: <UserSettingsPage />,
     },
   ];
 

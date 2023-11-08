@@ -16,40 +16,31 @@ import { auth } from "../../config/firebase";
 import { useNavigate } from "react-router-dom";
 import Logo from "../utils/Logo";
 import { set } from "lodash";
+import { useGlobalState } from "../utils/GlobalState";
 
 type Props = object;
 
 const AdminSideNavBar = (props: Props) => {
   const navigate = useNavigate();
 
-  const [tabIndex, setTabIndex] = useState(0);
+  const { activeTabIndex, setActiveTabIndex } = useGlobalState();
 
   const tabs = [
     {
       name: "Dashboard",
 
       icon: AiOutlineDashboard,
-      onClick: () => setTabIndex(0),
-    },
-    {
-      name: "Analytics",
-      icon: BiAnalyse,
-      onClick: () => setTabIndex(1),
+      onClick: () => setActiveTabIndex(0),
     },
     {
       name: "Clients",
       icon: FaRegHandshake,
-      onClick: () => setTabIndex(2),
+      onClick: () => setActiveTabIndex(1),
     },
     {
       name: "Sales Team",
       icon: IoMdPeople,
-      onClick: () => setTabIndex(3),
-    },
-    {
-      name: "Settings",
-      icon: MdSettings,
-      onClick: () => setTabIndex(4),
+      onClick: () => setActiveTabIndex(2),
     },
     {
       name: "Sign Out",
@@ -80,7 +71,7 @@ const AdminSideNavBar = (props: Props) => {
       <Flex
         width={"100%"}
         h="100%"
-        maxHeight={"30em"}
+        maxHeight={"20em"}
         alignItems={"center"}
         flexDirection={"column"}
         justifyContent={"space-evenly"}
@@ -89,7 +80,7 @@ const AdminSideNavBar = (props: Props) => {
           <React.Fragment key={index}>
             <Box h={6} />
             <SideNavBarButton
-              active={index === tabIndex}
+              active={index === activeTabIndex}
               buttonText={tab.name}
               Icon={tab.icon}
               onClick={tab.onClick}

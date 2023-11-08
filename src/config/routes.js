@@ -1,12 +1,12 @@
-import AdminHome from "../screens/admin/AdminHome";
-import AuthPage from "../screens/auth/AuthPage";
+import AdminDashboard from "../components/admin/AdminDashboard";
+import AuthPage from "../components/auth/AuthPage";
 import RecordConversionsPage from "../components/users/conversions/RecordConversionsPage";
-import UserDashboard from "../screens/user/UserDashboard";
+import UserDashboard from "../components/users/UserDashboard";
 
 const routes = [
   {
     path: "",
-    component: UserDashboard,
+    component: AdminDashboard,
     name: "Home Page",
     protected: true,
   },

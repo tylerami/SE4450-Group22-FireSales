@@ -1,5 +1,5 @@
 export class Sale {
-  saleId: string;
+  id: string;
   date: Date;
   userId: string;
   clientId: string;
@@ -10,7 +10,7 @@ export class Sale {
   attachments?: Array<File>;
 
   constructor(
-    saleId: string,
+    id: string,
     date: Date,
     userId: string,
     clientId: string,
@@ -20,7 +20,7 @@ export class Sale {
     amount: number,
     attachments?: Array<File>
   ) {
-    this.saleId = saleId;
+    this.id = id;
     this.userId = userId;
     this.date = date;
     this.clientId = clientId;
@@ -64,7 +64,7 @@ export class Sale {
   }
 }
 
-function createSaleId({
+export function createSaleId({
   dateString,
   clientId,
   userId,
@@ -75,7 +75,7 @@ function createSaleId({
   userId: string;
   customerId: string;
 }): string {
-  return `${dateString}-${userId}-${clientId}-${customerId}`;
+  return `${dateString}_${userId}_${clientId}_${customerId}`;
 }
 
 function dateFromDD_MM_YYYY(dateString: string): Date {
