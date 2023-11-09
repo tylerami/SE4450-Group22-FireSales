@@ -33,6 +33,7 @@ const RegistrationContainer = ({ goToLogin = () => {} }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
+  // implement auth service here
   const signInWithGoogle = () => {
     setDisabled(true);
     signInWithPopup(auth, Providers.google)

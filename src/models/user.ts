@@ -1,3 +1,4 @@
+import { generateUserID } from "@utils/Identification";
 import { CompensationGroup } from "./CompensationGroup";
 import { PaymentType } from "./enums/PaymentType";
 import { Role } from "./enums/Role";
@@ -39,6 +40,27 @@ export class User {
     this.compensationGroupId = compensationGroupId;
     this.paymentDetails = paymentDetails;
     this.registeredAt = registeredAt;
+  }
+
+  public static create({
+    uid,
+    firstName,
+    lastName,
+    email,
+  }: {
+    uid: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+  }): User {
+    return new User({
+      uid,
+      firstName,
+      lastName,
+      email,
+      roles: [Role.salesperson],
+      registeredAt: new Date(),
+    });
   }
 
   public isAdmin = () => this.roles.includes(Role.admin);

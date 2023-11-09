@@ -7,14 +7,15 @@ const routes = [
   {
     path: "",
     component: UserDashboard,
-    name: "Home Page",
+    name: "User Dashboard",
     protected: true,
   },
   {
     path: "/admin",
     component: AdminDashboard,
-    name: "Home Page",
+    name: "Admin Dashboard",
     protected: true,
+    adminOnly: true,
   },
   {
     path: "/conversions",
