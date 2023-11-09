@@ -9,10 +9,11 @@ export class Conversion {
   dateOccured: Date;
   loggedAt: Date;
   userId: string;
+  compensationGroupId: string;
   affliateLink: AffiliateLink;
   customer: Customer;
   amount: number; // Bet size
-  attachments?: Array<File>;
+  attachmentUrls?: Array<string>;
   currency: Currency;
   messages: Array<Message>;
 
@@ -21,10 +22,11 @@ export class Conversion {
     dateOccured,
     loggedAt,
     userId,
+    compensationGroupId,
     affliateLink,
     customer,
     amount,
-    attachments,
+    attachmentUrls,
     currency,
     messages = [],
   }: {
@@ -32,10 +34,11 @@ export class Conversion {
     dateOccured: Date;
     loggedAt: Date;
     userId: string;
+    compensationGroupId: string;
     affliateLink: AffiliateLink;
     customer: Customer;
     amount: number;
-    attachments?: Array<File>;
+    attachmentUrls?: Array<string>;
     currency: Currency;
     messages?: Array<Message>;
   }) {
@@ -43,10 +46,11 @@ export class Conversion {
     this.dateOccured = dateOccured;
     this.loggedAt = loggedAt;
     this.userId = userId;
+    this.compensationGroupId = compensationGroupId;
     this.affliateLink = affliateLink;
     this.customer = customer;
     this.amount = amount;
-    this.attachments = attachments;
+    this.attachmentUrls = attachmentUrls;
     this.currency = currency;
     this.messages = messages;
   }
@@ -54,19 +58,21 @@ export class Conversion {
   static fromManualInput({
     dateString, // maybe modify this to accept a Date object instead
     userId,
+    compensationGroupId,
     affliateLink,
     customer,
     amount,
-    attachments,
+    attachmentUrls,
     currency = Currency.CAD,
   }: {
     dateString: string;
     userId: string;
+    compensationGroupId: string;
     affliateLink: AffiliateLink;
-    currency: Currency;
+    currency?: Currency;
     customer: Customer;
     amount: number;
-    attachments?: Array<File>;
+    attachmentUrls?: Array<string>;
   }) {
     const id = createSaleId({
       dateString,
@@ -81,10 +87,11 @@ export class Conversion {
       dateOccured,
       loggedAt,
       userId,
+      compensationGroupId,
       affliateLink,
       customer,
       amount,
-      attachments,
+      attachmentUrls,
       currency,
     });
   }

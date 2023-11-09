@@ -10,6 +10,7 @@ export const conversionSample = new Conversion({
   dateOccured: new Date(),
   loggedAt: new Date(),
   userId: "user123",
+  compensationGroupId: "comp123",
   affliateLink: affiliateLinkSample,
   customer: customerSample,
   amount: 100,

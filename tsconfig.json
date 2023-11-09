@@ -4,6 +4,8 @@
     "module": "esnext",
     "strict": true,
     "esModuleInterop": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "skipLibCheck": true,
     "noImplicitAny": false,
     "jsx": "preserve",

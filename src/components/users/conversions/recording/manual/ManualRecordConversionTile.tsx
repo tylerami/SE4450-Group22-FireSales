@@ -20,6 +20,8 @@ import { AttachmentIcon, ChevronDownIcon, DeleteIcon } from "@chakra-ui/icons";
 import { Conversion } from "../../../../../models/Conversion";
 import { customerIdFromName } from "../../../../../models/Customer";
 import { FaDollarSign } from "react-icons/fa";
+import affiliateLinkSample from "__mocks__/models/AffiliateLink.mock";
+import { customerSample } from "__mocks__/models/Customer.mock";
 
 // List of sportsbooks can be moved outside the component if it doesn't change, to prevent re-creation on each render.
 const sportsbooks = ["pointsbet", "betano", "bet99"];
@@ -65,16 +67,14 @@ const RecordConversionTile = ({
   const handleSave = () => {
     // TODO: get userId from auth context
     const userId = "1234";
-    const commission = 0;
 
     const sale: Conversion = Conversion.fromManualInput({
       dateString,
-      clientId: sportsbookId,
-      customerId: customerIdFromName(customerName),
+      affliateLink: affiliateLinkSample,
+      customer: customerSample,
       amount: Number(saleAmount),
-      attachments,
+      compensationGroupId: "1234",
       userId,
-      commission,
     });
     setConversion(sale);
   };

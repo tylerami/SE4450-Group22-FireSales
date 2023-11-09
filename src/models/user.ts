@@ -9,7 +9,7 @@ export class User {
   email: string;
   roles: Role[];
   registeredAt: Date;
-  compensation?: CompensationGroup;
+  compensationGroupId?: string;
   paymentDetails?: Map<PaymentType, string>;
 
   constructor({
@@ -19,7 +19,7 @@ export class User {
     email,
     roles = [Role.salesperson],
     registeredAt,
-    compensation,
+    compensationGroupId,
     paymentDetails,
   }: {
     uid: string;
@@ -28,7 +28,7 @@ export class User {
     email: string;
     roles: Role[];
     registeredAt: Date;
-    compensation?: CompensationGroup;
+    compensationGroupId?: string;
     paymentDetails?: Map<PaymentType, string>;
   }) {
     this.uid = uid;
@@ -36,7 +36,7 @@ export class User {
     this.lastName = lastName;
     this.email = email;
     this.roles = roles;
-    this.compensation = compensation;
+    this.compensationGroupId = compensationGroupId;
     this.paymentDetails = paymentDetails;
     this.registeredAt = registeredAt;
   }
