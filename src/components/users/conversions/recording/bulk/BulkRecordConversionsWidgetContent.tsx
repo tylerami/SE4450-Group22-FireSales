@@ -1,8 +1,15 @@
 import React, { useState, useCallback } from "react";
-import { Button, Heading, Input, InputGroup } from "@chakra-ui/react";
-import RecordConversionTile from "./RecordConversionTile";
+import {
+  Button,
+  Heading,
+  Input,
+  InputGroup,
+  Spacer,
+  Switch,
+} from "@chakra-ui/react";
+import RecordConversionTile from "../manual/ManualRecordConversionTile";
 import { AddIcon } from "@chakra-ui/icons";
-import { Sale } from "../../../models/sale";
+import { Conversion } from "../../../../../models/Conversion";
 import {
   Table,
   Thead,
@@ -20,7 +27,7 @@ import {
 
 type Props = {};
 
-const BulkRecordConversionsWidget = (props: Props) => {
+const BulkRecordConversionsWidgetContent = (props: Props) => {
   const [errorText, setErrorText] = useState(null);
   const [attachments, setAttachments] = useState<File[]>([]);
 
@@ -75,18 +82,7 @@ const BulkRecordConversionsWidget = (props: Props) => {
   const textSize = "0.8em";
 
   return (
-    <Flex
-      p={26}
-      borderRadius="20px"
-      width="95%"
-      gap={2}
-      flexDirection="column"
-      boxShadow="3px 4px 12px rgba(0, 0, 0, 0.2)"
-    >
-      <Heading as="h1" fontSize="1.2em" fontWeight={700}>
-        Bulk Record Conversions
-      </Heading>
-
+    <React.Fragment>
       <Text fontSize={textSize}>
         1. Upload a CSV file with the following format:
       </Text>
@@ -161,8 +157,8 @@ const BulkRecordConversionsWidget = (props: Props) => {
         Record Bulk Conversions
       </Button>
       {errorText && <Text color={"red"}>{errorText}</Text>}
-    </Flex>
+    </React.Fragment>
   );
 };
 
-export default BulkRecordConversionsWidget;
+export default BulkRecordConversionsWidgetContent;

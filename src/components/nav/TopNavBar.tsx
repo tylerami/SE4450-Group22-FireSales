@@ -13,8 +13,10 @@ import {
   InputLeftElement,
   Circle,
   Image,
+  Button,
 } from "@chakra-ui/react";
 import { FiSearch, FiUser } from "react-icons/fi";
+import { useNavigate } from "react-router-dom";
 
 const profilePictureSrc = null;
 
@@ -31,6 +33,8 @@ const TopNavBar: React.FC<TopNavBarProps> = ({
   userRole,
   profileImageSrc,
 }) => {
+  const navigate = useNavigate();
+
   return (
     <Flex
       p={6}
@@ -45,6 +49,9 @@ const TopNavBar: React.FC<TopNavBarProps> = ({
           {pageName}
         </Heading>
       </Box>
+
+      <Button onClick={() => navigate("/admin")}>Admin Dashboard</Button>
+      <Button onClick={() => navigate("/")}>User Dashboard</Button>
 
       {/* Right-aligned Profile section */}
       <Flex mx={8}>

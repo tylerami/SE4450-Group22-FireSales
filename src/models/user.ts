@@ -1,36 +1,45 @@
-import { CompensationPackage } from "./compensationPackage";
+import { CompensationGroup } from "./CompensationGroup";
+import { PaymentType } from "./enums/PaymentType";
+import { Role } from "./enums/Role";
 
 export class User {
+  uid: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  roles: Role[];
+  registeredAt: Date;
+  compensation?: CompensationGroup;
+  paymentDetails?: Map<PaymentType, string>;
+
+  constructor({
+    uid,
+    firstName,
+    lastName,
+    email,
+    roles = [Role.salesperson],
+    registeredAt,
+    compensation,
+    paymentDetails,
+  }: {
     uid: string;
     firstName: string;
     lastName: string;
     email: string;
-    role: string;
+    roles: Role[];
     registeredAt: Date;
-    compensation?: CompensationPackage;
-    paymentDetails?: Map<string, any>;
-    address?: Map<string, any>;
+    compensation?: CompensationGroup;
+    paymentDetails?: Map<PaymentType, string>;
+  }) {
+    this.uid = uid;
+    this.firstName = firstName;
+    this.lastName = lastName;
+    this.email = email;
+    this.roles = roles;
+    this.compensation = compensation;
+    this.paymentDetails = paymentDetails;
+    this.registeredAt = registeredAt;
+  }
 
-    constructor(
-        uid: string,
-        firstName: string,
-        lastName: string,
-        email: string,
-        role: string,
-        registeredAt: Date,
-        compensation?: CompensationPackage,
-        paymentDetails?: Map<string, any>,
-        address?: Map<string, any>,
-       
-    ) {
-        this.uid = uid;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
-        this.role = role;
-        this.compensation = compensation;
-        this.paymentDetails = paymentDetails;
-        this.address = address;
-        this.registeredAt = registeredAt;
-    }
+  public isAdmin = () => this.roles.includes(Role.admin);
 }

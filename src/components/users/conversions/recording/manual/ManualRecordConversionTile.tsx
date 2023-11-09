@@ -17,8 +17,8 @@ import {
   Box,
 } from "@chakra-ui/react";
 import { AttachmentIcon, ChevronDownIcon, DeleteIcon } from "@chakra-ui/icons";
-import { Sale } from "../../../models/sale";
-import { customerIdFromName } from "../../../models/customer";
+import { Conversion } from "../../../../../models/Conversion";
+import { customerIdFromName } from "../../../../../models/Customer";
 import { FaDollarSign } from "react-icons/fa";
 
 // List of sportsbooks can be moved outside the component if it doesn't change, to prevent re-creation on each render.
@@ -27,7 +27,7 @@ const sportsbooks = ["pointsbet", "betano", "bet99"];
 type Props = {
   // add a prop for deleting a row
   deleteRow: () => void;
-  setConversion: (conversion: Sale) => void;
+  setConversion: (conversion: Conversion) => void;
   rowIndex?: number;
 };
 
@@ -67,7 +67,7 @@ const RecordConversionTile = ({
     const userId = "1234";
     const commission = 0;
 
-    const sale: Sale = Sale.fromManualInput({
+    const sale: Conversion = Conversion.fromManualInput({
       dateString,
       clientId: sportsbookId,
       customerId: customerIdFromName(customerName),
@@ -139,7 +139,7 @@ const RecordConversionTile = ({
           <Input
             pl={8}
             type="number"
-            placeholder="Sale Amount"
+            placeholder="Conversion Amount"
             value={saleAmount}
             onChange={(e) => {
               setSaleAmount(e.target.value);

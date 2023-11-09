@@ -14,13 +14,9 @@ import {
   Text,
 } from "@chakra-ui/react";
 import React, { useState } from "react";
+import { PaymentType } from "../../../models/enums/PaymentType";
 
 type Props = {};
-
-enum PaymentType {
-  etransfer = "etransfer",
-  paypal = "paypal",
-}
 
 const PaymentSettingsWidget = (props: Props) => {
   const [payoutDay, setPayoutDay] = useState(null);

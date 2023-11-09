@@ -1,5 +1,4 @@
 import {
-  Box,
   Button,
   Flex,
   Heading,
@@ -7,106 +6,52 @@ import {
   Table,
   Tbody,
   Td,
-  Text,
   Th,
   Thead,
   Tr,
 } from "@chakra-ui/react";
 import React, { useState } from "react";
-import { Sale, createSaleId } from "../../../../models/sale";
-import { customerIdFromName } from "../../../../models/customer";
-import ConversionRow from "./ConversionRow";
+import { Conversion } from "../../../../models/Conversion";
 import ImageComponent from "../../../utils/ImageComponent";
 import { CloseIcon } from "@chakra-ui/icons";
+import ConversionMessageWidget from "./conversion_management/ConversionMessagesWidget";
+import { formatDateString } from "../../../../utils/Date";
+import { sampleConversions } from "__mocks__/models/Conversion.mock";
 
 type Props = {};
-
-const sportsbooks = [
-  {
-    clientId: "pointsbet",
-    commission: 500,
-    minBet: 100,
-  },
-  {
-    clientId: "betano",
-    commission: 500,
-    minBet: 100,
-  },
-  {
-    clientId: "proline",
-    commission: 500,
-    minBet: 100,
-  },
-  {
-    clientId: "bet99",
-    commission: 500,
-    minBet: 100,
-  },
-];
-
-const conversions: Sale[] = [
-  {
-    id: "2023-11-07_user1_pointsbet_tyler_amirault",
-    userId: "user1",
-    clientId: "pointsbet",
-    amount: 100,
-    date: new Date(),
-    currencyIso: "USD",
-    customerId: customerIdFromName("Tyler Amirault"),
-    commission: 50,
-  },
-  {
-    id: "2",
-    userId: "1",
-    clientId: "pointsbet",
-    amount: 100,
-    date: new Date(),
-    currencyIso: "USD",
-    customerId: customerIdFromName("Tyler Amirault"),
-    commission: 50,
-  },
-  {
-    id: "3s",
-    userId: "1",
-    clientId: "pointsbet",
-    amount: 100,
-    date: new Date(),
-    currencyIso: "USD",
-    customerId: customerIdFromName("Tyler Amirault"),
-    commission: 50,
-  },
-];
 
 const properties = [
   {
     label: "Conversion ID",
-    function: (Sale) => Sale.id,
+    function: (Conversion) => Conversion.id,
   },
   {
     label: "Date",
-    function: (Sale) => formatDateString(Sale.date),
+    function: (Conversion) => formatDateString(Conversion.date),
   },
   {
     label: "Sportsbook",
-    function: (Sale) => Sale.clientId,
+    function: (Conversion) => Conversion.clientId,
   },
   {
     label: "Bet size",
-    function: (Sale) => Sale.amount,
+    function: (Conversion) => Conversion.amount,
   },
   {
     label: "Customer Name",
-    function: (Sale) => Sale.customerId,
+    function: (Conversion) => Conversion.customerId,
   },
   {
     label: "Commission",
-    function: (Sale) => Sale.commission,
+    function: (Conversion) => Conversion.commission,
   },
 ];
+
 const UserManagementWidget = (props: Props) => {
-  const [selectedConversion, setSelectedConversion] = useState<Sale | null>(
-    null
-  );
+  const conversions = sampleConversions;
+
+  const [selectedConversion, setSelectedConversion] =
+    useState<Conversion | null>(null);
 
   return (
     <Flex
@@ -121,13 +66,13 @@ const UserManagementWidget = (props: Props) => {
       <Flex justifyContent={"space-between"}>
         <Heading as="h1" fontSize={"1.2em"} fontWeight={700}>
           {selectedConversion
-            ? `${formatDateString(selectedConversion.date)} / ${
-                selectedConversion.clientId
-              } / ${selectedConversion.customerId} / $${
-                selectedConversion.amount
-              } bet / $${selectedConversion.commission} commission `
+            ? selectedConversion.description()
             : "User Management"}
         </Heading>
+
+        <Button cursor={"default"} _hover={{}} disabled>
+          Not Verified
+        </Button>
 
         {selectedConversion && (
           <IconButton
@@ -158,6 +103,19 @@ const UserManagementWidget = (props: Props) => {
         </Flex>
       )}
 
+      {selectedConversion && (
+        <Flex gap={8}>
+          <Button size="lg" colorScheme="green" w="full">
+            Approve
+          </Button>
+          <Button size="lg" colorScheme="red" w="full">
+            Deny
+          </Button>
+        </Flex>
+      )}
+
+      {selectedConversion && <ConversionMessageWidget />}
+
       {!selectedConversion && (
         <Table size="sm">
           <Thead>
@@ -168,34 +126,21 @@ const UserManagementWidget = (props: Props) => {
             </Tr>
           </Thead>
           <Tbody>
-            {conversions.map((sale, i) => {
-              return (
-                <React.Fragment>
-                  <Tr>
-                    {properties.map((property, i) => {
-                      return (
-                        <Td textAlign={"center"}>{property.function(sale)}</Td>
-                      );
-                    })}
-                  </Tr>
-                  <Tr width={"100%"}>
-                    {" "}
-                    <Td colSpan={properties.length / 2}>
-                      <Button
-                        width={"full"}
-                        onClick={() => setSelectedConversion(sale)}
-                      >
-                        View Attachments
-                      </Button>
-                    </Td>
-                    <Td colSpan={properties.length / 2}>
-                      <Button width={"full"}>Expand Conversation</Button>
-                    </Td>
-                  </Tr>
-                  <Box h={4}></Box>
-                </React.Fragment>
-              );
-            })}
+            {conversions.map((sale, i) => (
+              <Tr
+                cursor={"pointer"}
+                onClick={() => {
+                  setSelectedConversion(sale);
+                }}
+                _hover={{ background: "rgba(237, 125, 49, 0.26)" }}
+              >
+                {properties.map((property, i) => {
+                  return (
+                    <Td textAlign={"center"}>{property.function(sale)}</Td>
+                  );
+                })}
+              </Tr>
+            ))}
           </Tbody>
         </Table>
       )}
@@ -204,12 +149,3 @@ const UserManagementWidget = (props: Props) => {
 };
 
 export default UserManagementWidget;
-
-function formatDateString(date: Date) {
-  const year = date.getFullYear();
-  const month = date.getMonth() + 1;
-  const day = date.getDate();
-  return `${year}-${month < 10 ? `0${month}` : month}-${
-    day < 10 ? `0${day}` : day
-  }`;
-}

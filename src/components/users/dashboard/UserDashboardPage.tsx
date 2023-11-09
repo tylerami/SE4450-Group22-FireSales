@@ -24,7 +24,7 @@ const UserDashboardPage = (props: Props) => {
         gap={6}
         alignItems={"center"}
       >
-        <Box h={2}></Box>
+        <Box></Box>
         <ReferralLinkWidget></ReferralLinkWidget>
         <UserPerformanceWidget></UserPerformanceWidget>
 

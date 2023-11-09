@@ -4,7 +4,7 @@ import TopNavBar from "../nav/TopNavBar";
 import UserSideNavBar from "../nav/UserSideNavBar";
 import UserDashboardPage from "./dashboard/UserDashboardPage";
 import { useGlobalState } from "../utils/GlobalState";
-import RecordConversionsPage from "./conversions/RecordConversionsPage";
+import ConversionsPage from "./conversions/ConversionsPage";
 import UserSettingsPage from "./settings/UserSettingsPage";
 
 type Props = {};
@@ -21,7 +21,7 @@ const UserDashboard = (props: Props) => {
     },
     {
       name: "Conversion Logging",
-      content: <RecordConversionsPage />,
+      content: <ConversionsPage />,
     },
     {
       name: "Settings",

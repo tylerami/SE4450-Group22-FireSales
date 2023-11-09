@@ -17,12 +17,18 @@
     "allowSyntheticDefaultImports": true,
     "moduleResolution": "node",
     "resolveJsonModule": true,
-    "isolatedModules": true,
-    "noEmit": true
+    "isolatedModules": false,
+    "noEmit": true,
+    "baseUrl": "./src",
+    "paths": {
+      "@models/*": ["models/*"],
+      "@components/*": ["components/*"],
+      "@utils/*": ["utils/*"]
+    }
   },
   "include": [
     "src/**/*"
-  ],
+, "src/__mocks__"  ],
   "exclude": [
     "node_modules",
     "**/*.spec.ts"

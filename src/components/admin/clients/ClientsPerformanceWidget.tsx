@@ -8,7 +8,7 @@ import {
   Heading,
   Spacer,
 } from "@chakra-ui/react";
-import React from "react";
+import React, { useState } from "react";
 import {
   Table,
   Thead,
@@ -23,8 +23,9 @@ import {
   Circle,
   Flex,
 } from "@chakra-ui/react";
-import { ChevronDownIcon } from "@chakra-ui/icons";
+import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
 import ImageComponent from "../../utils/ImageComponent";
+import ClientsPerformanceChart from "./ClientsPerformanceChart";
 
 type Props = {};
 
@@ -60,6 +61,8 @@ const ClientsPerformanceWidget = (props: Props) => {
       earnings: 600,
     },
   ];
+
+  const [expandTable, setExpandTable] = useState<boolean>(false);
 
   return (
     <Flex
@@ -101,6 +104,17 @@ const ClientsPerformanceWidget = (props: Props) => {
         </Menu>
       </Flex>
       <Box h={8}></Box>
+      <Flex
+        maxH="60vh"
+        width={"100%"}
+        minWidth={"80%"}
+        justifyContent={"center"}
+        alignSelf="center"
+        height="full"
+      >
+        <ClientsPerformanceChart />
+      </Flex>
+      <Box h={8}></Box>
 
       <Table size="sm" variant="simple" alignSelf={"center"} width={"100%"}>
         <Thead>
@@ -113,23 +127,33 @@ const ClientsPerformanceWidget = (props: Props) => {
           </Tr>
         </Thead>
         <Tbody>
-          {tableRows.map((row, index) => (
-            <Tr key={index}>
-              <Td maxW={"5em"} textAlign={"left"}>
-                <ImageComponent
-                  maxHeight="5em"
-                  maxWidth="10em"
-                  imagePath={`/sportsbooks/logos/${row.sportsbook.toLowerCase()}-logo-dark.png`}
-                />
-              </Td>
-              <Td textAlign="center">{row.conversions}</Td>
-              <Td textAlign="center">${row.avgBetSize.toLocaleString()}</Td>
-              <Td textAlign="center">${row.avgCommission.toLocaleString()}</Td>
-              <Td textAlign="center">${row.earnings.toLocaleString()}</Td>
-            </Tr>
-          ))}
+          {tableRows
+            .slice(0, expandTable ? tableRows.length : 1)
+            .map((row, index) => (
+              <Tr key={index}>
+                <Td maxW={"5em"} textAlign={"left"}>
+                  <ImageComponent
+                    maxHeight="5em"
+                    maxWidth="10em"
+                    imagePath={`/sportsbooks/logos/${row.sportsbook.toLowerCase()}-logo-dark.png`}
+                  />
+                </Td>
+                <Td textAlign="center">{row.conversions}</Td>
+                <Td textAlign="center">${row.avgBetSize.toLocaleString()}</Td>
+                <Td textAlign="center">
+                  ${row.avgCommission.toLocaleString()}
+                </Td>
+                <Td textAlign="center">${row.earnings.toLocaleString()}</Td>
+              </Tr>
+            ))}
         </Tbody>
       </Table>
+      <Button
+        onClick={() => setExpandTable(!expandTable)}
+        rightIcon={expandTable ? <ChevronUpIcon /> : <ChevronDownIcon />}
+      >
+        {expandTable ? "Collapse Table" : "View All Sportsbooks"}
+      </Button>
     </Flex>
   );
 };

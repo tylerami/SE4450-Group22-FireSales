@@ -1,14 +1,26 @@
 import React, { useState, useCallback } from "react";
-import { Box, Button, Flex, Heading, Text } from "@chakra-ui/react";
-import RecordConversionTile from "./RecordConversionTile";
+import {
+  Box,
+  Button,
+  Flex,
+  Heading,
+  Spacer,
+  Switch,
+  Text,
+} from "@chakra-ui/react";
+import RecordConversionTile from "./ManualRecordConversionTile";
 import { AddIcon } from "@chakra-ui/icons";
-import { Sale } from "../../../models/sale";
+import { Conversion } from "../../../../../models/Conversion";
+
+type Props = {};
 
 // Since the Props type is empty, we can omit it and also the props parameter
-const RecordConversionsWidget = () => {
+const ManualRecordConversionsWidgetContent = (props: Props) => {
   const [rowCount, setRowCount] = useState(1);
-  // conversions is an object with keys of row numbers and values of Sale objects
-  const [conversions, setConversions] = useState<Record<number, Sale>>({});
+  // conversions is an object with keys of row numbers and values of Conversion objects
+  const [conversions, setConversions] = useState<Record<number, Conversion>>(
+    {}
+  );
 
   const [errorText, setErrorText] = useState(null);
 
@@ -47,18 +59,7 @@ const RecordConversionsWidget = () => {
   ));
 
   return (
-    <Flex
-      p={26}
-      borderRadius="20px"
-      width="95%"
-      gap={2}
-      flexDirection="column"
-      boxShadow="3px 4px 12px rgba(0, 0, 0, 0.2)"
-    >
-      <Heading as="h1" fontSize="1.2em" fontWeight={700}>
-        Record Conversions
-      </Heading>
-
+    <React.Fragment>
       <Box h={2} />
 
       {recordConversionTiles}
@@ -72,8 +73,8 @@ const RecordConversionsWidget = () => {
         Record Conversions
       </Button>
       {errorText && <Text color={"red"}>{errorText}</Text>}
-    </Flex>
+    </React.Fragment>
   );
 };
 
-export default RecordConversionsWidget;
+export default ManualRecordConversionsWidgetContent;

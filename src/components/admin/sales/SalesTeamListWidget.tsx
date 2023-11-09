@@ -27,7 +27,7 @@ import {
   IconButton,
 } from "@chakra-ui/react";
 import { ChevronDownIcon } from "@chakra-ui/icons";
-import { User } from "../../../models/user";
+import { User } from "../../../models/User";
 
 // Define a type for the row structure
 type TableRowData = {
