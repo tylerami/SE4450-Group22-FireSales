@@ -11,7 +11,7 @@ import {
   IconButton,
   Spacer,
 } from "@chakra-ui/react";
-import ClientLinksContainer from "./ClientLinksContainer";
+import AffiliateLinksContainer from "./AffiliateLinksContainer";
 import { UserContext } from "components/auth/UserProvider";
 import { DependencyInjection } from "utils/DependencyInjection";
 import { Client } from "@models/Client";
@@ -55,7 +55,7 @@ const useFetchData = (currentUser) => {
   return { compensationGroup, clients, isLoading, error };
 };
 
-const ReferralLinkWidget = () => {
+const AffiliateLinkWidget = () => {
   const { currentUser } = useContext(UserContext);
   const [pageIndex, setPageIndex] = useState(0);
 
@@ -103,9 +103,6 @@ const ReferralLinkWidget = () => {
     }));
   }, [clients, compensationGroup]);
 
-  console.log(clientLinkGroups);
-  console.log(clients);
-  console.log(compensationGroup);
   const clientLinkGroupRows: ClientLinkGroup[][] = useMemo(() => {
     let rows: ClientLinkGroup[][] = [];
     let maxCols = clientLinkGroups.length;
@@ -170,7 +167,7 @@ const ReferralLinkWidget = () => {
 
       <Flex w="100%" gap={8} justifyContent="space-evenly">
         {currentRow.map((group, j) => (
-          <ClientLinksContainer
+          <AffiliateLinksContainer
             client={group.client}
             affiliateLinks={group.affiliateLinks}
             key={j}
@@ -181,4 +178,4 @@ const ReferralLinkWidget = () => {
   );
 };
 
-export default ReferralLinkWidget;
+export default AffiliateLinkWidget;

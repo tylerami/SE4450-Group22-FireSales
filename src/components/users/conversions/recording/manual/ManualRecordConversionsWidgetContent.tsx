@@ -1,21 +1,16 @@
 import React, { useState, useCallback } from "react";
-import {
-  Box,
-  Button,
-  Flex,
-  Heading,
-  Spacer,
-  Switch,
-  Text,
-} from "@chakra-ui/react";
+import { Box, Button, Text } from "@chakra-ui/react";
 import RecordConversionTile from "./ManualRecordConversionTile";
 import { AddIcon } from "@chakra-ui/icons";
 import { Conversion } from "../../../../../models/Conversion";
-
-type Props = {};
+import { CompensationGroup } from "@models/CompensationGroup";
 
 // Since the Props type is empty, we can omit it and also the props parameter
-const ManualRecordConversionsWidgetContent = (props: Props) => {
+const ManualRecordConversionsWidgetContent = ({
+  compensationGroup,
+}: {
+  compensationGroup: CompensationGroup;
+}) => {
   const [rowCount, setRowCount] = useState(1);
   // conversions is an object with keys of row numbers and values of Conversion objects
   const [conversions, setConversions] = useState<Record<number, Conversion>>(
@@ -50,6 +45,7 @@ const ManualRecordConversionsWidgetContent = (props: Props) => {
   const recordConversionTiles = Array.from({ length: rowCount }, (_, index) => (
     <Box my={2}>
       <RecordConversionTile
+        compensationGroup={compensationGroup}
         rowIndex={index + 1}
         setConversion={(conversion) => setConversion(index, conversion)}
         deleteRow={deleteRow}

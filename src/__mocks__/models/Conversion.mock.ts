@@ -11,7 +11,7 @@ export const conversionSample = new Conversion({
   loggedAt: new Date(),
   userId: "user123",
   compensationGroupId: "comp123",
-  affliateLink: generateAffiliateLinks(1)[0],
+  affiliateLink: generateAffiliateLinks(1)[0],
   customer: customerSample,
   amount: 100,
   currency: Currency.CAD,

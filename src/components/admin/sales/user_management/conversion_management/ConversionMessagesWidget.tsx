@@ -1,29 +1,15 @@
 import {
   Box,
-  Button,
-  Circle,
   Flex,
-  Heading,
-  Icon,
   IconButton,
   InputGroup,
   InputRightElement,
-  Table,
-  Tbody,
-  Td,
-  Text,
   Textarea,
-  Th,
-  Thead,
-  Tr,
 } from "@chakra-ui/react";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 
-import { ArrowForwardIcon, ArrowUpIcon, CloseIcon } from "@chakra-ui/icons";
-import { FiUser } from "react-icons/fi";
+import { ArrowUpIcon } from "@chakra-ui/icons";
 import ConversionMessageTile from "./ConversionMessageTile";
-
-type Props = {};
 
 const messages = [
   {

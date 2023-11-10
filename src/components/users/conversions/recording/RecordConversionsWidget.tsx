@@ -1,31 +1,14 @@
-import React, { useState, useCallback } from "react";
-import {
-  Button,
-  Heading,
-  Input,
-  InputGroup,
-  Spacer,
-  Switch,
-} from "@chakra-ui/react";
-import RecordConversionTile from "./manual/ManualRecordConversionTile";
-import { AddIcon } from "@chakra-ui/icons";
-import { Conversion } from "../../../../models/Conversion";
-import {
-  Table,
-  Thead,
-  Tbody,
-  Tr,
-  Th,
-  Td,
-  Image,
-  Box,
-  Text,
-  Icon,
-  Circle,
-  Flex,
-} from "@chakra-ui/react";
+import React, { useState, useContext, useEffect } from "react";
+import { Heading, Spacer, Spinner, Switch, Text } from "@chakra-ui/react";
+import { Flex } from "@chakra-ui/react";
 import ManualRecordConversionsWidgetContent from "./manual/ManualRecordConversionsWidgetContent";
 import BulkRecordConversionsWidgetContent from "./bulk/BulkRecordConversionsWidgetContent";
+import { CompensationGroupService } from "services/interfaces/CompensationGroupService";
+import { DependencyInjection } from "utils/DependencyInjection";
+import { CompensationGroup } from "models/CompensationGroup";
+import { UserContext } from "components/auth/UserProvider";
+
+const ENABLE_BULK_MODE = false;
 
 type Props = {};
 
@@ -35,7 +18,27 @@ enum RecordMode {
 }
 
 const RecordConversionsWidget = (props: Props) => {
+  const compGroupService: CompensationGroupService =
+    DependencyInjection.compensationGroupService();
+
   const [recordMode, setRecordMode] = useState<RecordMode>(RecordMode.manual);
+  const [compensationGroup, setCompensationGroup] =
+    useState<CompensationGroup | null>(null);
+
+  const { currentUser } = useContext(UserContext);
+
+  useEffect(() => {
+    const fetchCompensationGroup = async () => {
+      const compGroupId = currentUser?.compensationGroupId;
+      if (!compGroupId) {
+        return;
+      }
+      const compGroup = await compGroupService.get(compGroupId);
+      setCompensationGroup(compGroup);
+    };
+
+    fetchCompensationGroup();
+  }, [compGroupService, currentUser?.compensationGroupId]);
 
   function handleSwitchChange() {
     if (recordMode === RecordMode.manual) {
@@ -59,17 +62,28 @@ const RecordConversionsWidget = (props: Props) => {
           {recordMode === RecordMode.bulk && "Bulk"} Record Conversions
         </Heading>
         <Spacer />
-        {/* Disable bulk mode for now */}
 
-        {/* <Text>Manual mode</Text>
-        <Switch onChange={handleSwitchChange} mx={4} />
-        <Text>Bulk mode</Text> */}
+        {ENABLE_BULK_MODE && (
+          <React.Fragment>
+            <Text>Manual mode</Text>
+            <Switch onChange={handleSwitchChange} mx={4} />
+            <Text>Bulk mode</Text>{" "}
+          </React.Fragment>
+        )}
       </Flex>
 
-      {recordMode === RecordMode.manual ? (
-        <ManualRecordConversionsWidgetContent />
+      {compensationGroup ? (
+        recordMode === RecordMode.manual ? (
+          <ManualRecordConversionsWidgetContent
+            compensationGroup={compensationGroup}
+          />
+        ) : (
+          <BulkRecordConversionsWidgetContent />
+        )
       ) : (
-        <BulkRecordConversionsWidgetContent />
+        <Flex w="100%" h="10em" justifyContent={"center"} alignItems={"center"}>
+          <Spinner size="lg" />
+        </Flex>
       )}
     </Flex>
   );

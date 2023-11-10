@@ -1,15 +1,5 @@
-import React, { useState, useCallback } from "react";
-import {
-  Button,
-  Heading,
-  Input,
-  InputGroup,
-  Spacer,
-  Switch,
-} from "@chakra-ui/react";
-import RecordConversionTile from "../manual/ManualRecordConversionTile";
-import { AddIcon } from "@chakra-ui/icons";
-import { Conversion } from "../../../../../models/Conversion";
+import React, { useState } from "react";
+import { Button, Heading, Input, InputGroup } from "@chakra-ui/react";
 import {
   Table,
   Thead,
@@ -17,11 +7,8 @@ import {
   Tr,
   Th,
   Td,
-  Image,
   Box,
   Text,
-  Icon,
-  Circle,
   Flex,
 } from "@chakra-ui/react";
 

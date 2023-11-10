@@ -16,7 +16,7 @@ export class Conversion {
   loggedAt: Date;
   userId: string;
   compensationGroupId: string;
-  affliateLink: AffiliateLink;
+  affiliateLink: AffiliateLink;
   customer: Customer;
   amount: number; // Bet size
   attachmentUrls?: Array<string>;
@@ -29,7 +29,7 @@ export class Conversion {
     loggedAt,
     userId,
     compensationGroupId,
-    affliateLink,
+    affiliateLink,
     customer,
     amount,
     attachmentUrls,
@@ -41,7 +41,7 @@ export class Conversion {
     loggedAt: Date;
     userId: string;
     compensationGroupId: string;
-    affliateLink: AffiliateLink;
+    affiliateLink: AffiliateLink;
     customer: Customer;
     amount: number;
     attachmentUrls?: Array<string>;
@@ -53,7 +53,7 @@ export class Conversion {
     this.loggedAt = loggedAt;
     this.userId = userId;
     this.compensationGroupId = compensationGroupId;
-    this.affliateLink = affliateLink;
+    this.affiliateLink = affiliateLink;
     this.customer = customer;
     this.amount = amount;
     this.attachmentUrls = attachmentUrls;
@@ -65,7 +65,7 @@ export class Conversion {
     dateString, // maybe modify this to accept a Date object instead
     userId,
     compensationGroupId,
-    affliateLink,
+    affiliateLink,
     customer,
     amount,
     attachmentUrls,
@@ -74,7 +74,7 @@ export class Conversion {
     dateString: string;
     userId: string;
     compensationGroupId: string;
-    affliateLink: AffiliateLink;
+    affiliateLink: AffiliateLink;
     currency?: Currency;
     customer: Customer;
     amount: number;
@@ -82,7 +82,7 @@ export class Conversion {
   }) {
     const id = createSaleId({
       dateString,
-      clientId: affliateLink.clientId,
+      clientId: affiliateLink.clientId,
       userId,
       customerId: customer.id,
     });
@@ -94,7 +94,7 @@ export class Conversion {
       loggedAt,
       userId,
       compensationGroupId,
-      affliateLink,
+      affiliateLink,
       customer,
       amount,
       attachmentUrls,
@@ -104,9 +104,9 @@ export class Conversion {
 
   public description(): string {
     return `${formatDateString(this.dateOccured)} / ${
-      this.affliateLink.clientId
+      this.affiliateLink.clientId
     } / ${this.customer.id} / $${this.amount} bet / $${
-      this.affliateLink.commission
+      this.affiliateLink.commission
     } commission `;
   }
 }
@@ -133,14 +133,14 @@ export function averageCommission(conversions: Array<Conversion>): number {
   }
 
   const total = conversions.reduce((total, conversion) => {
-    return total + conversion.affliateLink.commission;
+    return total + conversion.affiliateLink.commission;
   }, 0);
   return total / conversions.length;
 }
 
 export function totalCommission(conversions: Array<Conversion>): number {
   return conversions.reduce((total, conversion) => {
-    return total + conversion.affliateLink.commission;
+    return total + conversion.affiliateLink.commission;
   }, 0);
 }
 

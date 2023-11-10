@@ -6,6 +6,7 @@ import { sampleClients } from "./Client.mock";
 const clients: Client[] = sampleClients;
 
 const clientIds = clients.map((client) => client.id);
+const clientNames = clients.map((client) => client.name);
 
 export function generateAffiliateLinks(count: number): AffiliateLink[] {
   const affiliateLinks: AffiliateLink[] = [];
@@ -15,6 +16,7 @@ export function generateAffiliateLinks(count: number): AffiliateLink[] {
     affiliateLinks.push(
       new AffiliateLink({
         clientId: clientIds[i % clientIds.length],
+        clientName: clientNames[i % clientNames.length],
         type: linkTypes[i % linkTypes.length], // or vary the type as needed
         link: `https://example.com/link${i}`,
         enabled: true,

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Box } from "@chakra-ui/react";
 import BulkRecordConversionsWidgetContent from "./recording/bulk/BulkRecordConversionsWidgetContent";
 import RecordConversionsWidget from "./recording/RecordConversionsWidget";
-import ConversionHistoryWidget from "./ConversionHistoryWidget";
+import ConversionHistoryWidget from "./history/ConversionHistoryWidget";
 
 type Props = {};
 

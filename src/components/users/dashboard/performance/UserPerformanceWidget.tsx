@@ -1,9 +1,3 @@
-// I want to see:
-// - my performance this week / month / year
-// - my commission rate
-
-// - area to upload new sales
-// - my conversion history
 import {
   Box,
   Flex,
@@ -18,17 +12,8 @@ import {
 } from "@chakra-ui/react";
 import React, { useContext, useEffect, useState } from "react";
 
-import {
-  Menu,
-  MenuButton,
-  MenuList,
-  MenuItem,
-  Button,
-  Icon,
-  IconButton,
-} from "@chakra-ui/react";
+import { Menu, MenuButton, MenuList, MenuItem, Button } from "@chakra-ui/react";
 import { ChevronDownIcon } from "@chakra-ui/icons";
-import ImageComponent from "../../utils/ImageComponent";
 import UserPerformanceChart from "./UserPerformanceChart";
 import { Timeframe, getTimeframeLabel } from "models/enums/Timeframe";
 import { sampleConversions } from "__mocks__/models/Conversion.mock";
@@ -36,25 +21,38 @@ import {
   Conversion,
   averageBetSize,
   averageCommission,
+  filterConversionsByTimeframe,
   totalCommission,
 } from "models/Conversion";
 import { ConversionService } from "services/interfaces/ConversionService";
 import { DependencyInjection } from "utils/DependencyInjection";
 import { UserContext } from "components/auth/UserProvider";
-import { Client } from "@models/Client";
+import { Client } from "models/Client";
+import { CompensationGroup } from "models/CompensationGroup";
+import { ClientService } from "services/interfaces/ClientService";
+import { CompensationGroupService } from "services/interfaces/CompensationGroupService";
+import { AffiliateLink } from "models/AffiliateLink";
+import { getReferralLinkTypeLabel } from "models/enums/ReferralLinkType";
+import { generateSampleCompensationGroups } from "__mocks__/models/CompensationGroup.mock";
+import { formatMoney } from "utils/Money";
+import PerformanceWidgetMetric from "../PerformanceWidgetMetric";
 
 type Props = {};
 
 const UserPerformanceWidget = (props: Props) => {
+  const conversionService: ConversionService =
+    DependencyInjection.conversionService();
+  const clientService: ClientService = DependencyInjection.clientService();
+  const compGroupService: CompensationGroupService =
+    DependencyInjection.compensationGroupService();
+
   const [timeframe, setTimeframe] = useState<Timeframe>(Timeframe.lastMonth);
   const [conversions, setConversions] = useState<Conversion[]>([]);
   const [filteredConversions, setFilteredConversions] = useState<Conversion[]>(
     []
   );
-  const [clients, setClients] = useState<Client[]>([]);
-
-  const conversionService: ConversionService =
-    DependencyInjection.conversionService();
+  const [compensationGroup, setCompensationGroup] =
+    useState<CompensationGroup | null>(null);
 
   const { currentUser } = useContext(UserContext);
 
@@ -67,11 +65,23 @@ const UserPerformanceWidget = (props: Props) => {
       setConversions(conversions);
     };
 
+    const fetchCompensationGroup = async () => {
+      if (!currentUser?.compensationGroupId) return;
+      const compensationGroup = await compGroupService.get(
+        currentUser.compensationGroupId
+      );
+      setCompensationGroup(compensationGroup);
+    };
+
     fetchConversions();
-  }, [conversionService, currentUser]);
+    fetchCompensationGroup();
+  }, [conversionService, currentUser, compGroupService, clientService]);
 
   const handleChangeTimeframe = (timeframe: Timeframe) => {
     setTimeframe(timeframe);
+    setFilteredConversions(
+      filterConversionsByTimeframe(conversions, timeframe)
+    );
   };
 
   // todo: implement
@@ -99,42 +109,41 @@ const UserPerformanceWidget = (props: Props) => {
     },
   ];
 
-  // Implement
-
   const tableHeaders = [
     "Sportsbook",
+    "Link Type",
     "Conversions",
+    "Earnings",
     "Avg. Bet Size",
     "Avg. Commission",
-    "Earnings",
-  ];
-
-  const tableRows = [
-    {
-      sportsbook: "PointsBet",
-      conversions: 12,
-      avgBetSize: 100,
-      avgCommission: 50,
-      earnings: 600,
-    },
-    {
-      sportsbook: "Bet99",
-      conversions: 12,
-      avgBetSize: 100,
-      avgCommission: 50,
-      earnings: 600,
-    },
-    {
-      sportsbook: "Betano",
-      conversions: 12,
-      avgBetSize: 100,
-      avgCommission: 50,
-      earnings: 600,
-    },
   ];
 
   const timeframes: Timeframe[] = Object.values(Timeframe).filter(
     (value): value is Timeframe => typeof value === "number"
+  );
+
+  const sameAffiliateLink = (
+    conversion: Conversion,
+    link: AffiliateLink
+  ): boolean =>
+    conversion.affiliateLink.clientId === link.clientId &&
+    conversion.affiliateLink.type === link.type;
+
+  const affiliateLinkGroups: {
+    link: AffiliateLink;
+    conversions: Conversion[];
+  }[] = (compensationGroup?.affiliateLinks ?? []).map((link, i) => ({
+    link,
+    conversions: filteredConversions.filter((conv) =>
+      sameAffiliateLink(conv, link)
+    ),
+  }));
+
+  affiliateLinkGroups.sort(
+    (a, b) => b.conversions.length - a.conversions.length
+  );
+  affiliateLinkGroups.sort((a, b) =>
+    a.link.clientName.localeCompare(b.link.clientName)
   );
 
   return (
@@ -156,7 +165,7 @@ const UserPerformanceWidget = (props: Props) => {
           </MenuButton>
           <MenuList>
             {timeframes.map((tf, index) => (
-              <MenuItem key={index} onClick={() => setTimeframe(tf)}>
+              <MenuItem key={index} onClick={() => handleChangeTimeframe(tf)}>
                 {getTimeframeLabel(tf)}
               </MenuItem>
             ))}
@@ -193,7 +202,7 @@ const UserPerformanceWidget = (props: Props) => {
       >
         <UserPerformanceChart
           timeframe={timeframe}
-          conversions={sampleConversions}
+          conversions={filteredConversions}
         />
       </Flex>
 
@@ -210,7 +219,7 @@ const UserPerformanceWidget = (props: Props) => {
           <PerformanceWidgetMetric
             key={i}
             title={metric.title}
-            value={metric.getValue(conversions).toString()}
+            value={metric.getValue(filteredConversions).toString()}
           />
         ))}
       </Flex>
@@ -226,66 +235,25 @@ const UserPerformanceWidget = (props: Props) => {
           </Tr>
         </Thead>
         <Tbody>
-          {tableRows.map((row, index) => (
-            <Tr key={index}>
-              <Td maxW={"5em"} textAlign={"left"}>
-                <ImageComponent
-                  maxHeight="5em"
-                  maxWidth="10em"
-                  imagePath={`/sportsbooks/logos/${row.sportsbook.toLowerCase()}-logo-dark.png`}
-                />
-              </Td>
-              <Td textAlign="center">{row.conversions}</Td>
-              <Td textAlign="center">${row.avgBetSize.toLocaleString()}</Td>
-              <Td textAlign="center">${row.avgCommission.toLocaleString()}</Td>
-              <Td textAlign="center">${row.earnings.toLocaleString()}</Td>
-            </Tr>
-          ))}
+          {affiliateLinkGroups.map(
+            ({ link, conversions: groupConversions }, i) => (
+              <Tr>
+                <Td textAlign={"center"}>{link.clientName}</Td>
+                <Td textAlign={"center"}>
+                  {getReferralLinkTypeLabel(link.type)}
+                </Td>
+                {performanceMetrics.map((metric, i) => (
+                  <Td textAlign={"center"}>
+                    {metric.getValue(groupConversions).toString()}
+                  </Td>
+                ))}
+              </Tr>
+            )
+          )}
         </Tbody>
       </Table>
     </Flex>
   );
 };
-
-const PerformanceWidgetMetric = ({
-  title,
-  value,
-  subtitle,
-}: {
-  title: string;
-  value: string;
-  subtitle?: string;
-}) => {
-  return (
-    <Flex
-      direction={"column"}
-      alignItems={"center"}
-      borderRadius="20px"
-      width="full"
-      mx={4}
-      border="1px solid lightgray"
-      p={4}
-    >
-      <Heading size="md" color="#ED7D31">
-        {title}{" "}
-      </Heading>
-      <Box h={2} />
-      <Heading size="lg" fontWeight={400}>
-        {" "}
-        {value}
-      </Heading>
-      {subtitle && <Text fontSize="0.8em">{subtitle}</Text>}
-    </Flex>
-  );
-};
-
-function formatMoney(amount: number): string {
-  const formatter = new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-  });
-
-  return formatter.format(amount);
-}
 
 export default UserPerformanceWidget;

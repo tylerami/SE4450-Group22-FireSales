@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import {
   Flex,
   Input,
@@ -9,43 +9,42 @@ import {
   Button,
   IconButton,
   InputGroup,
-  InputRightElement,
   Text,
   Heading,
   InputLeftElement,
   Icon,
-  Box,
 } from "@chakra-ui/react";
-import { AttachmentIcon, ChevronDownIcon, DeleteIcon } from "@chakra-ui/icons";
+import { ChevronDownIcon, DeleteIcon } from "@chakra-ui/icons";
 import { Conversion } from "../../../../../models/Conversion";
-import { customerIdFromName } from "../../../../../models/Customer";
 import { FaDollarSign } from "react-icons/fa";
 import { customerSample } from "__mocks__/models/Customer.mock";
-import { generateAffiliateLinks } from "__mocks__/models/AffiliateLink.mock";
-
-// List of sportsbooks can be moved outside the component if it doesn't change, to prevent re-creation on each render.
-const sportsbooks = ["pointsbet", "betano", "bet99"];
+import { AffiliateLink } from "models/AffiliateLink";
+import { UserContext } from "components/auth/UserProvider";
+import { CompensationGroup } from "models/CompensationGroup";
 
 type Props = {
-  // add a prop for deleting a row
+  compensationGroup: CompensationGroup;
   deleteRow: () => void;
   setConversion: (conversion: Conversion) => void;
   rowIndex?: number;
 };
 
 const RecordConversionTile = ({
+  compensationGroup,
   deleteRow,
   setConversion,
   rowIndex: rowNumber,
 }: Props) => {
   const [dateString, setDate] = useState<string>("");
-  const [sportsbookId, setSportsbook] = useState<string>("");
+  const [affiliateLink, setAffiliateLink] = useState<AffiliateLink | null>(
+    null
+  );
   const [customerName, setCustomerName] = useState<string>("");
   const [saleAmount, setSaleAmount] = useState<string>("");
   const [attachments, setAttachments] = useState<File[]>([]);
 
-  const handleSportsbookSelect = (sportsbook: string) => {
-    setSportsbook(sportsbook);
+  const handleSelectAffiliateLink = (affiliateLink: AffiliateLink) => {
+    setAffiliateLink(affiliateLink);
   };
 
   const handleFilesChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -64,17 +63,23 @@ const RecordConversionTile = ({
     }
   };
 
+  const { currentUser } = useContext(UserContext);
+
   const handleSave = () => {
-    // TODO: get userId from auth context
-    const userId = "1234";
+    if (!currentUser) return;
+
+    if (!affiliateLink) {
+      // set error
+      return;
+    }
 
     const sale: Conversion = Conversion.fromManualInput({
       dateString,
-      affliateLink: generateAffiliateLinks(1)[0],
+      affiliateLink,
       customer: customerSample,
       amount: Number(saleAmount),
       compensationGroupId: "1234",
-      userId,
+      userId: currentUser.uid,
     });
     setConversion(sale);
   };
@@ -106,7 +111,7 @@ const RecordConversionTile = ({
       >
         <Input
           type="date"
-          width={"35%"}
+          width={"30%"}
           value={dateString}
           onChange={(e) => {
             setDate(e.target.value);
@@ -115,18 +120,20 @@ const RecordConversionTile = ({
         />
         <Menu>
           <MenuButton width={"35%"} as={Button} rightIcon={<ChevronDownIcon />}>
-            {sportsbookId || "Sportsbook"}
+            {affiliateLink
+              ? affiliateLink.description()
+              : "Select Affiliate Link"}
           </MenuButton>
           <MenuList>
-            {sportsbooks.map((item, index) => (
+            {compensationGroup.affiliateLinks.map((link, index) => (
               <MenuItem
                 key={index}
                 onClick={() => {
-                  handleSportsbookSelect(item);
+                  handleSelectAffiliateLink(link);
                   handleSave();
                 }}
               >
-                {item}
+                {link.description()}
               </MenuItem>
             ))}
           </MenuList>

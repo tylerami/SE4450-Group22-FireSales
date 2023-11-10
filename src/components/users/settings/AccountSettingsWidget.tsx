@@ -1,4 +1,3 @@
-import { ChevronDownIcon } from "@chakra-ui/icons";
 import {
   Box,
   Button,
@@ -6,14 +5,9 @@ import {
   Heading,
   Input,
   InputGroup,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
-  Select,
   Text,
 } from "@chakra-ui/react";
-import React, { useState } from "react";
+import React from "react";
 
 type Props = {};
 

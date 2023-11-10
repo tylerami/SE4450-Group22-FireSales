@@ -2,20 +2,15 @@ import React from "react";
 import {
   Flex,
   Box,
-  Input,
   Avatar,
   Text,
   Icon,
-  Spacer,
   Heading,
-  InputGroup,
-  InputRightElement,
-  InputLeftElement,
   Circle,
   Image,
   Button,
 } from "@chakra-ui/react";
-import { FiSearch, FiUser } from "react-icons/fi";
+import { FiUser } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 
 const profilePictureSrc = null;

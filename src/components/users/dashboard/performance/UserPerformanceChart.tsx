@@ -1,6 +1,6 @@
-import { Timeframe, divideTimeframeIntoSegments } from "models/enums/Timeframe";
+import { Timeframe } from "models/enums/Timeframe";
 import BarChart from "components/utils/BarChart";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import {
   Conversion,
   ConversionSegment,
@@ -30,7 +30,7 @@ const UserPerformanceChart = ({
         {
           series: "Earnings",
           value: convSegment.conversions.reduce(
-            (acc, curr) => acc + curr.affliateLink.commission,
+            (acc, curr) => acc + curr.affiliateLink.commission,
             0
           ),
         },
@@ -41,7 +41,7 @@ const UserPerformanceChart = ({
   const maxSegmentEarnings = Math.max(
     ...conversionSegments.map((seg) =>
       seg.conversions.reduce(
-        (acc, curr) => acc + curr.affliateLink.commission,
+        (acc, curr) => acc + curr.affiliateLink.commission,
         0
       )
     )

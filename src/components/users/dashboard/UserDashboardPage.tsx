@@ -1,7 +1,7 @@
 import { Box, Flex, Heading } from "@chakra-ui/react";
 import React from "react";
-import UserPerformanceWidget from "./UserPerformanceWidget";
-import ReferralLinkWidget from "./ReferralLinkWidget";
+import UserPerformanceWidget from "./performance/UserPerformanceWidget";
+import AffiliateLinkWidget from "./referrals/AffiliateLinkWidget";
 
 type Props = {};
 
@@ -25,7 +25,7 @@ const UserDashboardPage = (props: Props) => {
         alignItems={"center"}
       >
         <Box></Box>
-        <ReferralLinkWidget></ReferralLinkWidget>
+        <AffiliateLinkWidget></AffiliateLinkWidget>
         <UserPerformanceWidget></UserPerformanceWidget>
 
         <Box h={20}></Box>
