@@ -7,7 +7,7 @@ import AuthChecker from "./components/auth/AuthChecker";
 import * as React from "react";
 import { ChakraProvider, Box } from "@chakra-ui/react";
 import { GlobalStateProvider } from "./components/utils/GlobalState";
-import { UserProvider } from "@components/auth/UserProvider";
+import { UserProvider } from "components/auth/UserProvider";
 
 function App() {
   const [loading, setLoading] = useState(true);

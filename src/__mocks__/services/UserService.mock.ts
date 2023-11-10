@@ -1,4 +1,5 @@
 import { User } from "@models/User";
+import { sampleUser } from "__mocks__/models/User.mock";
 import { UserService } from "services/interfaces/UserService";
 
 export class MockUserService implements UserService {
@@ -12,7 +13,7 @@ export class MockUserService implements UserService {
     return user;
   }
   async get(userId: string): Promise<User | null> {
-    return null;
+    return sampleUser;
   }
   async update(user: User | Partial<User>): Promise<User> {
     return user as User;

@@ -1,4 +1,5 @@
 import { CompensationGroup } from "@models/CompensationGroup";
+import { generateSampleCompensationGroups } from "__mocks__/models/CompensationGroup.mock";
 import { CompensationGroupService } from "services/interfaces/CompensationGroupService";
 
 export class MockCompensationGroupService implements CompensationGroupService {
@@ -9,7 +10,7 @@ export class MockCompensationGroupService implements CompensationGroupService {
   }
 
   async get(compensationGroupId: string): Promise<CompensationGroup | null> {
-    return null;
+    return generateSampleCompensationGroups(1)[0];
   }
 
   async update(

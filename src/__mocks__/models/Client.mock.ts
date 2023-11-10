@@ -4,28 +4,20 @@ import {
   sportsAffiliateDeal1,
 } from "./AffiliateDeal.mock";
 
-// Sample Client Instances
-const clientSample1 = new Client({
-  id: "client1",
-  name: "Casino Royale",
-  casinoAffiliateDeal: casinoAffiliateDeal1,
-  enabled: true,
-});
+const names = ["PointsBet", "Betano", "Proline", "Bet99"];
+const ids = names.map((name) => name.replaceAll(" ", "").toLowerCase());
 
-const clientSample2 = new Client({
-  id: "client2",
-  name: "SportsMania",
-  sportsAffiliateDeal: sportsAffiliateDeal1,
-  enabled: true,
-});
+export function generateSampleClients(count: number): Client[] {
+  return Array.from({ length: count }, (_, i) => {
+    return new Client({
+      id: ids[i % ids.length],
+      name: names[i % names.length],
+      affiliateDeals: {
+        sports: sportsAffiliateDeal1,
+        casino: casinoAffiliateDeal1,
+      },
+    });
+  });
+}
 
-const clientSample3 = new Client({
-  id: "client3",
-  name: "MultiDeals Inc.",
-  casinoAffiliateDeal: casinoAffiliateDeal1,
-  sportsAffiliateDeal: sportsAffiliateDeal1,
-  enabled: true,
-});
-
-// Export the samples
-export const clientSamples = [clientSample1, clientSample2, clientSample3];
+export const sampleClients = generateSampleClients(4);

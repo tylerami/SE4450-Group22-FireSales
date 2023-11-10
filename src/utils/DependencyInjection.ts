@@ -5,6 +5,11 @@ import { MockCustomerService } from "__mocks__/services/CustomerService.mock";
 import { MockUserService } from "__mocks__/services/UserService.mock";
 import "reflect-metadata";
 import ImageFirebaseService from "services/implementations/ImageFirebaseService";
+import { ClientService } from "services/interfaces/ClientService";
+import { CompensationGroupService } from "services/interfaces/CompensationGroupService";
+import { ConversionService } from "services/interfaces/ConversionService";
+import { ImageService } from "services/interfaces/ImageService";
+import { UserService } from "services/interfaces/UserService";
 
 const USE_MOCKS = true;
 
@@ -19,24 +24,20 @@ const mockDependencies: Record<string, any> = {
   ImageService: new ImageFirebaseService(),
 };
 
-export const mockDependencyInjection = (): void => {
-  const dependencyInjection = DependencyInjection.getInstance();
-  Object.entries(mockDependencies).forEach(([key, value]) => {
-    dependencyInjection.register(
-      key as unknown as Constructor<any>,
-      value as any
-    );
-  });
-};
-
 // Use singleton pattern to inject dependencies
 export class DependencyInjection {
   private static instance: DependencyInjection;
   private readonly dependencies = new Map<string, any>();
 
+  private setupMockDependencies(): void {
+    Object.entries(mockDependencies).forEach(([key, value]) => {
+      this.register(key, value);
+    });
+  }
+
   private constructor() {
     if (USE_MOCKS) {
-      mockDependencyInjection();
+      this.setupMockDependencies();
     }
   }
 
@@ -48,15 +49,35 @@ export class DependencyInjection {
     return DependencyInjection.instance;
   }
 
-  public register<T>(token: Constructor<T>, implementation: T): void {
-    this.dependencies.set(token.name, implementation);
+  private register<T>(token: string, implementation: T): void {
+    this.dependencies.set(token, implementation);
   }
 
-  public resolve<T>(token: Constructor<T>): T {
-    const dependency = this.dependencies.get(token.name);
+  private resolve<T>(token: string): T {
+    const dependency = this.dependencies.get(token);
     if (!dependency) {
-      throw new Error(`Dependency not found for: ${token.name}`);
+      throw new Error(`Dependency not found for: ${token}`);
     }
     return dependency as T;
   }
+
+  public static clientService = (): ClientService =>
+    this.getInstance().resolve<ClientService>("ClientService");
+
+  public static conversionService = (): ConversionService =>
+    this.getInstance().resolve<ConversionService>("ConversionService");
+
+  public static userService = (): UserService =>
+    this.getInstance().resolve<UserService>("UserService");
+
+  public static compensationGroupService = (): CompensationGroupService =>
+    this.getInstance().resolve<CompensationGroupService>(
+      "CompensationGroupService"
+    );
+
+  public static customerService = (): CompensationGroupService =>
+    this.getInstance().resolve<CompensationGroupService>("CustomerService");
+
+  public static imageService = (): ImageService =>
+    this.getInstance().resolve<ImageService>("ImageService");
 }

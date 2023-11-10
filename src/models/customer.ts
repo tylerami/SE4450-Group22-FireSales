@@ -1,3 +1,5 @@
+import { generateUserID } from "utils/Identification";
+
 // Deprecate function
 export function customerIdFromName(fullName: string) {
   return fullName.replaceAll(" ", "_").toLowerCase();

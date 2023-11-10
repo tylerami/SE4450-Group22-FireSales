@@ -47,11 +47,13 @@ export class User {
     firstName,
     lastName,
     email,
+    compensationGroupId,
   }: {
     uid: string;
     firstName: string;
     lastName: string;
     email: string;
+    compensationGroupId?: string;
   }): User {
     return new User({
       uid,
@@ -60,6 +62,7 @@ export class User {
       email,
       roles: [Role.salesperson],
       registeredAt: new Date(),
+      compensationGroupId,
     });
   }
 

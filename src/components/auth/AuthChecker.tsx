@@ -18,7 +18,7 @@ const AuthChecker = ({
     if (adminOnly && auth.currentUser) {
       // check if user is admin
       // if not admin, redirect to home
-      navigate("/");
+      // navigate("/");
     }
   });
 

@@ -1,15 +1,13 @@
 // AuthService.ts
-import { User } from "@models/User";
+import { User } from "models/User";
 import { MockUserService } from "__mocks__/services/UserService.mock";
 import { Providers, auth } from "config/firebase";
-import { create } from "domain";
 import {
   User as FirebaseUser,
   UserCredential,
   signInWithPopup,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
-  AuthError,
 } from "firebase/auth";
 import { UserService } from "services/interfaces/UserService";
 
