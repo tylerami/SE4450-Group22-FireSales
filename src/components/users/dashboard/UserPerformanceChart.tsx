@@ -1,66 +1,83 @@
-import React from "react";
-
+import { Timeframe, divideTimeframeIntoSegments } from "models/enums/Timeframe";
+import BarChart from "components/utils/BarChart";
+import React, { useEffect, useState } from "react";
 import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend,
-} from "chart.js";
-import { Bar } from "react-chartjs-2";
+  Conversion,
+  ConversionSegment,
+  segmentConversionsByTimeframe,
+} from "models/Conversion";
 
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend
-);
+const UserPerformanceChart = ({
+  conversions,
+  timeframe,
+}: {
+  conversions: Conversion[];
+  timeframe: Timeframe;
+}) => {
+  const conversionSegments: ConversionSegment[] = segmentConversionsByTimeframe(
+    conversions,
+    timeframe
+  );
 
-export const options = {
-  plugins: {},
-  responsive: true,
-  interaction: {
-    mode: "index" as const,
-    intersect: false,
-  },
-  scales: {
-    x: {
-      stacked: true,
-    },
-    y: {
-      stacked: true,
-    },
-  },
-};
+  const generateBarChartSegments = (convSegment: ConversionSegment) => {
+    return {
+      xAxisLabel: convSegment.segmentLabel,
+      data: [
+        {
+          series: "Conversions",
+          value: convSegment.conversions.length,
+        },
+        {
+          series: "Earnings",
+          value: convSegment.conversions.reduce(
+            (acc, curr) => acc + curr.affliateLink.commission,
+            0
+          ),
+        },
+      ],
+    };
+  };
 
-const labels = ["January", "February", "March", "April", "May", "June", "July"];
+  const maxSegmentEarnings = Math.max(
+    ...conversionSegments.map((seg) =>
+      seg.conversions.reduce(
+        (acc, curr) => acc + curr.affliateLink.commission,
+        0
+      )
+    )
+  );
 
-export const data = {
-  labels,
-  datasets: [
-    {
-      label: "Revenue",
-      data: [200, 400, 600, 400, 300, 1000, 200],
-      backgroundColor: "red",
-      stack: "Stack 0",
-      maxBarThickness: 20,
-    },
-    {
-      label: "Earnings",
-      data: [200, 400, 600, 400, 300, 1000, 200],
-      backgroundColor: "orange",
-      stack: "Stack 1",
-      maxBarThickness: 20,
-    },
-  ],
-};
+  const maxSegmentConversions = Math.max(
+    ...conversionSegments.map((seg) => seg.conversions.length)
+  );
 
-const UserPerformanceChart = () => {
-  return <Bar options={options} data={data} />;
+  return (
+    <BarChart
+      segments={conversionSegments.map((convSegment) =>
+        generateBarChartSegments(convSegment)
+      )}
+      leftAxisLabel={{
+        label: "Conversions",
+        start: 0,
+        end: maxSegmentConversions,
+      }}
+      rightAxisLabel={{
+        label: "Earnings (CAD)",
+        start: 0,
+        end: maxSegmentEarnings,
+      }}
+      series={[
+        {
+          name: "Conversions",
+          color: "#076AFF",
+        },
+        {
+          name: "Earnings",
+          color: "#3FB54D",
+        },
+      ]}
+    />
+  );
 };
 
 export default UserPerformanceChart;

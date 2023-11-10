@@ -16,7 +16,7 @@ import {
   Td,
   Th,
 } from "@chakra-ui/react";
-import React, { useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 
 import {
   Menu,
@@ -30,21 +30,76 @@ import {
 import { ChevronDownIcon } from "@chakra-ui/icons";
 import ImageComponent from "../../utils/ImageComponent";
 import UserPerformanceChart from "./UserPerformanceChart";
+import { Timeframe, getTimeframeLabel } from "models/enums/Timeframe";
+import { sampleConversions } from "__mocks__/models/Conversion.mock";
+import {
+  Conversion,
+  averageBetSize,
+  averageCommission,
+  totalCommission,
+} from "models/Conversion";
+import { ConversionService } from "services/interfaces/ConversionService";
+import { DependencyInjection } from "utils/DependencyInjection";
+import { UserContext } from "components/auth/UserProvider";
+import { Client } from "@models/Client";
 
 type Props = {};
 
 const UserPerformanceWidget = (props: Props) => {
+  const [timeframe, setTimeframe] = useState<Timeframe>(Timeframe.lastMonth);
+  const [conversions, setConversions] = useState<Conversion[]>([]);
+  const [filteredConversions, setFilteredConversions] = useState<Conversion[]>(
+    []
+  );
+  const [clients, setClients] = useState<Client[]>([]);
+
+  const conversionService: ConversionService =
+    DependencyInjection.conversionService();
+
+  const { currentUser } = useContext(UserContext);
+
+  useEffect(() => {
+    const fetchConversions = async () => {
+      if (currentUser == null) return;
+      const conversions = await conversionService.query({
+        userId: currentUser.uid,
+      });
+      setConversions(conversions);
+    };
+
+    fetchConversions();
+  }, [conversionService, currentUser]);
+
+  const handleChangeTimeframe = (timeframe: Timeframe) => {
+    setTimeframe(timeframe);
+  };
+
+  // todo: implement
   const balanceOwed = 10000;
 
   const performanceMetrics = [
     {
       title: "Conversions",
-      value: "12",
+      getValue: (conversions: Conversion[]) => conversions.length,
     },
-    { title: "Earnings", value: "$12,000" },
-    { title: "Avg. Bet Size", value: "$100 / bet" },
-    { title: "Avg. Commission Rate", value: "$50 / conversion" },
+    {
+      title: "Earnings",
+      getValue: (conversions: Conversion[]) =>
+        formatMoney(totalCommission(conversions)),
+    },
+    {
+      title: "Avg. Bet Size",
+      getValue: (conversions: Conversion[]) =>
+        formatMoney(averageBetSize(conversions)),
+    },
+    {
+      title: "Avg. Commission Rate",
+      getValue: (conversions: Conversion[]) =>
+        formatMoney(averageCommission(conversions)),
+    },
   ];
+
+  // Implement
 
   const tableHeaders = [
     "Sportsbook",
@@ -78,6 +133,10 @@ const UserPerformanceWidget = (props: Props) => {
     },
   ];
 
+  const timeframes: Timeframe[] = Object.values(Timeframe).filter(
+    (value): value is Timeframe => typeof value === "number"
+  );
+
   return (
     <Flex
       p={26}
@@ -93,13 +152,14 @@ const UserPerformanceWidget = (props: Props) => {
 
         <Menu>
           <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
-            Filter
+            {getTimeframeLabel(timeframe)}
           </MenuButton>
           <MenuList>
-            <MenuItem>Option 1</MenuItem>
-            <MenuItem>Option 2</MenuItem>
-            <MenuItem>Option 3</MenuItem>
-            {/* Add more MenuItems as needed */}
+            {timeframes.map((tf, index) => (
+              <MenuItem key={index} onClick={() => setTimeframe(tf)}>
+                {getTimeframeLabel(tf)}
+              </MenuItem>
+            ))}
           </MenuList>
         </Menu>
       </Flex>
@@ -131,7 +191,10 @@ const UserPerformanceWidget = (props: Props) => {
         alignSelf="center"
         height="full"
       >
-        <UserPerformanceChart></UserPerformanceChart>
+        <UserPerformanceChart
+          timeframe={timeframe}
+          conversions={sampleConversions}
+        />
       </Flex>
 
       <Box h={6}></Box>
@@ -147,8 +210,8 @@ const UserPerformanceWidget = (props: Props) => {
           <PerformanceWidgetMetric
             key={i}
             title={metric.title}
-            value={metric.value}
-          ></PerformanceWidgetMetric>
+            value={metric.getValue(conversions).toString()}
+          />
         ))}
       </Flex>
       <Box h={8}></Box>

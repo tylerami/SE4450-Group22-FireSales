@@ -1,9 +1,6 @@
 import { AffiliateDeal } from "@models/AffiliateDeal";
 import { Client } from "@models/Client";
-import {
-  generateSampleClients,
-  sampleClients as sampleClients,
-} from "__mocks__/models/Client.mock";
+import { generateSampleClients } from "__mocks__/models/Client.mock";
 import { ClientService } from "services/interfaces/ClientService";
 
 export class MockClientService implements ClientService {
@@ -17,7 +14,7 @@ export class MockClientService implements ClientService {
     return client as Client;
   }
   async getAll(): Promise<Client[]> {
-    return generateSampleClients(5);
+    return generateSampleClients(6);
   }
   async setSportsAffiliateDeal(
     clientId: string,

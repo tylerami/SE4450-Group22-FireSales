@@ -3,6 +3,12 @@ import { AffiliateLink } from "./AffiliateLink";
 import { Customer } from "./Customer";
 import { Message } from "./Message";
 import { Currency } from "./enums/Currency";
+import {
+  Timeframe,
+  TimeframeSegment,
+  divideTimeframeIntoSegments,
+  getIntervalStart,
+} from "./enums/Timeframe";
 
 export class Conversion {
   id: string;
@@ -103,6 +109,80 @@ export class Conversion {
       this.affliateLink.commission
     } commission `;
   }
+}
+
+export type ConversionSegment = {
+  segmentLabel: string;
+  conversions: Array<Conversion>;
+};
+
+export function averageBetSize(conversions: Array<Conversion>): number {
+  if (conversions.length === 0) {
+    return 0;
+  }
+
+  const total = conversions.reduce((total, conversion) => {
+    return total + conversion.amount;
+  }, 0);
+  return total / conversions.length;
+}
+
+export function averageCommission(conversions: Array<Conversion>): number {
+  if (conversions.length === 0) {
+    return 0;
+  }
+
+  const total = conversions.reduce((total, conversion) => {
+    return total + conversion.affliateLink.commission;
+  }, 0);
+  return total / conversions.length;
+}
+
+export function totalCommission(conversions: Array<Conversion>): number {
+  return conversions.reduce((total, conversion) => {
+    return total + conversion.affliateLink.commission;
+  }, 0);
+}
+
+export function segmentConversionsByTimeframe(
+  conversions: Array<Conversion>,
+  timeframe: Timeframe
+): ConversionSegment[] {
+  const timeframeSegments: TimeframeSegment[] =
+    divideTimeframeIntoSegments(timeframe);
+
+  const conversionSegments: ConversionSegment[] = timeframeSegments.map(
+    (segment) => ({
+      segmentLabel: segment.label,
+      conversions: filterConversionsByDateInterval(conversions, {
+        fromDate: segment.start,
+        toDate: segment.end,
+      }),
+    })
+  );
+
+  return conversionSegments;
+}
+
+export function filterConversionsByDateInterval(
+  conversions: Conversion[],
+  { fromDate, toDate }: { fromDate?: Date; toDate?: Date }
+) {
+  return conversions.filter(
+    (conversion) =>
+      !(fromDate && conversion.dateOccured < fromDate) &&
+      !(toDate && conversion.dateOccured > toDate)
+  );
+}
+
+export function filterConversionsByTimeframe(
+  conversions: Array<Conversion>,
+  timeframe: Timeframe
+): Array<Conversion> {
+  const intervalStart = getIntervalStart(timeframe);
+  return conversions.filter(
+    (conversion) => conversion.dateOccured >= intervalStart
+  );
 }
 
 export function createSaleId({
