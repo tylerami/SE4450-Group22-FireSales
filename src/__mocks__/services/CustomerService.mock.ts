@@ -2,6 +2,9 @@ import { Customer } from "@models/Customer";
 import { CustomerService } from "services/interfaces/CustomerService";
 
 export class MockCustomerService implements CustomerService {
+  async searchByName(fullName: string): Promise<Customer[]> {
+    return [];
+  }
   async create(customer: Customer): Promise<Customer> {
     return customer;
   }

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import {
   Flex,
   Box,
@@ -12,23 +12,18 @@ import {
 } from "@chakra-ui/react";
 import { FiUser } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
+import { UserContext } from "components/auth/UserProvider";
 
 const profilePictureSrc = null;
 
 interface TopNavBarProps {
   pageName: string;
-  userName: string;
-  userRole: string;
-  profileImageSrc: string | null;
 }
 
-const TopNavBar: React.FC<TopNavBarProps> = ({
-  pageName,
-  userName,
-  userRole,
-  profileImageSrc,
-}) => {
+const TopNavBar: React.FC<TopNavBarProps> = ({ pageName }) => {
   const navigate = useNavigate();
+
+  const { currentUser } = useContext(UserContext);
 
   return (
     <Flex
@@ -51,16 +46,14 @@ const TopNavBar: React.FC<TopNavBarProps> = ({
       {/* Right-aligned Profile section */}
       <Flex mx={8}>
         <Box mx={4} textAlign="right">
-          <Text fontWeight="bold">{userName}</Text>
+          <Text fontWeight="bold">{currentUser?.firstName}</Text>
           <Text fontSize="sm" color="gray.500">
-            {userRole}
+            {currentUser?.roles[0]}
           </Text>
         </Box>
-        {profileImageSrc && (
-          <Avatar name={userName} src={profileImageSrc} size="sm" />
-        )}
-        {profilePictureSrc ? (
-          <Image borderRadius="full" boxSize="40px" src={profilePictureSrc} />
+
+        {!currentUser ? (
+          <Image borderRadius="full" boxSize="40px" src={""} />
         ) : (
           <Circle size="40px" bg="gray.200" mr={4}>
             <Icon as={FiUser} />

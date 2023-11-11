@@ -52,7 +52,7 @@ const RecordConversionsWidget = (props: Props) => {
     <Flex
       p={26}
       borderRadius="20px"
-      width="95%"
+      width="100%"
       gap={2}
       flexDirection="column"
       boxShadow="3px 4px 12px rgba(0, 0, 0, 0.2)"

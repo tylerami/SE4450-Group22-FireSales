@@ -15,7 +15,7 @@ export class Customer {
     id = generateUserID(),
     email,
   }: {
-    id: string;
+    id?: string;
     fullName: string;
     email?: string;
   }) {

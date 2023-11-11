@@ -58,12 +58,7 @@ const UserDashboard = (props: Props) => {
       >
         {/* Top Navigation Bar - spans the width minus the sidebar */}
         <Box w="full">
-          <TopNavBar
-            pageName={contentTabs[activeTabIndex].name}
-            userName="Ruan Badenhorst"
-            userRole="Salesperson"
-            profileImageSrc={null}
-          />
+          <TopNavBar pageName={contentTabs[activeTabIndex].name} />
         </Box>
 
         {/* Main page content */}

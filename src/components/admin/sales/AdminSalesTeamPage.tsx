@@ -3,7 +3,7 @@ import SalesTeamListWidget from "./SalesTeamListWidget";
 import { Box, Flex, Heading, Icon, IconButton, Spacer } from "@chakra-ui/react";
 import CompensationGroupWidget from "./CompensationGroupWidget";
 import { User } from "../../../models/User";
-import UserPerformanceSummaryWidget from "./user_management/UserPerformanceSummaryWidget";
+import UserPerformanceSummaryWidget from "./user_management/performance/UserPerformanceSummaryWidget";
 import { ChevronLeftIcon } from "@chakra-ui/icons";
 import UserManagementWidget from "./user_management/UserManagementWidget";
 

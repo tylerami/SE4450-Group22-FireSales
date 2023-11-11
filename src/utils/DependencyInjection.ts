@@ -8,6 +8,7 @@ import ImageFirebaseService from "services/implementations/ImageFirebaseService"
 import { ClientService } from "services/interfaces/ClientService";
 import { CompensationGroupService } from "services/interfaces/CompensationGroupService";
 import { ConversionService } from "services/interfaces/ConversionService";
+import { CustomerService } from "services/interfaces/CustomerService";
 import { ImageService } from "services/interfaces/ImageService";
 import { UserService } from "services/interfaces/UserService";
 
@@ -75,8 +76,8 @@ export class DependencyInjection {
       "CompensationGroupService"
     );
 
-  public static customerService = (): CompensationGroupService =>
-    this.getInstance().resolve<CompensationGroupService>("CustomerService");
+  public static customerService = (): CustomerService =>
+    this.getInstance().resolve<CustomerService>("CustomerService");
 
   public static imageService = (): ImageService =>
     this.getInstance().resolve<ImageService>("ImageService");

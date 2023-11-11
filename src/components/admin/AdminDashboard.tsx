@@ -60,12 +60,7 @@ const AdminDashboard = (props) => {
       >
         {/* Top Navigation Bar - spans the width minus the sidebar */}
         <Box w="full">
-          <TopNavBar
-            pageName={tabs[activeTabIndex].name}
-            userName="Tyler Amirault"
-            userRole="Admin"
-            profileImageSrc={null}
-          />
+          <TopNavBar pageName={tabs[activeTabIndex].name} />
         </Box>
 
         {/* Welcome text */}

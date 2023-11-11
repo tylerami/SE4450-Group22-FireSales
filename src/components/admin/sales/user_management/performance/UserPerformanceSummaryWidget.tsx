@@ -29,7 +29,7 @@ import {
 } from "@chakra-ui/react";
 import { ChevronDownIcon } from "@chakra-ui/icons";
 import UserPerformanceSummaryChart from "./UserPerformanceSummaryChart";
-import ImageComponent from "../../../utils/ImageComponent";
+import ImageComponent from "../../../../utils/ImageComponent";
 
 type Props = {};
 

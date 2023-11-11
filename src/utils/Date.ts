@@ -1,4 +1,8 @@
-export function formatDateString(date: Date) {
+export function formatDateString(date: Date | undefined) {
+  if (!date) {
+    return "";
+  }
+
   const year = date.getFullYear();
   const month = date.getMonth() + 1;
   const day = date.getDate();

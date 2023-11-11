@@ -10,6 +10,11 @@ import {
   getIntervalStart,
 } from "./enums/Timeframe";
 
+export type ConversionAttachmentGroup = {
+  conversion: Conversion;
+  attachments: File[];
+};
+
 export class Conversion {
   id: string;
   dateOccured: Date;

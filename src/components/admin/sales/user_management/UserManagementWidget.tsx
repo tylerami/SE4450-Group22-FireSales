@@ -67,7 +67,7 @@ const UserManagementWidget = (props: Props) => {
         <Heading as="h1" fontSize={"1.2em"} fontWeight={700}>
           {selectedConversion
             ? selectedConversion.description()
-            : "User Management"}
+            : "Conversion History"}
         </Heading>
 
         <Button cursor={"default"} _hover={{}} disabled>
