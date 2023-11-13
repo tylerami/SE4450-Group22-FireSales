@@ -237,13 +237,13 @@ const UserPerformanceWidget = (props: Props) => {
         <Tbody>
           {affiliateLinkGroups.map(
             ({ link, conversions: groupConversions }, i) => (
-              <Tr>
+              <Tr key={i}>
                 <Td textAlign={"center"}>{link.clientName}</Td>
                 <Td textAlign={"center"}>
                   {getReferralLinkTypeLabel(link.type)}
                 </Td>
                 {performanceMetrics.map((metric, i) => (
-                  <Td textAlign={"center"}>
+                  <Td key={i} textAlign={"center"}>
                     {metric.getValue(groupConversions).toString()}
                   </Td>
                 ))}

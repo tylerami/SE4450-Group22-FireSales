@@ -26,7 +26,7 @@ const UserDashboardPage = (props: Props) => {
       >
         <Box></Box>
         <AffiliateLinkWidget></AffiliateLinkWidget>
-        <UserPerformanceWidget></UserPerformanceWidget>
+        <UserPerformanceWidget />
 
         <Box h={20}></Box>
       </Flex>

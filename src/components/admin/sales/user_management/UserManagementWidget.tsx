@@ -14,7 +14,7 @@ import React, { useState } from "react";
 import { Conversion } from "../../../../models/Conversion";
 import ImageComponent from "../../../utils/ImageComponent";
 import { CloseIcon } from "@chakra-ui/icons";
-import ConversionMessageWidget from "./conversion_management/ConversionMessagesWidget";
+import ConversionMessageWidget from "../../../common/conversions/ConversionMessagesWidget";
 import { formatDateString } from "../../../../utils/Date";
 import { sampleConversions } from "__mocks__/models/Conversion.mock";
 

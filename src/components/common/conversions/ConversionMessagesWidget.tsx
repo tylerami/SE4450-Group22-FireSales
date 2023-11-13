@@ -9,7 +9,7 @@ import {
 import React, { useEffect, useRef } from "react";
 
 import { ArrowUpIcon } from "@chakra-ui/icons";
-import ConversionMessageTile from "./ConversionMessageTile";
+import ConversionMessageTile from "../../admin/sales/user_management/conversion_management/ConversionMessageTile";
 
 const messages = [
   {

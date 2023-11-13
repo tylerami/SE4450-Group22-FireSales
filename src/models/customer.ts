@@ -1,4 +1,5 @@
 import { generateUserID } from "utils/Identification";
+import { Timestamp, DocumentData } from "firebase/firestore";
 
 // Deprecate function
 export function customerIdFromName(fullName: string) {
@@ -22,5 +23,21 @@ export class Customer {
     this.id = id;
     this.fullName = fullName;
     this.email = email;
+  }
+
+  public toFirestoreDoc(): DocumentData {
+    return {
+      id: this.id,
+      fullName: this.fullName,
+      email: this.email,
+    };
+  }
+
+  public static fromFirestoreDoc(doc: DocumentData): Customer {
+    return new Customer({
+      id: doc.id,
+      fullName: doc.fullName,
+      email: doc.email,
+    });
   }
 }

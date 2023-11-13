@@ -17,9 +17,15 @@ import { DependencyInjection } from "utils/DependencyInjection";
 import { UserContext } from "components/auth/UserProvider";
 import { CloseIcon } from "@chakra-ui/icons";
 import ImageComponent from "components/utils/ImageComponent";
-import ConversionMessageWidget from "components/admin/sales/user_management/conversion_management/ConversionMessagesWidget";
+import ConversionMessageWidget from "components/common/conversions/ConversionMessagesWidget";
 import { formatDateString } from "utils/Date";
 import { sampleConversions } from "__mocks__/models/Conversion.mock";
+import SelectedConversionContent from "./SelectedConversionContent";
+import ConversionBrowserContent from "./ConversionBrowserContent";
+import { CompensationGroupService } from "services/interfaces/CompensationGroupService";
+import { CompensationGroup } from "@models/CompensationGroup";
+import { ClientService } from "services/interfaces/ClientService";
+import { Client } from "models/Client";
 
 type Props = {};
 
@@ -54,13 +60,36 @@ const ConversionHistoryWidget = (props: Props) => {
   const conversionService: ConversionService =
     DependencyInjection.conversionService();
 
+  const compGroupService: CompensationGroupService =
+    DependencyInjection.compensationGroupService();
+
+  const clientService: ClientService = DependencyInjection.clientService();
+
   const [conversions, setConversions] = useState<Conversion[]>([]);
   const [selectedConversion, setSelectedConversion] =
     useState<Conversion | null>(null);
+  const [compGroup, setCompGroup] = useState<CompensationGroup | null>(null);
+  const [clients, setClients] = useState<Client[]>([]);
 
   const { currentUser } = useContext(UserContext);
 
   useEffect(() => {
+    const fetchCompGroup = async () => {
+      if (!currentUser || !currentUser.compensationGroupId) return;
+
+      const compGroup = await compGroupService.get(
+        currentUser.compensationGroupId
+      );
+      setCompGroup(compGroup);
+    };
+
+    const fetchClients = async () => {
+      if (!currentUser) return;
+
+      const clients: Client[] = await clientService.getAll();
+      setClients(clients);
+    };
+
     const fetchConversions = async () => {
       if (!currentUser) return;
 
@@ -72,7 +101,9 @@ const ConversionHistoryWidget = (props: Props) => {
     };
 
     fetchConversions();
-  }, [conversionService, currentUser]);
+    fetchCompGroup();
+    fetchClients();
+  }, [clientService, compGroupService, conversionService, currentUser]);
 
   return (
     <Flex
@@ -84,86 +115,18 @@ const ConversionHistoryWidget = (props: Props) => {
       flexDirection={"column"}
       boxShadow={"3px 4px 12px rgba(0, 0, 0, 0.2)"}
     >
-      <Flex justifyContent={"space-between"}>
-        <Heading as="h1" fontSize={"1.2em"} fontWeight={700}>
-          {selectedConversion
-            ? selectedConversion.description()
-            : "Conversion History"}
-        </Heading>
-
-        <Button cursor={"default"} _hover={{}} disabled>
-          Not Verified
-        </Button>
-
-        {selectedConversion && (
-          <IconButton
-            onClick={() => {
-              setSelectedConversion(null);
-            }}
-            icon={<CloseIcon />}
-            aria-label={""}
-          />
-        )}
-      </Flex>
-
-      {selectedConversion && (
-        <Flex
-          maxH={"40em"}
-          gap={10}
-          justifyContent={"space-evenly"}
-          alignItems={"center"}
-          w="100%"
-        >
-          {Array.from({ length: 3 }, (_, index) => (
-            <ImageComponent
-              imagePath={`/conversions/1/${selectedConversion.id}_${
-                index + 1
-              }.png`}
-            />
-          ))}
-        </Flex>
-      )}
-
-      {selectedConversion && (
-        <Flex gap={8}>
-          <Button size="lg" colorScheme="green" w="full">
-            Approve
-          </Button>
-          <Button size="lg" colorScheme="red" w="full">
-            Deny
-          </Button>
-        </Flex>
-      )}
-
-      {selectedConversion && <ConversionMessageWidget />}
-
-      {!selectedConversion && (
-        <Table size="sm">
-          <Thead>
-            <Tr>
-              {properties.map((property, i) => {
-                return <Th textAlign={"center"}>{property.label}</Th>;
-              })}
-            </Tr>
-          </Thead>
-          <Tbody>
-            {conversions.map((sale, i) => (
-              <Tr
-                cursor={"pointer"}
-                onClick={() => {
-                  setSelectedConversion(sale);
-                }}
-                _hover={{ background: "rgba(237, 125, 49, 0.26)" }}
-              >
-                {properties.map((property, i) => {
-                  return (
-                    <Td textAlign={"center"}>{property.function(sale)}</Td>
-                  );
-                })}
-              </Tr>
-            ))}
-          </Tbody>
-        </Table>
+      {selectedConversion ? (
+        <SelectedConversionContent
+          exit={() => setSelectedConversion(null)}
+          selectedConversion={selectedConversion}
+        />
+      ) : (
+        <ConversionBrowserContent
+          clients={clients}
+          compGroup={compGroup}
+          conversions={conversions}
+          selectConversion={setSelectedConversion}
+        />
       )}
     </Flex>
   );

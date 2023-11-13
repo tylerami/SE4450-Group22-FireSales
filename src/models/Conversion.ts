@@ -2,6 +2,7 @@ import { formatDateString } from "../utils/Date";
 import { AffiliateLink } from "./AffiliateLink";
 import { Customer } from "./Customer";
 import { Message } from "./Message";
+import { ConversionsStatus } from "./enums/ConversionStatus";
 import { Currency } from "./enums/Currency";
 import {
   Timeframe,
@@ -9,6 +10,7 @@ import {
   divideTimeframeIntoSegments,
   getIntervalStart,
 } from "./enums/Timeframe";
+import { Timestamp, DocumentData } from "firebase/firestore";
 
 export type ConversionAttachmentGroup = {
   conversion: Conversion;
@@ -20,7 +22,8 @@ export class Conversion {
   dateOccured: Date;
   loggedAt: Date;
   userId: string;
-  compensationGroupId: string;
+  status: ConversionsStatus;
+  compensationGroupId?: string;
   affiliateLink: AffiliateLink;
   customer: Customer;
   amount: number; // Bet size
@@ -33,6 +36,7 @@ export class Conversion {
     dateOccured,
     loggedAt,
     userId,
+    status,
     compensationGroupId,
     affiliateLink,
     customer,
@@ -45,7 +49,8 @@ export class Conversion {
     dateOccured: Date;
     loggedAt: Date;
     userId: string;
-    compensationGroupId: string;
+    status: ConversionsStatus;
+    compensationGroupId?: string;
     affiliateLink: AffiliateLink;
     customer: Customer;
     amount: number;
@@ -57,6 +62,7 @@ export class Conversion {
     this.dateOccured = dateOccured;
     this.loggedAt = loggedAt;
     this.userId = userId;
+    this.status = status;
     this.compensationGroupId = compensationGroupId;
     this.affiliateLink = affiliateLink;
     this.customer = customer;
@@ -98,6 +104,7 @@ export class Conversion {
       dateOccured,
       loggedAt,
       userId,
+      status: ConversionsStatus.pending,
       compensationGroupId,
       affiliateLink,
       customer,
@@ -113,6 +120,44 @@ export class Conversion {
     } / ${this.customer.id} / $${this.amount} bet / $${
       this.affiliateLink.commission
     } commission `;
+  }
+
+  public toFirestoreDoc(): DocumentData {
+    return {
+      id: this.id,
+      dateOccured: this.dateOccured
+        ? Timestamp.fromDate(this.dateOccured)
+        : null,
+      loggedAt: this.loggedAt ? Timestamp.fromDate(this.loggedAt) : null,
+      userId: this.userId,
+      status: this.status,
+      compensationGroupId: this.compensationGroupId,
+      affiliateLink: this.affiliateLink.toFirestoreDoc(),
+      customer: this.customer.toFirestoreDoc(),
+      amount: this.amount,
+      attachmentUrls: this.attachmentUrls,
+      currency: this.currency,
+      messages: this.messages.map((message) => message.toFirestoreDoc()), // Assuming Message has a toFirestoreDoc method
+    };
+  }
+
+  public static fromFirestoreDoc(doc: DocumentData): Conversion {
+    return new Conversion({
+      id: doc.id,
+      dateOccured: doc.dateOccured ? doc.dateOccured.toDate() : new Date(),
+      loggedAt: doc.loggedAt ? doc.loggedAt.toDate() : new Date(),
+      userId: doc.userId,
+      status: doc.status as ConversionsStatus,
+      compensationGroupId: doc.compensationGroupId,
+      affiliateLink: AffiliateLink.fromFirestoreDoc(doc.affiliateLink),
+      customer: Customer.fromFirestoreDoc(doc.customer),
+      amount: doc.amount,
+      attachmentUrls: doc.attachmentUrls,
+      currency: doc.currency as Currency,
+      messages: doc.messages.map((msgDoc: DocumentData) =>
+        Message.fromFirestoreDoc(msgDoc)
+      ),
+    });
   }
 }
 

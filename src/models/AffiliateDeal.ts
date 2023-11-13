@@ -1,5 +1,6 @@
 import { Currency } from "./enums/Currency";
 import { ReferralLinkType } from "./enums/ReferralLinkType";
+import { Timestamp, DocumentData } from "firebase/firestore";
 
 export class AffiliateDeal {
   clientId: string;
@@ -50,5 +51,41 @@ export class AffiliateDeal {
     this.currency = currency;
     this.minBetSize = minBetSize;
     this.targetMonthlyConversions = targetMonthlyConversions;
+  }
+
+  toFirestoreDoc(affiliateDeal: AffiliateDeal): DocumentData {
+    return {
+      clientId: affiliateDeal.clientId,
+      clientName: affiliateDeal.clientName,
+      type: affiliateDeal.type,
+      link: affiliateDeal.link,
+      enabled: affiliateDeal.enabled,
+      createdAt: affiliateDeal.createdAt
+        ? Timestamp.fromDate(affiliateDeal.createdAt)
+        : null,
+      updatedAt: affiliateDeal.updatedAt
+        ? Timestamp.fromDate(affiliateDeal.updatedAt)
+        : null,
+      cpa: affiliateDeal.cpa,
+      currency: affiliateDeal.currency,
+      minBetSize: affiliateDeal.minBetSize,
+      targetMonthlyConversions: affiliateDeal.targetMonthlyConversions,
+    };
+  }
+
+  static fromFirestoreDoc(doc: DocumentData): AffiliateDeal {
+    return new AffiliateDeal({
+      clientId: doc.clientId,
+      clientName: doc.clientName,
+      type: doc.type as ReferralLinkType,
+      link: doc.link,
+      enabled: doc.enabled,
+      createdAt: doc.createdAt ? doc.createdAt.toDate() : new Date(),
+      updatedAt: doc.updatedAt ? doc.updatedAt.toDate() : undefined,
+      cpa: doc.cpa,
+      currency: doc.currency as Currency,
+      minBetSize: doc.minBetSize,
+      targetMonthlyConversions: doc.targetMonthlyConversions,
+    });
   }
 }

@@ -1,3 +1,4 @@
+import { ConversionsStatus } from "models/enums/ConversionStatus";
 import { Conversion } from "../../models/Conversion";
 import { Currency } from "../../models/enums/Currency";
 import { generateAffiliateLinks } from "./AffiliateLink.mock";
@@ -10,6 +11,7 @@ export const conversionSample = new Conversion({
   dateOccured: new Date(),
   loggedAt: new Date(),
   userId: "user123",
+  status: ConversionsStatus.pending,
   compensationGroupId: "comp123",
   affiliateLink: generateAffiliateLinks(1)[0],
   customer: customerSample,

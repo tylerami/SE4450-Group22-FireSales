@@ -34,7 +34,7 @@ type Props = {
   compensationGroup: CompensationGroup;
   deleteRow: () => void;
   errorText?: string;
-  setConversion: (conversionGroup: ConversionAttachmentGroup) => void;
+  setConversionGroup: (conversionGroup: ConversionAttachmentGroup) => void;
   rowIndex?: number;
 };
 
@@ -42,7 +42,7 @@ const RecordConversionTile = ({
   compensationGroup,
   errorText,
   deleteRow,
-  setConversion: setConversionGroup,
+  setConversionGroup,
   rowIndex: rowNumber,
 }: Props) => {
   const customerService: CustomerService =
@@ -61,12 +61,13 @@ const RecordConversionTile = ({
   };
 
   const handleFilesChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    console.log(event.target.files);
     setAttachments(Array.from(event.target.files ?? []));
     handleSave();
   };
 
   const triggerFileUpload = () => {
-    const fileInput = document.getElementById("file-upload");
+    const fileInput = document.getElementById(`file-upload-${rowNumber}`);
     if (fileInput) {
       (fileInput as HTMLInputElement).click();
     }
@@ -242,7 +243,7 @@ const RecordConversionTile = ({
                   multiple
                   hidden
                   onChange={handleFilesChange}
-                  id="file-upload"
+                  id={`file-upload-${rowNumber}`}
                 />
                 {attachments.length <= 0 ? " Upload Files" : "Remove Files"}
               </Button>
@@ -262,11 +263,6 @@ const RecordConversionTile = ({
               </React.Fragment>
             )}
           </Flex>
-          <IconButton
-            aria-label="Delete row"
-            onClick={deleteRow}
-            icon={<DeleteIcon />}
-          />
         </Flex>
       </Flex>
       {errorText && <Text color="#FF3838">{errorText}</Text>}

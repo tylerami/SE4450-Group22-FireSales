@@ -1,8 +1,8 @@
-import { get } from "http";
 import {
   ReferralLinkType,
   getReferralLinkTypeLabel,
 } from "./enums/ReferralLinkType";
+import { Timestamp, DocumentData } from "firebase/firestore";
 
 export class AffiliateLink {
   clientId: string;
@@ -45,5 +45,31 @@ export class AffiliateLink {
 
   public description(): string {
     return `${this.clientName} - ${getReferralLinkTypeLabel(this.type)}`;
+  }
+
+  public toFirestoreDoc(): DocumentData {
+    return {
+      clientId: this.clientId,
+      clientName: this.clientName,
+      type: this.type,
+      link: this.link,
+      enabled: this.enabled,
+      createdAt: this.createdAt ? Timestamp.fromDate(this.createdAt) : null,
+      commission: this.commission,
+      minBetSize: this.minBetSize,
+    };
+  }
+
+  public static fromFirestoreDoc(doc: DocumentData): AffiliateLink {
+    return new AffiliateLink({
+      clientId: doc.clientId,
+      clientName: doc.clientName,
+      type: doc.type as ReferralLinkType,
+      link: doc.link,
+      enabled: doc.enabled,
+      createdAt: doc.createdAt ? doc.createdAt.toDate() : new Date(),
+      commission: doc.commission,
+      minBetSize: doc.minBetSize,
+    });
   }
 }

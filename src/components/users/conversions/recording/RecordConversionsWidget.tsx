@@ -8,7 +8,7 @@ import { DependencyInjection } from "utils/DependencyInjection";
 import { CompensationGroup } from "models/CompensationGroup";
 import { UserContext } from "components/auth/UserProvider";
 
-const ENABLE_BULK_MODE = false;
+const ENABLE_BULK_MODE = true;
 
 type Props = {};
 
@@ -78,7 +78,9 @@ const RecordConversionsWidget = (props: Props) => {
             compensationGroup={compensationGroup}
           />
         ) : (
-          <BulkRecordConversionsWidgetContent />
+          <BulkRecordConversionsWidgetContent
+            compensationGroup={compensationGroup}
+          />
         )
       ) : (
         <Flex w="100%" h="10em" justifyContent={"center"} alignItems={"center"}>

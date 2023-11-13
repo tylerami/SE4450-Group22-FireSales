@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from "react";
-import { Box, Button, Text } from "@chakra-ui/react";
+import { Box, Button, Flex, Text } from "@chakra-ui/react";
 import RecordConversionTile from "./ManualRecordConversionTile";
 import { AddIcon } from "@chakra-ui/icons";
 import {
@@ -9,6 +9,7 @@ import {
 import { CompensationGroup } from "@models/CompensationGroup";
 import { ConversionService } from "services/interfaces/ConversionService";
 import { DependencyInjection } from "utils/DependencyInjection";
+import { RiSubtractLine } from "react-icons/ri";
 
 // Since the Props type is empty, we can omit it and also the props parameter
 const ManualRecordConversionsWidgetContent = ({
@@ -52,8 +53,9 @@ const ManualRecordConversionsWidgetContent = ({
   }, []);
 
   const deleteRow = useCallback(() => {
+    setRowError(rowCount - 1, undefined);
     setRowCount((currentRowCount) => currentRowCount - 1);
-  }, []);
+  }, [rowCount]);
 
   const setConversion = useCallback(
     (
@@ -78,7 +80,7 @@ const ManualRecordConversionsWidgetContent = ({
 
     resetErrors();
     let foundError = false;
-    for (let i = 0; i <= rowCount; i++) {
+    for (let i = 0; i < rowCount; i++) {
       if (!conversions[i]) {
         setRowError(i, "Please fill out all fields");
         foundError = true;
@@ -101,15 +103,15 @@ const ManualRecordConversionsWidgetContent = ({
   }
 
   // Generate an array of RecordConversionTile components
-  const recordConversionTiles = Array.from({ length: rowCount }, (_, index) => (
-    <Box>
+  const recordConversionTiles = Array.from({ length: rowCount }, (_, i) => (
+    <Box key={`${i}-box`}>
       <RecordConversionTile
         compensationGroup={compensationGroup}
-        errorText={errorsByRow[index]}
-        rowIndex={index + 1}
-        setConversion={(conversion) => setConversion(index, conversion)}
+        errorText={errorsByRow[i]}
+        rowIndex={i + 1}
+        setConversionGroup={(conversion) => setConversion(i, conversion)}
         deleteRow={deleteRow}
-        key={index}
+        key={i}
       />
     </Box>
   ));
@@ -120,11 +122,19 @@ const ManualRecordConversionsWidgetContent = ({
 
       {recordConversionTiles}
 
-      <Box h={2} />
+      <Box h={0} />
 
-      <Button leftIcon={<AddIcon />} onClick={addRow}>
-        Add Row
-      </Button>
+      <Flex gap={4} w="100%">
+        <Button w="full" leftIcon={<AddIcon />} onClick={addRow}>
+          Add Row
+        </Button>
+        {rowCount > 1 && (
+          <Button minW="40%" leftIcon={<RiSubtractLine />} onClick={deleteRow}>
+            Remove Row
+          </Button>
+        )}
+      </Flex>
+      <Box />
       <Button
         isLoading={loading}
         size="lg"

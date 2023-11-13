@@ -1,7 +1,6 @@
-import { generateUserID } from "@utils/Identification";
-import { CompensationGroup } from "./CompensationGroup";
 import { PaymentType } from "./enums/PaymentType";
 import { Role } from "./enums/Role";
+import { Timestamp, DocumentData } from "firebase/firestore";
 
 export class User {
   uid: string;
@@ -67,4 +66,40 @@ export class User {
   }
 
   public isAdmin = () => this.roles.includes(Role.admin);
+
+  public toFirestoreDoc(): DocumentData {
+    const paymentDetailsObject = this.paymentDetails
+      ? Object.fromEntries(this.paymentDetails)
+      : {};
+
+    return {
+      uid: this.uid,
+      firstName: this.firstName,
+      lastName: this.lastName,
+      email: this.email,
+      roles: this.roles,
+      registeredAt: this.registeredAt
+        ? Timestamp.fromDate(this.registeredAt)
+        : null,
+      compensationGroupId: this.compensationGroupId,
+      paymentDetails: paymentDetailsObject,
+    };
+  }
+
+  public static fromFirestoreDoc(doc: DocumentData): User {
+    const paymentDetailsMap = doc.paymentDetails
+      ? new Map(Object.entries(doc.paymentDetails))
+      : new Map();
+
+    return new User({
+      uid: doc.uid,
+      firstName: doc.firstName,
+      lastName: doc.lastName,
+      email: doc.email,
+      roles: doc.roles,
+      registeredAt: doc.registeredAt ? doc.registeredAt.toDate() : new Date(),
+      compensationGroupId: doc.compensationGroupId,
+      paymentDetails: paymentDetailsMap,
+    });
+  }
 }
