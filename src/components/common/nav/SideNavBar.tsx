@@ -3,47 +3,18 @@ import React from "react";
 
 import { Box } from "@chakra-ui/react"; // Using Chakra UI for the box
 import SideNavBarButton from "./SideNavBarButton";
-import { AiOutlineDashboard } from "react-icons/ai";
-import { MdSettings, MdTrendingUp } from "react-icons/md";
-import { RiLogoutBoxRLine } from "react-icons/ri";
-import { signOut } from "firebase/auth";
-import { auth } from "../../config/firebase";
-import { useNavigate } from "react-router-dom";
-import Logo from "../utils/Logo";
-import { useGlobalState } from "../utils/GlobalState";
+import Logo from "../../utils/Logo";
+import { Tab } from "@components/common/nav/Tab";
+import { useGlobalState } from "components/utils/GlobalState";
 
-type Props = object;
+type Props = {
+  tabs: Tab[];
+};
 
-const UserSideNavBar = (props: Props) => {
-  const navigate = useNavigate();
+const SideNavBar = ({ tabs }: Props) => {
+  const heightInEm = tabs.length * 4 + 2;
 
-  const { activeTabIndex, setActiveTabIndex } = useGlobalState();
-
-  const tabs = [
-    {
-      name: "Dashboard",
-      icon: AiOutlineDashboard,
-      onClick: () => setActiveTabIndex(0),
-    },
-    {
-      name: "Conversions",
-      icon: MdTrendingUp,
-      onClick: () => setActiveTabIndex(1),
-    },
-    {
-      name: "Settings",
-      icon: MdSettings,
-      onClick: () => setActiveTabIndex(2),
-    },
-    {
-      name: "Sign Out",
-      icon: RiLogoutBoxRLine,
-      onClick: () =>
-        signOut(auth).then(() => {
-          navigate("/login");
-        }),
-    },
-  ];
+  const { activeTabIndex } = useGlobalState();
 
   return (
     <Flex
@@ -64,7 +35,7 @@ const UserSideNavBar = (props: Props) => {
       <Flex
         width={"100%"}
         h="100%"
-        maxHeight={"20em"}
+        maxHeight={`${heightInEm}em`}
         alignItems={"center"}
         flexDirection={"column"}
         justifyContent={"space-evenly"}
@@ -88,4 +59,4 @@ const UserSideNavBar = (props: Props) => {
   );
 };
 
-export default UserSideNavBar;
+export default SideNavBar;

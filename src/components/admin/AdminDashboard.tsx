@@ -1,33 +1,64 @@
 import React from "react";
-import { Box, Flex, Heading } from "@chakra-ui/react";
-import AdminSideNavBar from "../nav/AdminSideNavBar";
-import TopNavBar from "../nav/TopNavBar";
-import SalesTeamTableWidget from "./dashboard/team/SalesTeamTableWidget";
-import PerformanceChartWidget from "./dashboard/performance/PerformanceChartWidget";
-import ClientsSummaryTableWidget from "./dashboard/clients/ClientsSummaryTableWidget";
-import AdminDashboardPage from "./dashboard/AdminDashboardPage";
-import AdminClientsPage from "./clients/AdminClientsPage";
-import AdminSalesTeamPage from "./sales/AdminSalesTeamPage";
+import { Box, Flex } from "@chakra-ui/react";
+import SideNavBar from "../common/nav/SideNavBar";
+import TopNavBar from "../common/nav/TopNavBar";
 import { useGlobalState } from "../utils/GlobalState";
+import { MdMonetizationOn } from "react-icons/md";
+import { BiAnalyse } from "react-icons/bi";
+import { IoMdPeople } from "react-icons/io";
+import { FaRegHandshake } from "react-icons/fa";
+import { RiLogoutBoxRLine } from "react-icons/ri";
+import { signOut } from "firebase/auth";
+import { useNavigate } from "react-router-dom";
+import { auth } from "config/firebase";
+import PerformancePage from "./performance/PerformancePage";
+import AdminSalesTeamPage from "./sales/AdminSalesTeamPage";
+import AdminClientsPage from "./clients/AdminClientsPage";
+import CompensationGroupsPage from "./compensation_groups/CompensationGroupsPage";
+import { Tab } from "@components/common/nav/Tab";
 
 const AdminDashboard = (props) => {
   // Assuming the SideNavBar has a fixed width for simplicity
   const sideNavWidth = "14em"; // or 224px, or any other unit
 
-  const { activeTabIndex } = useGlobalState();
+  const navigate = useNavigate();
 
-  const tabs = [
-    // {
-    //   name: "Dashboard",
-    //   content: <AdminDashboardPage />,
-    // },
+  const { activeTabIndex, setActiveTabIndex } = useGlobalState();
+
+  const adminTabs: Tab[] = [
     {
-      name: "Clients",
-      content: <AdminClientsPage />,
+      name: "Performance",
+      icon: BiAnalyse,
+      content: <PerformancePage />,
+      onClick: () => setActiveTabIndex(0),
     },
     {
       name: "Sales Team",
+      icon: IoMdPeople,
       content: <AdminSalesTeamPage />,
+      onClick: () => setActiveTabIndex(1),
+    },
+
+    {
+      name: "Clients",
+      icon: FaRegHandshake,
+      content: <AdminClientsPage />,
+      onClick: () => setActiveTabIndex(2),
+    },
+
+    {
+      name: "Sales Groups",
+      icon: MdMonetizationOn,
+      content: <CompensationGroupsPage />,
+      onClick: () => setActiveTabIndex(3),
+    },
+    {
+      name: "Sign Out",
+      icon: RiLogoutBoxRLine,
+      onClick: () =>
+        signOut(auth).then(() => {
+          navigate("/login");
+        }),
     },
   ];
 
@@ -47,7 +78,7 @@ const AdminDashboard = (props) => {
         w={sideNavWidth}
         overflowY="auto" // Scrollable vertically if content overflows
       >
-        <AdminSideNavBar />
+        <SideNavBar tabs={adminTabs} />
       </Box>
 
       {/* Main content area - padding left equals the width of the SideNavBar */}
@@ -60,7 +91,7 @@ const AdminDashboard = (props) => {
       >
         {/* Top Navigation Bar - spans the width minus the sidebar */}
         <Box w="full">
-          <TopNavBar pageName={tabs[activeTabIndex].name} />
+          <TopNavBar pageName={adminTabs[activeTabIndex].name} />
         </Box>
 
         {/* Welcome text */}
@@ -73,7 +104,7 @@ const AdminDashboard = (props) => {
           overflowX={"hidden"}
           flex={1}
         >
-          {tabs[activeTabIndex].content}
+          {adminTabs[activeTabIndex].content}
         </Flex>
       </Flex>
     </Flex>

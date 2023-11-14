@@ -4,6 +4,7 @@ import { Timestamp, DocumentData } from "firebase/firestore";
 
 export class CompensationGroup {
   id: string;
+  // this should be consistent with the AffiliateDealContainer in Client
   affiliateLinks: AffiliateLink[];
   createdAt: Date;
   updatedAt?: Date;

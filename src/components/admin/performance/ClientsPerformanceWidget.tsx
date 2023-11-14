@@ -35,9 +35,9 @@ import {
   getReferralLinkTypeLabel,
 } from "models/enums/ReferralLinkType";
 import { formatMoney } from "utils/Money";
-import PerformanceMetricBox from "./PerformanceMetricBox";
 import ClientsPerformanceChart from "./ClientsPerformanceChart";
 import { AffiliateDeal } from "@models/AffiliateDeal";
+import PerformanceMetricBox from "./PerformanceMetricBox";
 
 type Props = {};
 

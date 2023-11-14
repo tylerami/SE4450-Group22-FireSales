@@ -1,6 +1,6 @@
 import { Box, Flex, Heading } from "@chakra-ui/react";
 import React from "react";
-import GroupedBarChart from "../performance/GroupedBarChart";
+import GroupedBarChart from "../GroupedBarChart";
 
 import {
   Menu,

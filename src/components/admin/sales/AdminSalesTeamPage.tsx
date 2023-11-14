@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import SalesTeamListWidget from "./SalesTeamListWidget";
 import { Box, Flex, Heading, Icon, IconButton, Spacer } from "@chakra-ui/react";
-import CompensationGroupWidget from "./compensation_group/CompensationGroupWidget";
 import { User } from "../../../models/User";
 import UserPerformanceSummaryWidget from "./user_management/performance/UserPerformanceSummaryWidget";
 import { ChevronLeftIcon } from "@chakra-ui/icons";
@@ -35,7 +34,6 @@ const AdminSalesTeamPage = (props: Props) => {
       ) : (
         <React.Fragment>
           <SalesTeamListWidget setSelectedUser={setSelectedUser} />
-          <CompensationGroupWidget></CompensationGroupWidget>
         </React.Fragment>
       )}
       <Box h={20} />

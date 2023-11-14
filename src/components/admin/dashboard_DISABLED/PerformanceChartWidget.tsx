@@ -20,7 +20,7 @@ const PerformanceChartWidget = (props: Props) => {
     <Flex
       p={26}
       borderRadius={"20px"}
-      width={"100%"}
+      width={"95%"}
       flexDirection={"column"}
       boxShadow={"3px 4px 12px rgba(0, 0, 0, 0.2)"}
     >

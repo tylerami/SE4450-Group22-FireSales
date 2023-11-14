@@ -1,46 +1,39 @@
-import { Flex, Heading, Stack } from "@chakra-ui/react";
-import React, { useState } from "react";
+import { Flex } from "@chakra-ui/react";
+import React from "react";
 
-import { IoMdFlame } from "react-icons/io"; // Import the flame icon
 import { Box } from "@chakra-ui/react"; // Using Chakra UI for the box
-import SideNavBarButton from "./SideNavBarButton";
-import { MdDashboard } from "react-icons/md";
+import SideNavBarButton from "../../common/nav/SideNavBarButton";
 import { AiOutlineDashboard } from "react-icons/ai";
-import { BiAnalyse } from "react-icons/bi";
-import { IoMdPeople } from "react-icons/io";
-import { FaRegHandshake } from "react-icons/fa";
-import { MdSettings } from "react-icons/md";
+import { MdSettings, MdTrendingUp } from "react-icons/md";
 import { RiLogoutBoxRLine } from "react-icons/ri";
 import { signOut } from "firebase/auth";
-import { auth } from "../../config/firebase";
+import { auth } from "../../../config/firebase";
 import { useNavigate } from "react-router-dom";
-import Logo from "../utils/Logo";
-import { set } from "lodash";
-import { useGlobalState } from "../utils/GlobalState";
+import Logo from "../../utils/Logo";
+import { useGlobalState } from "../../utils/GlobalState";
 
 type Props = object;
 
-const AdminSideNavBar = (props: Props) => {
+const UserSideNavBar = (props: Props) => {
   const navigate = useNavigate();
 
   const { activeTabIndex, setActiveTabIndex } = useGlobalState();
 
   const tabs = [
-    // {
-    //   name: "Dashboard",
-
-    //   icon: AiOutlineDashboard,
-    //   onClick: () => setActiveTabIndex(0),
-    // },
     {
-      name: "Clients",
-      icon: FaRegHandshake,
+      name: "Dashboard",
+      icon: AiOutlineDashboard,
       onClick: () => setActiveTabIndex(0),
     },
     {
-      name: "Sales Team",
-      icon: IoMdPeople,
+      name: "Conversions",
+      icon: MdTrendingUp,
       onClick: () => setActiveTabIndex(1),
+    },
+    {
+      name: "Settings",
+      icon: MdSettings,
+      onClick: () => setActiveTabIndex(2),
     },
     {
       name: "Sign Out",
@@ -51,8 +44,6 @@ const AdminSideNavBar = (props: Props) => {
         }),
     },
   ];
-
-  const heightInEm = tabs.length * 4 + 2;
 
   return (
     <Flex
@@ -73,7 +64,7 @@ const AdminSideNavBar = (props: Props) => {
       <Flex
         width={"100%"}
         h="100%"
-        maxHeight={`${heightInEm}em`}
+        maxHeight={"20em"}
         alignItems={"center"}
         flexDirection={"column"}
         justifyContent={"space-evenly"}
@@ -97,4 +88,4 @@ const AdminSideNavBar = (props: Props) => {
   );
 };
 
-export default AdminSideNavBar;
+export default UserSideNavBar;

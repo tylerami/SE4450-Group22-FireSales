@@ -1,7 +1,7 @@
 import { Flex, Heading } from "@chakra-ui/react";
 import React from "react";
 import ClientsSummaryTableWidget from "./clients/ClientsSummaryTableWidget";
-import PerformanceChartWidget from "./performance/PerformanceChartWidget";
+import PerformanceChartWidget from "./PerformanceChartWidget";
 import SalesTeamTableWidget from "./team/SalesTeamTableWidget";
 
 type Props = {};
