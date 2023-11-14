@@ -1,7 +1,7 @@
 import React from "react";
-import ClientsPerformanceWidget from "./ClientsPerformanceWidget";
+import ClientsPerformanceWidget from "./performance/ClientsPerformanceWidget";
 import { Box, Flex } from "@chakra-ui/react";
-import ClientsSettingsWidget from "./ClientSettingsWidget";
+import ClientsSettingsWidget from "./settings/ClientSettingsWidget";
 
 type Props = {};
 

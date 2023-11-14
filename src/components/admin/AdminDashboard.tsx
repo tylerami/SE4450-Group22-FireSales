@@ -17,10 +17,10 @@ const AdminDashboard = (props) => {
   const { activeTabIndex } = useGlobalState();
 
   const tabs = [
-    {
-      name: "Dashboard",
-      content: <AdminDashboardPage />,
-    },
+    // {
+    //   name: "Dashboard",
+    //   content: <AdminDashboardPage />,
+    // },
     {
       name: "Clients",
       content: <AdminClientsPage />,

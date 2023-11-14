@@ -20,7 +20,7 @@ ChartJS.register(
   Legend
 );
 
-export type BarChartSegments = {
+export type BarChartSegment = {
   xAxisLabel: string;
   data: { series: string; value: number }[];
 };
@@ -33,7 +33,7 @@ const BarChart = ({
   rightAxisLabel,
 }: {
   series: { name: string; color: string }[];
-  segments: BarChartSegments[];
+  segments: BarChartSegment[];
   maxBarThickness?: number;
   leftAxisLabel?: {
     label?: string;

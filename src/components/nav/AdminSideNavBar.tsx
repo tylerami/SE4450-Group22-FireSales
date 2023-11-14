@@ -26,21 +26,21 @@ const AdminSideNavBar = (props: Props) => {
   const { activeTabIndex, setActiveTabIndex } = useGlobalState();
 
   const tabs = [
-    {
-      name: "Dashboard",
+    // {
+    //   name: "Dashboard",
 
-      icon: AiOutlineDashboard,
-      onClick: () => setActiveTabIndex(0),
-    },
+    //   icon: AiOutlineDashboard,
+    //   onClick: () => setActiveTabIndex(0),
+    // },
     {
       name: "Clients",
       icon: FaRegHandshake,
-      onClick: () => setActiveTabIndex(1),
+      onClick: () => setActiveTabIndex(0),
     },
     {
       name: "Sales Team",
       icon: IoMdPeople,
-      onClick: () => setActiveTabIndex(2),
+      onClick: () => setActiveTabIndex(1),
     },
     {
       name: "Sign Out",
@@ -51,6 +51,8 @@ const AdminSideNavBar = (props: Props) => {
         }),
     },
   ];
+
+  const heightInEm = tabs.length * 4 + 2;
 
   return (
     <Flex
@@ -71,7 +73,7 @@ const AdminSideNavBar = (props: Props) => {
       <Flex
         width={"100%"}
         h="100%"
-        maxHeight={"20em"}
+        maxHeight={`${heightInEm}em`}
         alignItems={"center"}
         flexDirection={"column"}
         justifyContent={"space-evenly"}

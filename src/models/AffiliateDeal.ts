@@ -12,7 +12,7 @@ export class AffiliateDeal {
   updatedAt?: Date;
   cpa: number;
   currency: Currency;
-  minBetSize: number;
+  targetBetSize?: number;
   targetMonthlyConversions?: number;
 
   constructor({
@@ -25,7 +25,7 @@ export class AffiliateDeal {
     updatedAt,
     cpa,
     currency = Currency.CAD,
-    minBetSize,
+    targetBetSize,
     targetMonthlyConversions,
   }: {
     clientId: string;
@@ -37,8 +37,8 @@ export class AffiliateDeal {
     updatedAt?: Date;
     cpa: number;
     currency?: Currency;
-    minBetSize: number;
-    targetMonthlyConversions: number;
+    targetBetSize?: number;
+    targetMonthlyConversions?: number;
   }) {
     this.clientId = clientId;
     this.clientName = clientName;
@@ -49,7 +49,7 @@ export class AffiliateDeal {
     this.updatedAt = updatedAt;
     this.cpa = cpa;
     this.currency = currency;
-    this.minBetSize = minBetSize;
+    this.targetBetSize = targetBetSize;
     this.targetMonthlyConversions = targetMonthlyConversions;
   }
 
@@ -68,7 +68,7 @@ export class AffiliateDeal {
         : null,
       cpa: affiliateDeal.cpa,
       currency: affiliateDeal.currency,
-      minBetSize: affiliateDeal.minBetSize,
+      targetBetSize: affiliateDeal.targetBetSize,
       targetMonthlyConversions: affiliateDeal.targetMonthlyConversions,
     };
   }
@@ -84,7 +84,7 @@ export class AffiliateDeal {
       updatedAt: doc.updatedAt ? doc.updatedAt.toDate() : undefined,
       cpa: doc.cpa,
       currency: doc.currency as Currency,
-      minBetSize: doc.minBetSize,
+      targetBetSize: doc.targetBetSize,
       targetMonthlyConversions: doc.targetMonthlyConversions,
     });
   }

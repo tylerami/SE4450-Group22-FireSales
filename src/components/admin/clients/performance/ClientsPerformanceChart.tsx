@@ -5,9 +5,11 @@ import {
   Conversion,
   ConversionSegment,
   segmentConversionsByTimeframe,
+  totalGrossProfit,
+  totalRevenue,
 } from "models/Conversion";
 
-const UserPerformanceChart = ({
+const ClientsPerformanceChart = ({
   conversions,
   timeframe,
 }: {
@@ -41,12 +43,7 @@ const UserPerformanceChart = ({
   };
 
   const maxSegmentEarnings = Math.max(
-    ...conversionSegments.map((seg) =>
-      seg.conversions.reduce(
-        (acc, curr) => acc + curr.affiliateLink.commission,
-        0
-      )
-    )
+    ...conversionSegments.map((seg) => totalRevenue(seg.conversions))
   );
 
   const maxSegmentConversions = Math.max(
@@ -64,14 +61,18 @@ const UserPerformanceChart = ({
         end: maxSegmentConversions,
       }}
       rightAxisLabel={{
-        label: "Earnings (CAD)",
+        label: "$CAD",
         start: 0,
         end: maxSegmentEarnings,
       }}
       series={[
         {
           name: "Conversions",
-          color: "#076AFF",
+          color: "#4D3FB5",
+        },
+        {
+          name: "Revenue",
+          color: "#07B0FF",
         },
         {
           name: "Earnings",
@@ -82,4 +83,4 @@ const UserPerformanceChart = ({
   );
 };
 
-export default UserPerformanceChart;
+export default ClientsPerformanceChart;

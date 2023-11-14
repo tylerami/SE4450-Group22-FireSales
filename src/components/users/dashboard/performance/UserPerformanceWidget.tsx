@@ -35,7 +35,7 @@ import { AffiliateLink } from "models/AffiliateLink";
 import { getReferralLinkTypeLabel } from "models/enums/ReferralLinkType";
 import { generateSampleCompensationGroups } from "__mocks__/models/CompensationGroup.mock";
 import { formatMoney } from "utils/Money";
-import PerformanceWidgetMetric from "../PerformanceWidgetMetric";
+import PerformanceWidgetMetric from "./PerformanceWidgetMetric";
 
 type Props = {};
 

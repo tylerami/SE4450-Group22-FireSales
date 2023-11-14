@@ -13,6 +13,7 @@ export class AffiliateLink {
   createdAt: Date;
   commission: number;
   minBetSize: number;
+  cpa: number;
 
   constructor({
     clientId,
@@ -23,6 +24,7 @@ export class AffiliateLink {
     createdAt = new Date(),
     commission,
     minBetSize,
+    cpa,
   }: {
     clientId: string;
     clientName: string;
@@ -32,6 +34,7 @@ export class AffiliateLink {
     createdAt?: Date;
     commission: number;
     minBetSize: number;
+    cpa: number;
   }) {
     this.clientId = clientId;
     this.clientName = clientName;
@@ -41,6 +44,7 @@ export class AffiliateLink {
     this.createdAt = createdAt;
     this.commission = commission;
     this.minBetSize = minBetSize;
+    this.cpa = cpa;
   }
 
   public description(): string {
@@ -57,6 +61,7 @@ export class AffiliateLink {
       createdAt: this.createdAt ? Timestamp.fromDate(this.createdAt) : null,
       commission: this.commission,
       minBetSize: this.minBetSize,
+      cpa: this.cpa,
     };
   }
 
@@ -70,6 +75,7 @@ export class AffiliateLink {
       createdAt: doc.createdAt ? doc.createdAt.toDate() : new Date(),
       commission: doc.commission,
       minBetSize: doc.minBetSize,
+      cpa: doc.cpa,
     });
   }
 }

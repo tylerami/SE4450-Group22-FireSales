@@ -9,7 +9,7 @@ export const casinoAffiliateDeal1 = new AffiliateDeal({
   link: "https://casinoroyale.com/deal",
   cpa: 100,
   currency: Currency.CAD,
-  minBetSize: 50,
+  targetBetSize: 50,
   targetMonthlyConversions: 200,
 });
 
@@ -20,7 +20,7 @@ export const sportsAffiliateDeal1 = new AffiliateDeal({
   link: "https://sportsmania.com/deal",
   cpa: 150,
   currency: Currency.USD,
-  minBetSize: 75,
+  targetBetSize: 75,
   targetMonthlyConversions: 250,
 });
 

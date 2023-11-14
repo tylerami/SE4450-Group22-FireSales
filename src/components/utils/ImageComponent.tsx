@@ -10,6 +10,7 @@ interface ImageComponentProps {
   maxHeight?: string;
   minHeight?: string;
   minWidth?: string;
+  margin?: string;
 }
 
 const ImageComponent: React.FC<ImageComponentProps> = ({
@@ -18,6 +19,7 @@ const ImageComponent: React.FC<ImageComponentProps> = ({
   width = "100%",
   maxWidth = "100%",
   maxHeight = "100%",
+  margin = "auto",
 }: ImageComponentProps) => {
   const imageService = new ImageFirebaseService();
 
@@ -46,7 +48,7 @@ const ImageComponent: React.FC<ImageComponentProps> = ({
       maxWidth={maxWidth}
       maxHeight={maxHeight}
       minHeight={maxHeight}
-      margin="auto"
+      margin={margin}
       display="flex"
       justifyContent={"center"}
       alignItems={"center"}

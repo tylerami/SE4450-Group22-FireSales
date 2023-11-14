@@ -20,6 +20,7 @@ export function generateAffiliateLinks(count: number): AffiliateLink[] {
         type: linkTypes[i % linkTypes.length], // or vary the type as needed
         link: `https://example.com/link${i}`,
         enabled: true,
+        cpa: Math.random() * 200 + 200, // Random CPA for example
         createdAt: new Date(),
         commission: Math.random() * 20, // Random commission for example
         minBetSize: 50 + i, // Incremental bet size for example

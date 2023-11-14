@@ -177,6 +177,11 @@ export function averageBetSize(conversions: Array<Conversion>): number {
   return total / conversions.length;
 }
 
+export function totalBets(conversions: Array<Conversion>): number {
+  return conversions.reduce((total, conversion) => {
+    return total + conversion.amount;
+  }, 0);
+}
 export function averageCommission(conversions: Array<Conversion>): number {
   if (conversions.length === 0) {
     return 0;
@@ -191,6 +196,71 @@ export function averageCommission(conversions: Array<Conversion>): number {
 export function totalCommission(conversions: Array<Conversion>): number {
   return conversions.reduce((total, conversion) => {
     return total + conversion.affiliateLink.commission;
+  }, 0);
+}
+
+export function averageCpa(conversions: Array<Conversion>): number {
+  if (conversions.length === 0) {
+    return 0;
+  }
+
+  const total = conversions.reduce((total, conversion) => {
+    return total + conversion.affiliateLink.cpa;
+  }, 0);
+  return total / conversions.length;
+}
+
+export function totalRevenue(conversions: Array<Conversion>): number {
+  return conversions.reduce((total, conversion) => {
+    return total + conversion.affiliateLink.cpa;
+  }, 0);
+}
+
+export function averageCostOfConversion(
+  conversions: Array<Conversion>
+): number {
+  if (conversions.length === 0) {
+    return 0;
+  }
+
+  const total = conversions.reduce((total, conversion) => {
+    return total + conversion.amount + conversion.affiliateLink.commission;
+  }, 0);
+  return total / conversions.length;
+}
+
+export function totalCostOfConversions(conversions: Array<Conversion>): number {
+  return conversions.reduce((total, conversion) => {
+    return total + conversion.amount + conversion.affiliateLink.commission;
+  }, 0);
+}
+
+export function averageUnitContribution(
+  conversions: Array<Conversion>
+): number {
+  if (conversions.length === 0) {
+    return 0;
+  }
+
+  const total = conversions.reduce((total, conversion) => {
+    return (
+      total +
+      conversion.affiliateLink.cpa -
+      conversion.amount -
+      conversion.affiliateLink.commission
+    );
+  }, 0);
+  return total / conversions.length;
+}
+
+export function totalGrossProfit(conversions: Array<Conversion>): number {
+  return conversions.reduce((total, conversion) => {
+    return (
+      total +
+      conversion.affiliateLink.cpa -
+      conversion.amount -
+      conversion.affiliateLink.commission
+    );
   }, 0);
 }
 

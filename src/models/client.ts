@@ -2,7 +2,7 @@ import { AffiliateDeal } from "./AffiliateDeal";
 import { ReferralLinkType } from "./enums/ReferralLinkType";
 import { Timestamp, DocumentData } from "firebase/firestore";
 
-type AffiliateDealContainer = {
+export type AffiliateDealContainer = {
   [key in ReferralLinkType]?: AffiliateDeal | undefined;
 };
 
@@ -13,6 +13,7 @@ export class Client {
   updatedAt?: Date;
   affiliateDeals: AffiliateDealContainer;
   enabled: boolean;
+  avgPaymentDays?: number;
 
   constructor({
     id,
@@ -21,6 +22,7 @@ export class Client {
     updatedAt,
     affiliateDeals,
     enabled = true,
+    avgPaymentDays,
   }: {
     id: string;
     name: string;
@@ -28,6 +30,7 @@ export class Client {
     updatedAt?: Date;
     affiliateDeals?: AffiliateDealContainer;
     enabled?: boolean;
+    avgPaymentDays?: number;
   }) {
     this.id = id;
     this.name = name;
@@ -35,6 +38,7 @@ export class Client {
     this.updatedAt = updatedAt;
     this.affiliateDeals = affiliateDeals || {};
     this.enabled = enabled;
+    this.avgPaymentDays = avgPaymentDays;
   }
 
   public hasSportsbookAffiliateDeal = () =>
@@ -89,6 +93,7 @@ export class Client {
       updatedAt: this.updatedAt ? Timestamp.fromDate(this.updatedAt) : null,
       affiliateDeals: affiliateDealsForFirestore,
       enabled: this.enabled,
+      avgPaymentDays: this.avgPaymentDays,
     };
   }
 
@@ -109,6 +114,13 @@ export class Client {
       updatedAt: doc.updatedAt ? doc.updatedAt.toDate() : undefined,
       affiliateDeals: affiliateDealsFromFirestore,
       enabled: doc.enabled,
+      avgPaymentDays: doc.avgPaymentDays,
     });
   }
+}
+
+export function getAllAffiliateDeals(clients: Client[]): AffiliateDeal[] {
+  return clients.reduce((acc: AffiliateDeal[], client: Client) => {
+    return [...acc, ...Object.values(client.affiliateDeals)];
+  }, []);
 }
