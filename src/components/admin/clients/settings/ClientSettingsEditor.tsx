@@ -88,7 +88,7 @@ const ClientSettingsEditor = ({ existingClient, exit }: Props) => {
     setAffiliateDeals(newAffiliateDeals);
   };
 
-  const editMode = existingClient !== undefined;
+  const editMode = existingClient !== null;
 
   const triggerAttachmentsUpload = () => {
     const fileInput = document.getElementById("attachments-upload");

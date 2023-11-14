@@ -20,10 +20,10 @@ export class CompensationGroup {
   }: {
     id: string;
     affiliateLinks?: AffiliateLink[];
-    createdAt: Date;
+    createdAt?: Date;
     updatedAt?: Date;
     enabled: boolean;
-    currency: Currency;
+    currency?: Currency;
   }) {
     this.id = id;
     this.affiliateLinks = affiliateLinks;

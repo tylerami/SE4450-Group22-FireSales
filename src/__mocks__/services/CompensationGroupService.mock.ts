@@ -20,6 +20,6 @@ export class MockCompensationGroupService implements CompensationGroupService {
   }
 
   async getAll(): Promise<CompensationGroup[]> {
-    return [];
+    return generateSampleCompensationGroups(5);
   }
 }

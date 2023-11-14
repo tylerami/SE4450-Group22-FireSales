@@ -62,7 +62,11 @@ const ClientsSettingsWidget = (props: Props) => {
             ))
           )}
 
-          <Button w="full" onClick={() => setCreateMode(true)}>
+          <Button
+            colorScheme="blue"
+            w="full"
+            onClick={() => setCreateMode(true)}
+          >
             Create New Client
           </Button>
         </React.Fragment>
