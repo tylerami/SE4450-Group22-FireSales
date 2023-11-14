@@ -6,6 +6,7 @@ export class Payout {
   userId: string;
   amount: number;
   currency: Currency;
+  conversionIds?: string[];
   dateOccured: Date;
   dateRecorded: Date;
   paymentMethod: PaymentMethod;
@@ -15,6 +16,7 @@ export class Payout {
     userId,
     amount,
     currency = Currency.CAD,
+    conversionIds,
     dateOccured,
     dateRecorded,
     paymentMethod,
@@ -23,6 +25,7 @@ export class Payout {
     userId: string;
     amount: number;
     currency?: Currency;
+    conversionIds?: string[];
     dateOccured: Date;
     dateRecorded: Date;
     paymentMethod: PaymentMethod;
@@ -31,6 +34,7 @@ export class Payout {
     this.userId = userId;
     this.amount = amount;
     this.currency = currency;
+    this.conversionIds = conversionIds;
     this.dateOccured = dateOccured;
     this.dateRecorded = dateRecorded;
     this.paymentMethod = paymentMethod;

@@ -1,5 +1,6 @@
 import { Conversion } from "@models/Conversion";
 import { UnassignedConversion } from "@models/UnassignedConversion";
+import { sampleConversions } from "__mocks__/models/Conversion.mock";
 import { ConversionService } from "services/interfaces/ConversionService";
 
 export class MockConversionService implements ConversionService {
@@ -37,7 +38,7 @@ export class MockConversionService implements ConversionService {
     compensationGroupId?: string | undefined;
     referralLinkType?: string | undefined;
   }): Promise<Conversion[]> {
-    return [];
+    return sampleConversions;
   }
 
   async createBulkUnassigned(

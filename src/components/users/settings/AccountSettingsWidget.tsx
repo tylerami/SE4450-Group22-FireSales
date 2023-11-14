@@ -7,11 +7,61 @@ import {
   InputGroup,
   Text,
 } from "@chakra-ui/react";
-import React from "react";
+import { User } from "models/User";
+import { UserContext } from "components/auth/UserProvider";
+import React, { useContext, useState } from "react";
+import { UserService } from "services/interfaces/UserService";
+import { DependencyInjection } from "utils/DependencyInjection";
+import useSuccessNotification from "components/utils/SuccessNotification";
 
 type Props = {};
 
 const AccountSettingsWidget = (props: Props) => {
+  const { currentUser } = useContext(UserContext);
+
+  const userService: UserService = DependencyInjection.userService();
+
+  const showSuccess = useSuccessNotification();
+
+  const saveChanges = async () => {
+    if (!currentUser) return;
+
+    const updatedUser: Partial<User> = {
+      uid: currentUser.uid,
+      phone: phoneNumber,
+      email: primaryEmail,
+      firstName: fullName.split(" ")[0],
+      lastName: fullName.split(" ")[1],
+    };
+
+    const result = await userService.update(updatedUser);
+    if (result) {
+      showSuccess({ message: "Changes saved successfully!" });
+    }
+  };
+
+  const changesMade = () => {
+    if (!currentUser) return false;
+
+    return (
+      fullName !== currentUser.getFullName() ||
+      primaryEmail !== currentUser.email ||
+      phoneNumber !== (currentUser.phone ?? "")
+    );
+  };
+
+  const [fullName, setFullName] = useState<string>(
+    currentUser?.getFullName() || ""
+  );
+
+  const [primaryEmail, setPrimaryEmail] = useState<string>(
+    currentUser?.email || ""
+  );
+
+  const [phoneNumber, setPhoneNumber] = useState<string>(
+    currentUser?.phone || ""
+  );
+
   return (
     <Flex
       p={26}
@@ -26,7 +76,10 @@ const AccountSettingsWidget = (props: Props) => {
           Account Settings
         </Heading>
 
-        <Button> Save Changes</Button>
+        <Button onClick={saveChanges} isDisabled={!changesMade()}>
+          {" "}
+          Save Changes
+        </Button>
       </Flex>
       <Flex width={"48%"} flexDirection={"column"}>
         <Text color="gray" fontSize="0.8em">
@@ -39,7 +92,9 @@ const AccountSettingsWidget = (props: Props) => {
             focusBorderColor="#ED7D31"
             variant={"outline"}
             placeholder="Full name"
-          ></Input>
+            defaultValue={fullName}
+            onChange={(e) => setFullName(e.target.value)}
+          />
         </InputGroup>
       </Flex>
       <Flex width={"48%"} flexDirection={"column"}>
@@ -53,6 +108,8 @@ const AccountSettingsWidget = (props: Props) => {
             focusBorderColor="#ED7D31"
             variant={"outline"}
             placeholder="Primary email"
+            defaultValue={primaryEmail}
+            onChange={(e) => setPrimaryEmail(e.target.value)}
           ></Input>
         </InputGroup>
       </Flex>
@@ -67,6 +124,8 @@ const AccountSettingsWidget = (props: Props) => {
             focusBorderColor="#ED7D31"
             variant={"outline"}
             placeholder="Phone number"
+            defaultValue={phoneNumber}
+            onChange={(e) => setPhoneNumber(e.target.value)}
           ></Input>
         </InputGroup>
       </Flex>

@@ -18,12 +18,7 @@ const UserDashboardPage = (props: Props) => {
       </Flex>
 
       {/* Column: Performance chart and table */}
-      <Flex
-        width={{ base: "100%", xl: "100%" }} // Full width on base, half on larger screens
-        direction="column"
-        gap={6}
-        alignItems={"center"}
-      >
+      <Flex width={"100%"} direction="column" gap={6} alignItems={"center"}>
         <Box></Box>
         <AffiliateLinkWidget></AffiliateLinkWidget>
         <UserPerformanceWidget />

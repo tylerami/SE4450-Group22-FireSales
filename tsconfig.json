@@ -10,11 +10,7 @@
     "noImplicitAny": false,
     "jsx": "preserve",
     "forceConsistentCasingInFileNames": true,
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "allowSyntheticDefaultImports": true,
     "moduleResolution": "node",
@@ -28,11 +24,6 @@
       "@utils/*": ["utils/*"]
     }
   },
-  "include": [
-    "src/**/*"
-, "src/__mocks__"  ],
-  "exclude": [
-    "node_modules",
-    "**/*.spec.ts"
-  ]
+  "include": ["src/**/*", "src/__mocks__"],
+  "exclude": ["node_modules", "**/*.spec.ts"]
 }

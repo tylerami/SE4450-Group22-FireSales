@@ -1,5 +1,6 @@
 export enum ConversionsStatus {
-  approved = "approved",
+  approvedPaid = "approvedPaid",
+  approvedUnpaid = "approvedUnpaid",
   rejected = "rejected",
   pending = "pending",
 }

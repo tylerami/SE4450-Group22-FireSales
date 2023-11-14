@@ -1,4 +1,4 @@
-import { PaymentMethod } from "./enums/PaymentMethod";
+import { PayoutPreferrences } from "./PayoutPreferrences";
 import { Role } from "./enums/Role";
 import { Timestamp, DocumentData } from "firebase/firestore";
 
@@ -8,36 +8,40 @@ export class User {
   lastName: string;
   email: string;
   roles: Role[];
+  phone?: string;
   registeredAt: Date;
   compensationGroupId?: string;
-  paymentDetails?: Map<PaymentMethod, string>;
+  payoutPreferrences?: PayoutPreferrences;
 
   constructor({
     uid,
     firstName,
     lastName,
     email,
+    phone,
     roles = [Role.salesperson],
     registeredAt,
     compensationGroupId,
-    paymentDetails,
+    payoutPreferrences,
   }: {
     uid: string;
     firstName: string;
     lastName: string;
     email: string;
+    phone?: string;
     roles: Role[];
     registeredAt: Date;
     compensationGroupId?: string;
-    paymentDetails?: Map<PaymentMethod, string>;
+    payoutPreferrences?: PayoutPreferrences;
   }) {
     this.uid = uid;
     this.firstName = firstName;
     this.lastName = lastName;
     this.email = email;
     this.roles = roles;
+    this.phone = phone;
     this.compensationGroupId = compensationGroupId;
-    this.paymentDetails = paymentDetails;
+    this.payoutPreferrences = payoutPreferrences;
     this.registeredAt = registeredAt;
   }
 
@@ -66,12 +70,11 @@ export class User {
   }
 
   public isAdmin = () => this.roles.includes(Role.admin);
+  public isSalesperson = () => this.roles.includes(Role.salesperson);
+
+  public getFullName = () => `${this.firstName} ${this.lastName}`;
 
   public toFirestoreDoc(): DocumentData {
-    const paymentDetailsObject = this.paymentDetails
-      ? Object.fromEntries(this.paymentDetails)
-      : {};
-
     return {
       uid: this.uid,
       firstName: this.firstName,
@@ -82,15 +85,11 @@ export class User {
         ? Timestamp.fromDate(this.registeredAt)
         : null,
       compensationGroupId: this.compensationGroupId,
-      paymentDetails: paymentDetailsObject,
+      payoutPreferrences: this.payoutPreferrences?.toFirestoreDoc() ?? null,
     };
   }
 
   public static fromFirestoreDoc(doc: DocumentData): User {
-    const paymentDetailsMap = doc.paymentDetails
-      ? new Map(Object.entries(doc.paymentDetails))
-      : new Map();
-
     return new User({
       uid: doc.uid,
       firstName: doc.firstName,
@@ -99,7 +98,9 @@ export class User {
       roles: doc.roles,
       registeredAt: doc.registeredAt ? doc.registeredAt.toDate() : new Date(),
       compensationGroupId: doc.compensationGroupId,
-      paymentDetails: paymentDetailsMap,
+      payoutPreferrences: doc.payoutPreferrences
+        ? PayoutPreferrences.fromFirestoreDoc(doc.payoutPreferrences)
+        : undefined,
     });
   }
 }

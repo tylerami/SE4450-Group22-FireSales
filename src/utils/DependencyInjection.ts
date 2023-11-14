@@ -2,6 +2,7 @@ import { MockClientService } from "__mocks__/services/ClientService.mock";
 import { MockCompensationGroupService } from "__mocks__/services/CompensationGroupService.mock";
 import { MockConversionService } from "__mocks__/services/ConversionService.mock";
 import { MockCustomerService } from "__mocks__/services/CustomerService.mock";
+import { MockPayoutService } from "__mocks__/services/PayoutService.mock";
 import { MockUserService } from "__mocks__/services/UserService.mock";
 import "reflect-metadata";
 import ImageFirebaseService from "services/implementations/ImageFirebaseService";
@@ -10,6 +11,7 @@ import { CompensationGroupService } from "services/interfaces/CompensationGroupS
 import { ConversionService } from "services/interfaces/ConversionService";
 import { CustomerService } from "services/interfaces/CustomerService";
 import { ImageService } from "services/interfaces/ImageService";
+import { PayoutService } from "services/interfaces/PayoutService";
 import { UserService } from "services/interfaces/UserService";
 
 const USE_MOCKS = true;
@@ -81,4 +83,7 @@ export class DependencyInjection {
 
   public static imageService = (): ImageService =>
     this.getInstance().resolve<ImageService>("ImageService");
+
+  public static payoutService = (): PayoutService =>
+    this.getInstance().resolve<PayoutService>("PayoutService");
 }

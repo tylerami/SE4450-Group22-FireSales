@@ -1,3 +1,4 @@
 export function formatMoney(amount: number, decimalCount: number = 2) {
-  return `$${amount.toFixed(decimalCount)}`;
+  const sign = amount < 0 ? "-" : "";
+  return `${sign}$${Math.abs(amount).toFixed(decimalCount)}`;
 }
