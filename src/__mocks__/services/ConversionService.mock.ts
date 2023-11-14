@@ -1,4 +1,5 @@
 import { Conversion } from "@models/Conversion";
+import { UnassignedConversion } from "@models/UnassignedConversion";
 import { ConversionService } from "services/interfaces/ConversionService";
 
 export class MockConversionService implements ConversionService {
@@ -37,5 +38,24 @@ export class MockConversionService implements ConversionService {
     referralLinkType?: string | undefined;
   }): Promise<Conversion[]> {
     return [];
+  }
+
+  async createBulkUnassigned(
+    items: {
+      conversion: UnassignedConversion;
+      attachments?: File[] | undefined;
+    }[]
+  ): Promise<UnassignedConversion[]> {
+    throw new Error("Method not implemented.");
+  }
+
+  async assignConversionsWithCode({
+    assignmentCode,
+    userId,
+  }: {
+    assignmentCode: string;
+    userId: string;
+  }): Promise<Conversion[]> {
+    throw new Error("Method not implemented.");
   }
 }

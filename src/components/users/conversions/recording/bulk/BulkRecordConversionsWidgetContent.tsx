@@ -1,16 +1,13 @@
 import React, { useContext, useState } from "react";
-import { Button, Heading, Input, InputGroup } from "@chakra-ui/react";
 import {
-  Table,
-  Thead,
-  Tbody,
-  Tr,
-  Th,
-  Td,
-  Box,
-  Text,
-  Flex,
+  Button,
+  Heading,
+  Icon,
+  Input,
+  InputGroup,
+  Spinner,
 } from "@chakra-ui/react";
+import { Box, Text, Flex } from "@chakra-ui/react";
 import { Conversion, ConversionAttachmentGroup } from "models/Conversion";
 import { filterCsvHeaders, getCsvFileContent } from "utils/File";
 import { sampleClients } from "__mocks__/models/Client.mock";
@@ -23,25 +20,77 @@ import { AffiliateLink } from "models/AffiliateLink";
 import { Customer } from "models/Customer";
 import { ConversionService } from "services/interfaces/ConversionService";
 import { DependencyInjection } from "utils/DependencyInjection";
+import BulkRecordConversionsInstructions from "./BulkRecordConversionsInstructions";
+import { CheckCircleIcon } from "@chakra-ui/icons";
+import BulkRecordConversionsProcessedTable from "./BulkRecordConversionsProcessedTable";
+import { FiXCircle } from "react-icons/fi";
 
 type Props = {
   compensationGroup: CompensationGroup | null;
 };
 
 const BulkRecordConversionsWidgetContent = ({ compensationGroup }: Props) => {
+  // Services
   const conversionService: ConversionService =
     DependencyInjection.conversionService();
 
+  // State
   const [errorText, setErrorText] = useState(null);
-  const [attachments, setAttachments] = useState<File[]>([]);
-
+  const [processing, setProcessing] = useState<boolean>(false);
   const [csvFile, setCsvFile] = useState<File | null>(null);
 
+  const [attachments, setAttachments] = useState<File[]>([]);
+  const [conversionsByNumber, setConversionsByNumber] = useState<Record<
+    number,
+    Conversion
+  > | null>(null);
+  const [attachmentsAreValid, setAttachmentsAreValid] =
+    useState<boolean>(false);
+
   const { currentUser } = useContext(UserContext);
+
+  const createConversionGroups = async (): Promise<
+    ConversionAttachmentGroup[]
+  > => {
+    if (conversionsByNumber == null) {
+      throw new Error("No conversions to record");
+    }
+
+    const getAttachmentsForConversion = (convNumber: number): File[] => {
+      const attachmentsForConv: File[] = [];
+      for (let attachment of attachments) {
+        const attachmentName = attachment.name;
+        const attachmentNumber = Number(
+          attachmentName.split("_")[0].replace("conv", "")
+        );
+
+        if (attachmentNumber === convNumber) {
+          attachmentsForConv.push(attachment);
+        }
+      }
+      return attachmentsForConv;
+    };
+
+    const conversionGroups: ConversionAttachmentGroup[] = [];
+    for (const convNumber of Object.keys(conversionsByNumber)) {
+      const conversion = conversionsByNumber[convNumber];
+      const attachments = getAttachmentsForConversion(Number(convNumber));
+      const conversionGroup: ConversionAttachmentGroup = {
+        conversion,
+        attachments,
+      };
+      conversionGroups.push(conversionGroup);
+    }
+
+    setProcessing(false);
+
+    return conversionGroups;
+  };
 
   const processCsvFile = async (
     csvFile: File
   ): Promise<Record<number, Conversion>> => {
+    setProcessing(true);
     let csvContent = await getCsvFileContent(csvFile);
 
     const expectedHeaders = [
@@ -58,8 +107,61 @@ const BulkRecordConversionsWidgetContent = ({ compensationGroup }: Props) => {
       keywordMatchThreshold: 3,
     });
 
+    const mapCsvRowToConversion = (csvRow: string): Conversion | null => {
+      const userId = currentUser?.uid;
+      if (!userId || compensationGroup === null) {
+        return null;
+      }
+
+      const values: string[] = csvRow.split(",");
+      const clients: Client[] = sampleClients;
+
+      const dateString: string = values[1];
+      const sportsbookName: string = values[2];
+      const typeString: string = values[3]?.toLowerCase();
+      const referralType: ReferralLinkType = typeString.includes("sports")
+        ? ReferralLinkType.sports
+        : ReferralLinkType.casino;
+
+      const matchedClient: Client | null = findClosestMatch<Client>(
+        sportsbookName,
+        clients,
+        (client) => client.name
+      );
+      if (matchedClient === null) {
+        return null;
+      }
+
+      const amount = Number(values[4]);
+      const customerName = values[5];
+
+      const matchedAffiliateLink: AffiliateLink | undefined =
+        compensationGroup.affiliateLinks.find(
+          (affiliateLink) =>
+            affiliateLink.clientId === matchedClient.id &&
+            affiliateLink.type === referralType
+        );
+
+      if (matchedAffiliateLink === undefined) {
+        return null;
+      }
+
+      const conversion: Conversion = Conversion.fromManualInput({
+        dateString,
+        userId,
+        affiliateLink: matchedAffiliateLink,
+        compensationGroupId: compensationGroup.id,
+        amount,
+        customer: new Customer({
+          fullName: customerName,
+        }),
+      });
+
+      return conversion;
+    };
+
     const rows: string[] = csvContent.split("\n");
-    const conversions: Record<number, Conversion> = {};
+    const conversionsByNumber: Record<number, Conversion> = {};
 
     for (let i = 1; i < rows.length; i++) {
       const row = rows[i];
@@ -67,7 +169,7 @@ const BulkRecordConversionsWidgetContent = ({ compensationGroup }: Props) => {
 
       const conversion = mapCsvRowToConversion(row);
       if (conversion !== null) {
-        conversions[convNumber] = conversion;
+        conversionsByNumber[convNumber] = conversion;
       }
 
       if (convNumber !== i + 1) {
@@ -75,105 +177,10 @@ const BulkRecordConversionsWidgetContent = ({ compensationGroup }: Props) => {
       }
     }
 
-    return conversions;
+    setConversionsByNumber(conversionsByNumber);
+    setProcessing(false);
+    return conversionsByNumber;
   };
-
-  const getAttachmentsForConversion = (convNumber: number): File[] => {
-    const attachmentsForConv: File[] = [];
-    for (let attachment of attachments) {
-      const attachmentName = attachment.name;
-      const attachmentNumber = Number(
-        attachmentName.split("_")[0].replace("conv", "")
-      );
-
-      if (attachmentNumber === convNumber) {
-        attachmentsForConv.push(attachment);
-      }
-    }
-    return attachmentsForConv;
-  };
-
-  const createConversionGroups = async (): Promise<
-    ConversionAttachmentGroup[]
-  > => {
-    if (!csvFile) {
-      return [];
-    }
-
-    const csvConversions: Record<number, Conversion> = await processCsvFile(
-      csvFile
-    );
-
-    const conversionGroups: ConversionAttachmentGroup[] = [];
-    for (const convNumber of Object.keys(csvConversions)) {
-      const conversion = csvConversions[convNumber];
-      const attachments = getAttachmentsForConversion(Number(convNumber));
-      const conversionGroup: ConversionAttachmentGroup = {
-        conversion,
-        attachments,
-      };
-      conversionGroups.push(conversionGroup);
-    }
-
-    return conversionGroups;
-  };
-
-  const mapCsvRowToConversion = (csvRow: string): Conversion | null => {
-    const userId = currentUser?.uid;
-    if (!userId || compensationGroup === null) {
-      return null;
-    }
-
-    const values: string[] = csvRow.split(",");
-    const clients: Client[] = sampleClients;
-
-    const dateString: string = values[1];
-    const sportsbookName: string = values[2];
-    const typeString: string = values[3]?.toLowerCase();
-    const referralType: ReferralLinkType = typeString.includes("sports")
-      ? ReferralLinkType.sports
-      : ReferralLinkType.casino;
-
-    const matchedClient: Client | null = findClosestMatch<Client>(
-      sportsbookName,
-      clients,
-      (client) => client.name
-    );
-    if (matchedClient === null) {
-      return null;
-    }
-
-    const amount = Number(values[4]);
-    const customerName = values[5];
-
-    const matchedAffiliateLink: AffiliateLink | undefined =
-      compensationGroup.affiliateLinks.find(
-        (affiliateLink) =>
-          affiliateLink.clientId === matchedClient.id &&
-          affiliateLink.type === referralType
-      );
-
-    if (matchedAffiliateLink === undefined) {
-      return null;
-    }
-
-    const conversion: Conversion = Conversion.fromManualInput({
-      dateString,
-      userId,
-      affiliateLink: matchedAffiliateLink,
-      compensationGroupId: compensationGroup.id,
-      amount,
-      customer: new Customer({
-        fullName: customerName,
-      }),
-    });
-
-    return conversion;
-  };
-
-  function resetError() {
-    setErrorText(null);
-  }
 
   async function recordConversions() {
     let conversionGroups: ConversionAttachmentGroup[];
@@ -187,7 +194,7 @@ const BulkRecordConversionsWidgetContent = ({ compensationGroup }: Props) => {
 
     const result = await conversionService.createBulk(conversionGroups);
     if (result !== undefined && result !== null) {
-      resetError();
+      setErrorText(null);
     } else {
       setErrorText(result);
     }
@@ -203,9 +210,11 @@ const BulkRecordConversionsWidgetContent = ({ compensationGroup }: Props) => {
       (fileInput as HTMLInputElement).click();
     }
   };
+
   const handleCsvChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
       setCsvFile(event.target.files[0]);
+      processCsvFile(event.target.files[0]);
     } else {
       setCsvFile(null);
     }
@@ -221,77 +230,69 @@ const BulkRecordConversionsWidgetContent = ({ compensationGroup }: Props) => {
       (fileInput as HTMLInputElement).click();
     }
   };
+
   const handleAttachementsChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     if (event.target.files) {
       setAttachments(Array.from(event.target.files));
+      validateAttachments();
     } else {
       setAttachments([]);
     }
   };
 
-  const headers = [
-    "Conversion number",
-    "Conversion date (YYYY-MM-DD)",
-    "Sportsbook",
-    "Type ('Casino' or 'Sportsbook')",
-    "Bet Size ($CAD)",
-    "Customer name",
-  ];
+  const validateAttachments = () => {
+    if (conversionsByNumber == null) {
+      setAttachmentsAreValid(false);
+      return;
+    }
 
-  const rows = [
-    ["1", "2023-10-05", "PointsBet", "sportsbook", "80", "Mitch Marner"],
-    ["2", "2023-10-06", "PointsBet", "sportsbook", "100", "Auston Matthews"],
-    ["3", "2023-10-06", "UniBet", "casino", "100", "Auston Matthews"],
-  ];
+    setProcessing(true);
+    let convNumsWithoutAttachments: number[] =
+      Object.keys(conversionsByNumber).map(Number);
 
-  const textSize = "0.8em";
+    for (let attachment of attachments) {
+      const attachmentName = attachment.name;
+      const attachmentNumber = Number(
+        attachmentName.split("_")[0].replace("conv", "")
+      );
+      if (attachmentNumber in convNumsWithoutAttachments) {
+        convNumsWithoutAttachments = convNumsWithoutAttachments.filter(
+          (n) => n !== attachmentNumber
+        );
+      }
+    }
+    if (convNumsWithoutAttachments.length > 0) {
+      setAttachmentsAreValid(false);
+    } else {
+      setAttachmentsAreValid(true);
+    }
+    setProcessing(false);
+  };
 
   const csvUploaded = csvFile !== null;
   const attachmentsUploaded = attachments.length > 0;
 
+  const conversions =
+    conversionsByNumber == null ? null : Object.values(conversionsByNumber);
+
+  const conversionsReadyToRecord =
+    !processing &&
+    conversions !== null &&
+    conversions.length > 0 &&
+    attachments &&
+    attachmentsAreValid;
+
   return (
     <React.Fragment>
-      <Text fontSize={textSize}>
-        1. Upload a CSV file with the following format:
-      </Text>
-
-      <Table size="sm" variant="simple" alignSelf={"center"} width={"100%"}>
-        <Thead>
-          <Tr>
-            {headers.map((header, index) => (
-              <Th key={index} textAlign="center">
-                {header}
-              </Th>
-            ))}
-          </Tr>
-        </Thead>
-        <Tbody>
-          {rows.map((row: string[], index) => (
-            <Tr key={index}>
-              {row.map((text, i) => (
-                <Td textAlign={"center"} key={i}>
-                  {text}{" "}
-                </Td>
-              ))}
-            </Tr>
-          ))}
-        </Tbody>
-      </Table>
-
-      <Box h={2} />
-      <Text fontSize={textSize}>
-        2. Upload at least one attachment per conversion in the CSV. Use the
-        following naming convention:
-      </Text>
-      <Heading size="xs" alignItems="center">
-        {"conv{conversionNumber}_attach{attachmentNumber}.png"}
-      </Heading>
-      <Text fontSize={textSize}>Examples:</Text>
-      <Heading size="xs" alignItems="center">
-        conv1_attach1.png, conv1_attach2.png, conv2_attach1.png, ...
-      </Heading>
+      {processing ? (
+        <Spinner size="xl" />
+      ) : conversions != null ? (
+        <BulkRecordConversionsProcessedTable conversions={conversions} />
+      ) : (
+        <BulkRecordConversionsInstructions />
+      )}
 
       <Box h={4} />
       <Flex justifyContent={"space-evenly"} alignItems={"start"}>
@@ -336,10 +337,19 @@ const BulkRecordConversionsWidgetContent = ({ compensationGroup }: Props) => {
           </Button>
         </InputGroup>
       </Flex>
-      <Box h={2} />
 
-      <Button size="lg" colorScheme="orange" onClick={recordConversions}>
-        Record Bulk Conversions
+      <Button
+        isDisabled={!csvFile}
+        size="lg"
+        isLoading={processing}
+        colorScheme="orange"
+        onClick={recordConversions}
+      >
+        {csvFile
+          ? conversionsReadyToRecord
+            ? "Record Conversions"
+            : "Fix Errors"
+          : "Upload CSV to Record Conversions"}
       </Button>
       {errorText && <Text color={"red"}>{errorText}</Text>}
     </React.Fragment>

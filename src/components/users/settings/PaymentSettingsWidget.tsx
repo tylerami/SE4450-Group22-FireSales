@@ -9,14 +9,14 @@ import {
   Text,
 } from "@chakra-ui/react";
 import React, { useState } from "react";
-import { PaymentType } from "../../../models/enums/PaymentType";
+import { PaymentMethod } from "../../../models/enums/PaymentMethod";
 
 type Props = {};
 
 const PaymentSettingsWidget = (props: Props) => {
   const [payoutDay, setPayoutDay] = useState(null);
 
-  const [paymentType, setPaymentType] = useState(PaymentType.etransfer);
+  const [paymentType, setPaymentType] = useState(PaymentMethod.etransfer);
 
   const payoutDayOptions = [
     { value: "Monday", label: "Monday" },
@@ -36,16 +36,16 @@ const PaymentSettingsWidget = (props: Props) => {
     setPaymentType(e.target.value);
   };
 
-  const paymentTypeOptions: { value: PaymentType; label: string }[] = [
-    { value: PaymentType.paypal, label: "Paypal" },
-    { value: PaymentType.etransfer, label: "E-transfer" },
+  const paymentTypeOptions: { value: PaymentMethod; label: string }[] = [
+    { value: PaymentMethod.paypal, label: "Paypal" },
+    { value: PaymentMethod.etransfer, label: "E-transfer" },
   ];
 
   // paypal is username, email, mobile
 
-  const paymentTypeFieldName: Record<PaymentType, string> = {
-    [PaymentType.paypal]: "Paypal username, email, or mobile",
-    [PaymentType.etransfer]: "E-transfer email or mobile",
+  const paymentTypeFieldName: Record<PaymentMethod, string> = {
+    [PaymentMethod.paypal]: "Paypal username, email, or mobile",
+    [PaymentMethod.etransfer]: "E-transfer email or mobile",
   };
 
   return (

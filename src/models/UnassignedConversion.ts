@@ -1,27 +1,22 @@
 import { dateFromDDMMYYYY, formatDateString } from "../utils/Date";
 import { AffiliateLink } from "./AffiliateLink";
+import { Conversion } from "./Conversion";
 import { Customer } from "./Customer";
 import { Message } from "./Message";
 import { ConversionsStatus } from "./enums/ConversionStatus";
 import { Currency } from "./enums/Currency";
-import {
-  Timeframe,
-  TimeframeSegment,
-  divideTimeframeIntoSegments,
-  getIntervalStart,
-} from "./enums/Timeframe";
 import { Timestamp, DocumentData } from "firebase/firestore";
 
 export type ConversionAttachmentGroup = {
-  conversion: Conversion;
+  conversion: UnassignedConversion;
   attachments: File[];
 };
 
-export class Conversion {
+export class UnassignedConversion {
+  assignmentCode: string;
   id: string;
   dateOccured: Date;
   loggedAt: Date;
-  userId: string;
   status: ConversionsStatus;
   compensationGroupId?: string;
   affiliateLink: AffiliateLink;
@@ -32,10 +27,11 @@ export class Conversion {
   messages: Array<Message>;
 
   constructor({
+    assignmentCode,
     id,
     dateOccured,
     loggedAt,
-    userId,
+
     status,
     compensationGroupId,
     affiliateLink,
@@ -48,7 +44,7 @@ export class Conversion {
     id: string;
     dateOccured: Date;
     loggedAt: Date;
-    userId: string;
+    assignmentCode: string;
     status: ConversionsStatus;
     compensationGroupId?: string;
     affiliateLink: AffiliateLink;
@@ -61,7 +57,7 @@ export class Conversion {
     this.id = id;
     this.dateOccured = dateOccured;
     this.loggedAt = loggedAt;
-    this.userId = userId;
+    this.assignmentCode = assignmentCode;
     this.status = status;
     this.compensationGroupId = compensationGroupId;
     this.affiliateLink = affiliateLink;
@@ -74,7 +70,7 @@ export class Conversion {
 
   static fromManualInput({
     dateString, // maybe modify this to accept a Date object instead
-    userId,
+    assignmentCode,
     compensationGroupId,
     affiliateLink,
     customer,
@@ -83,7 +79,7 @@ export class Conversion {
     currency = Currency.CAD,
   }: {
     dateString: string;
-    userId: string;
+    assignmentCode: string;
     compensationGroupId: string;
     affiliateLink: AffiliateLink;
     currency?: Currency;
@@ -91,19 +87,19 @@ export class Conversion {
     amount: number;
     attachmentUrls?: Array<string>;
   }) {
-    const id = getConversionId({
+    const id = getUnassignedConversionId({
       dateString,
       clientId: affiliateLink.clientId,
-      userId,
+      assignmentCode,
       customerId: customer.id,
     });
     const dateOccured = dateFromDDMMYYYY(dateString);
     const loggedAt = new Date();
-    return new Conversion({
+    return new UnassignedConversion({
       id,
       dateOccured,
       loggedAt,
-      userId,
+      assignmentCode,
       status: ConversionsStatus.pending,
       compensationGroupId,
       affiliateLink,
@@ -129,7 +125,7 @@ export class Conversion {
         ? Timestamp.fromDate(this.dateOccured)
         : null,
       loggedAt: this.loggedAt ? Timestamp.fromDate(this.loggedAt) : null,
-      userId: this.userId,
+      assignmentCode: this.assignmentCode,
       status: this.status,
       compensationGroupId: this.compensationGroupId,
       affiliateLink: this.affiliateLink.toFirestoreDoc(),
@@ -141,12 +137,12 @@ export class Conversion {
     };
   }
 
-  public static fromFirestoreDoc(doc: DocumentData): Conversion {
-    return new Conversion({
+  public static fromFirestoreDoc(doc: DocumentData): UnassignedConversion {
+    return new UnassignedConversion({
       id: doc.id,
       dateOccured: doc.dateOccured ? doc.dateOccured.toDate() : new Date(),
       loggedAt: doc.loggedAt ? doc.loggedAt.toDate() : new Date(),
-      userId: doc.userId,
+      assignmentCode: doc.assignmentCode,
       status: doc.status as ConversionsStatus,
       compensationGroupId: doc.compensationGroupId,
       affiliateLink: AffiliateLink.fromFirestoreDoc(doc.affiliateLink),
@@ -161,90 +157,31 @@ export class Conversion {
   }
 }
 
-export type ConversionSegment = {
-  segmentLabel: string;
-  conversions: Array<Conversion>;
-};
-
-export function averageBetSize(conversions: Array<Conversion>): number {
-  if (conversions.length === 0) {
-    return 0;
-  }
-
-  const total = conversions.reduce((total, conversion) => {
-    return total + conversion.amount;
-  }, 0);
-  return total / conversions.length;
+export function assignConversionsToUser({
+  unassignedConversions,
+  userId,
+}: {
+  unassignedConversions: UnassignedConversion[];
+  userId: string;
+}) {
+  return unassignedConversions.map((conv) => {
+    return new Conversion({
+      userId,
+      ...conv,
+    });
+  });
 }
 
-export function averageCommission(conversions: Array<Conversion>): number {
-  if (conversions.length === 0) {
-    return 0;
-  }
-
-  const total = conversions.reduce((total, conversion) => {
-    return total + conversion.affiliateLink.commission;
-  }, 0);
-  return total / conversions.length;
-}
-
-export function totalCommission(conversions: Array<Conversion>): number {
-  return conversions.reduce((total, conversion) => {
-    return total + conversion.affiliateLink.commission;
-  }, 0);
-}
-
-export function segmentConversionsByTimeframe(
-  conversions: Array<Conversion>,
-  timeframe: Timeframe
-): ConversionSegment[] {
-  const timeframeSegments: TimeframeSegment[] =
-    divideTimeframeIntoSegments(timeframe);
-
-  const conversionSegments: ConversionSegment[] = timeframeSegments.map(
-    (segment) => ({
-      segmentLabel: segment.label,
-      conversions: filterConversionsByDateInterval(conversions, {
-        fromDate: segment.start,
-        toDate: segment.end,
-      }),
-    })
-  );
-
-  return conversionSegments;
-}
-
-export function filterConversionsByDateInterval(
-  conversions: Conversion[],
-  { fromDate, toDate }: { fromDate?: Date; toDate?: Date }
-) {
-  return conversions.filter(
-    (conversion) =>
-      !(fromDate && conversion.dateOccured < fromDate) &&
-      !(toDate && conversion.dateOccured > toDate)
-  );
-}
-
-export function filterConversionsByTimeframe(
-  conversions: Array<Conversion>,
-  timeframe: Timeframe
-): Array<Conversion> {
-  const intervalStart = getIntervalStart(timeframe);
-  return conversions.filter(
-    (conversion) => conversion.dateOccured >= intervalStart
-  );
-}
-
-export function getConversionId({
+export function getUnassignedConversionId({
   dateString,
   clientId,
-  userId,
+  assignmentCode,
   customerId,
 }: {
   dateString: string;
   clientId: string;
-  userId: string;
+  assignmentCode: string;
   customerId: string;
 }): string {
-  return `${dateString}_${userId}_${clientId}_${customerId}`;
+  return `${dateString}_${assignmentCode}_${clientId}_${customerId}_UNASSIGNED`;
 }

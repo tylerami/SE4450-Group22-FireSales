@@ -10,6 +10,7 @@ import { CompensationGroup } from "@models/CompensationGroup";
 import { ConversionService } from "services/interfaces/ConversionService";
 import { DependencyInjection } from "utils/DependencyInjection";
 import { RiSubtractLine } from "react-icons/ri";
+import useSuccessNotification from "components/utils/SuccessNotification";
 
 // Since the Props type is empty, we can omit it and also the props parameter
 const ManualRecordConversionsWidgetContent = ({
@@ -35,6 +36,8 @@ const ManualRecordConversionsWidgetContent = ({
   function resetErrors() {
     setErrorsByRow({});
   }
+
+  const showSuccess = useSuccessNotification();
 
   function setRowError(rowNumber: number, error: string | null | undefined) {
     if (error === null) {

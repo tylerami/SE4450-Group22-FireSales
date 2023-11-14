@@ -1,4 +1,4 @@
-import { PaymentType } from "./enums/PaymentType";
+import { PaymentMethod } from "./enums/PaymentMethod";
 import { Role } from "./enums/Role";
 import { Timestamp, DocumentData } from "firebase/firestore";
 
@@ -10,7 +10,7 @@ export class User {
   roles: Role[];
   registeredAt: Date;
   compensationGroupId?: string;
-  paymentDetails?: Map<PaymentType, string>;
+  paymentDetails?: Map<PaymentMethod, string>;
 
   constructor({
     uid,
@@ -29,7 +29,7 @@ export class User {
     roles: Role[];
     registeredAt: Date;
     compensationGroupId?: string;
-    paymentDetails?: Map<PaymentType, string>;
+    paymentDetails?: Map<PaymentMethod, string>;
   }) {
     this.uid = uid;
     this.firstName = firstName;

@@ -1,30 +1,25 @@
-import { Client } from "models/Client";
-import { AffiliateLink } from "../../models/AffiliateLink";
-import { ReferralLinkType } from "../../models/enums/ReferralLinkType";
-import { sampleClients } from "./Client.mock";
+import { Payout } from "@models/Payout";
+import { Currency } from "@models/enums/Currency";
+import { PaymentMethod } from "@models/enums/PaymentMethod";
 
-const clients: Client[] = sampleClients;
+const userIds = ["user1", "user2", "user3", "user4"];
+const paymentAddresses = ["address1", "address2", "address3", "address4"];
 
-const clientIds = clients.map((client) => client.id);
-const clientNames = clients.map((client) => client.name);
-
-export function generateAffiliateLinks(count: number): AffiliateLink[] {
-  const affiliateLinks: AffiliateLink[] = [];
-  const linkTypes: ReferralLinkType[] = Object.values(ReferralLinkType);
-
-  for (let i = 0; i < count; i++) {
-    affiliateLinks.push(
-      new AffiliateLink({
-        clientId: clientIds[i % clientIds.length],
-        clientName: clientNames[i % clientNames.length],
-        type: linkTypes[i % linkTypes.length], // or vary the type as needed
-        link: `https://example.com/link${i}`,
-        enabled: true,
-        createdAt: new Date(),
-        commission: Math.random() * 20, // Random commission for example
-        minBetSize: 50 + i, // Incremental bet size for example
-      })
-    );
-  }
-  return affiliateLinks;
+export function generateSamplePayouts(
+  count: number,
+  userId: string | null = null
+): Payout[] {
+  return Array.from({ length: count }, (_, i) => {
+    return new Payout({
+      userId: userId ?? userIds[i % userIds.length],
+      amount: Math.floor(Math.random() * 1000) + 100, // Random amount between 100 and 1100
+      currency: Currency.CAD, // Default to CAD
+      dateOccured: new Date(),
+      dateRecorded: new Date(),
+      paymentMethod: PaymentMethod.etransfer, // Assume all use PayPal for simplicity
+      paymentAddress: paymentAddresses[i % paymentAddresses.length],
+    });
+  });
 }
+
+export const samplePayouts = generateSamplePayouts(4);

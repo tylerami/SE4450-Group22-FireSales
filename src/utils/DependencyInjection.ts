@@ -14,14 +14,14 @@ import { UserService } from "services/interfaces/UserService";
 
 const USE_MOCKS = true;
 
-type Constructor<T> = new (...args: any[]) => T;
-
 const mockDependencies: Record<string, any> = {
   ClientService: new MockClientService(),
   ConversionService: new MockConversionService(),
   UserService: new MockUserService(),
   CompensationGroupService: new MockCompensationGroupService(),
   CustomerService: new MockCustomerService(),
+  PayoutService: new MockPayoutService(),
+  // Firebase image service already implemented
   ImageService: new ImageFirebaseService(),
 };
 

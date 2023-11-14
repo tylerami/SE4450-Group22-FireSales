@@ -1,33 +1,16 @@
-import React, { useState, useEffect, useContext } from "react";
-import {
-  Button,
-  Flex,
-  Heading,
-  IconButton,
-  Spacer,
-  Table,
-  Tbody,
-  Td,
-  Th,
-  Thead,
-  Tr,
-} from "@chakra-ui/react";
+import React from "react";
+import { Button, Flex, Heading, IconButton, Spacer } from "@chakra-ui/react";
 import { Conversion } from "models/Conversion";
-import { ConversionService } from "services/interfaces/ConversionService";
-import { DependencyInjection } from "utils/DependencyInjection";
-import { UserContext } from "components/auth/UserProvider";
 import { CloseIcon } from "@chakra-ui/icons";
 import ImageComponent from "components/utils/ImageComponent";
 import ConversionMessageWidget from "components/common/conversions/ConversionMessagesWidget";
-import { formatDateString } from "utils/Date";
-import { sampleConversions } from "__mocks__/models/Conversion.mock";
 
 type Props = {
   selectedConversion: Conversion;
   exit: () => void;
 };
 
-const SelectedConversionContent = ({ selectedConversion, exit }) => {
+const SelectedConversionContent = ({ selectedConversion, exit }: Props) => {
   return (
     <React.Fragment>
       <Flex justifyContent={"start"} alignItems={"center"} gap={6}>

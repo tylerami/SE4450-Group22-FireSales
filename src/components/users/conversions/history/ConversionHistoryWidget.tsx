@@ -29,33 +29,6 @@ import { Client } from "models/Client";
 
 type Props = {};
 
-const properties = [
-  {
-    label: "Conversion ID",
-    function: (Conversion) => Conversion.id,
-  },
-  {
-    label: "Date",
-    function: (Conversion) => formatDateString(Conversion.date),
-  },
-  {
-    label: "Sportsbook",
-    function: (Conversion) => Conversion.clientId,
-  },
-  {
-    label: "Bet size",
-    function: (Conversion) => Conversion.amount,
-  },
-  {
-    label: "Customer Name",
-    function: (Conversion) => Conversion.customerId,
-  },
-  {
-    label: "Commission",
-    function: (Conversion) => Conversion.commission,
-  },
-];
-
 const ConversionHistoryWidget = (props: Props) => {
   const conversionService: ConversionService =
     DependencyInjection.conversionService();

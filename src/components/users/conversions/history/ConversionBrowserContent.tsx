@@ -1,9 +1,8 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState } from "react";
 import {
   Button,
   Flex,
   Heading,
-  IconButton,
   Menu,
   MenuButton,
   MenuItem,
@@ -18,24 +17,15 @@ import {
   Tr,
 } from "@chakra-ui/react";
 import { Conversion } from "models/Conversion";
-import { ConversionService } from "services/interfaces/ConversionService";
-import { DependencyInjection } from "utils/DependencyInjection";
-import { UserContext } from "components/auth/UserProvider";
-import { ChevronDownIcon, CloseIcon } from "@chakra-ui/icons";
-import ImageComponent from "components/utils/ImageComponent";
-import ConversionMessageWidget from "components/common/conversions/ConversionMessagesWidget";
+import { ChevronDownIcon } from "@chakra-ui/icons";
 import { formatDateString } from "utils/Date";
-import { sampleConversions } from "__mocks__/models/Conversion.mock";
 import { Timeframe, getTimeframeLabel } from "models/enums/Timeframe";
 import { CompensationGroup } from "@models/CompensationGroup";
-import { AffiliateLink } from "@models/AffiliateLink";
-import { time } from "console";
 import { Client } from "@models/Client";
 import {
   ReferralLinkType,
   getReferralLinkTypeLabel,
 } from "models/enums/ReferralLinkType";
-import { get } from "http";
 
 type Props = {
   conversions: Conversion[];
@@ -50,34 +40,37 @@ const ConversionBrowserContent = ({
   selectConversion,
   compGroup,
 }: Props) => {
-  const properties = [
+  const tableColumns: {
+    label: string;
+    getValue: (conv: Conversion) => string | number;
+  }[] = [
     {
       label: "Conversion ID",
-      function: (conv: Conversion) => conv.id,
+      getValue: (conv: Conversion) => conv.id,
     },
     {
       label: "Date",
-      function: (conv: Conversion) => formatDateString(conv.dateOccured),
+      getValue: (conv: Conversion) => formatDateString(conv.dateOccured),
     },
     {
       label: "Affilate Link",
-      function: (conv: Conversion) => conv.affiliateLink.description(),
+      getValue: (conv: Conversion) => conv.affiliateLink.description(),
     },
     {
       label: "Bet size",
-      function: (conv: Conversion) => conv.amount,
+      getValue: (conv: Conversion) => conv.amount,
     },
     {
       label: "Customer Name",
-      function: (conv: Conversion) => conv.customer.fullName,
+      getValue: (conv: Conversion) => conv.customer.fullName,
     },
     {
       label: "Commission",
-      function: (conv: Conversion) => conv.affiliateLink.commission,
+      getValue: (conv: Conversion) => conv.affiliateLink.commission,
     },
     {
       label: "Status",
-      function: (conv: Conversion) => conv.status,
+      getValue: (conv: Conversion) => conv.status,
     },
   ];
 
@@ -172,7 +165,7 @@ const ConversionBrowserContent = ({
       <Table size="sm">
         <Thead>
           <Tr>
-            {properties.map((property, i) => {
+            {tableColumns.map((property, i) => {
               return (
                 <Th key={i} textAlign={"center"}>
                   {property.label}
@@ -191,10 +184,10 @@ const ConversionBrowserContent = ({
               }}
               _hover={{ background: "rgba(237, 125, 49, 0.26)" }}
             >
-              {properties.map((property, i) => {
+              {tableColumns.map((property, i) => {
                 return (
                   <Td key={i} textAlign={"center"}>
-                    {property.function(sale)}
+                    {property.getValue(sale)}
                   </Td>
                 );
               })}

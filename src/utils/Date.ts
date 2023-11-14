@@ -10,3 +10,8 @@ export function formatDateString(date: Date | undefined) {
     day < 10 ? `0${day}` : day
   }`;
 }
+
+export function dateFromDDMMYYYY(dateString: string): Date {
+  const [day, month, year] = dateString.split("-");
+  return new Date(`${year}-${month}-${day}`);
+}
