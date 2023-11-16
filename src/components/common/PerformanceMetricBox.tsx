@@ -20,18 +20,23 @@ const PerformanceMetricBox = ({
     <Flex
       direction={"column"}
       alignItems={"center"}
+      justifyContent={"center"}
+      gap={2}
       borderRadius="12px"
       width="full"
-      mx={4}
       border="1px solid lightgray"
-      p={2}
+      p={{ base: 1, lg: 2 }}
     >
-      <Heading size="sm" color="#ED7D31">
+      <Text
+        fontWeight={500}
+        textAlign={"center"}
+        fontSize={{ base: "2xs", lg: "xs", xl: "sm" }}
+        color="#ED7D31"
+      >
         {title}{" "}
-      </Heading>
-      <Box h={2} />
-      <Heading size="lg" fontWeight={400}>
-        {" "}
+      </Text>
+
+      <Heading size={{ base: "sm", lg: "md", xl: "lg" }} fontWeight={400}>
         {value}
       </Heading>
       {subtitle && <Text fontSize="0.8em">{subtitle}</Text>}

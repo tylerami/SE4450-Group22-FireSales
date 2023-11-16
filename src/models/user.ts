@@ -4,6 +4,7 @@ import { Timestamp, DocumentData } from "firebase/firestore";
 
 export class User {
   uid: string;
+  profilePictureSrc?: string;
   firstName: string;
   lastName: string;
   email: string;
@@ -15,6 +16,7 @@ export class User {
 
   constructor({
     uid,
+    profilePictureSrc,
     firstName,
     lastName,
     email,
@@ -25,6 +27,7 @@ export class User {
     payoutPreferrences,
   }: {
     uid: string;
+    profilePictureSrc?: string;
     firstName: string;
     lastName: string;
     email: string;
@@ -35,6 +38,7 @@ export class User {
     payoutPreferrences?: PayoutPreferrences;
   }) {
     this.uid = uid;
+    this.profilePictureSrc = profilePictureSrc;
     this.firstName = firstName;
     this.lastName = lastName;
     this.email = email;
@@ -47,12 +51,14 @@ export class User {
 
   public static create({
     uid,
+    profilePictureSrc,
     firstName,
     lastName,
     email,
     compensationGroupId,
   }: {
     uid: string;
+    profilePictureSrc?: string;
     firstName: string;
     lastName: string;
     email: string;
@@ -60,6 +66,7 @@ export class User {
   }): User {
     return new User({
       uid,
+      profilePictureSrc,
       firstName,
       lastName,
       email,
@@ -77,6 +84,7 @@ export class User {
   public toFirestoreDoc(): DocumentData {
     return {
       uid: this.uid,
+      profilePictureSrc: this.profilePictureSrc,
       firstName: this.firstName,
       lastName: this.lastName,
       email: this.email,
@@ -92,6 +100,7 @@ export class User {
   public static fromFirestoreDoc(doc: DocumentData): User {
     return new User({
       uid: doc.uid,
+      profilePictureSrc: doc.profilePictureSrc,
       firstName: doc.firstName,
       lastName: doc.lastName,
       email: doc.email,

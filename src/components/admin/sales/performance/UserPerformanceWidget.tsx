@@ -9,11 +9,9 @@ import {
   Td,
   Th,
   Spacer,
+  useBreakpointValue,
 } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
-
-import { Menu, MenuButton, MenuList, MenuItem, Button } from "@chakra-ui/react";
-import { ChevronDownIcon } from "@chakra-ui/icons";
 import { Timeframe, getTimeframeLabel } from "models/enums/Timeframe";
 import {
   Conversion,
@@ -21,6 +19,7 @@ import {
   averageCommission,
   averageCpa,
   filterConversionsByTimeframe,
+  totalCommission,
   totalGrossProfit,
   totalRevenue,
 } from "models/Conversion";
@@ -35,14 +34,18 @@ import {
   getReferralLinkTypeLabel,
 } from "models/enums/ReferralLinkType";
 import { formatMoney } from "utils/Money";
-import ClientsPerformanceChart from "./ClientsPerformanceChart";
 import { AffiliateDeal } from "models/AffiliateDeal";
-import PerformanceMetricBox from "../../common/PerformanceMetricBox";
 import Filter, { FilterDefinition } from "components/utils/Filter";
+import PerformanceMetricBox from "components/common/PerformanceMetricBox";
+import UserPerformanceChart from "./UserPerformanceChart";
+import { User } from "@models/User";
 
-type Props = {};
+type Props = {
+  user: User;
+  conversions: Conversion[];
+};
 
-const ClientsPerformanceWidget = (props: Props) => {
+const UserPerformanceWidget = (props: Props) => {
   const conversionService: ConversionService =
     DependencyInjection.conversionService();
   const clientService: ClientService = DependencyInjection.clientService();
@@ -97,11 +100,6 @@ const ClientsPerformanceWidget = (props: Props) => {
   };
 
   useEffect(() => {
-    const fetchConversions = async () => {
-      const conversions = await conversionService.query({});
-      setConversions(conversions);
-    };
-
     const fetchCompensationGroups = async () => {
       const compensationGroups = await compGroupService.getAll();
       setCompensationGroups(compensationGroups);
@@ -112,7 +110,6 @@ const ClientsPerformanceWidget = (props: Props) => {
       setClients(clients);
     };
 
-    fetchConversions();
     fetchCompensationGroups();
     fetchClients();
   }, [conversionService, compGroupService, clientService]);
@@ -126,25 +123,29 @@ const ClientsPerformanceWidget = (props: Props) => {
       getValue: (conversions: Conversion[]) => conversions.length.toString(),
     },
     {
-      label: "Revenue",
+      label: "Commission",
       getValue: (conversions: Conversion[]) =>
-        formatMoney(totalRevenue(conversions)),
+        formatMoney(totalCommission(conversions)),
     },
     {
       label: "Profit",
       getValue: (conversions: Conversion[]) =>
         formatMoney(totalGrossProfit(conversions)),
     },
-    {
-      label: "Avg. Bet Size",
-      getValue: (conversions: Conversion[]) =>
-        formatMoney(averageBetSize(conversions)),
-    },
-    {
-      label: "Avg. Commission",
-      getValue: (conversions: Conversion[]) =>
-        formatMoney(averageCommission(conversions)),
-    },
+    ...(useBreakpointValue({ base: false, lg: true })
+      ? [
+          {
+            label: "Avg. Bet Size",
+            getValue: (conversions: Conversion[]) =>
+              formatMoney(averageBetSize(conversions)),
+          },
+          {
+            label: "Avg. Commission",
+            getValue: (conversions: Conversion[]) =>
+              formatMoney(averageCommission(conversions)),
+          },
+        ]
+      : []),
   ];
 
   const performanceMetrics = [
@@ -233,7 +234,7 @@ const ClientsPerformanceWidget = (props: Props) => {
     <Flex
       p={26}
       borderRadius={"20px"}
-      width={"95%"}
+      width={"100%"}
       flexDirection={"column"}
       boxShadow={"3px 4px 12px rgba(0, 0, 0, 0.2)"}
     >
@@ -251,7 +252,7 @@ const ClientsPerformanceWidget = (props: Props) => {
 
       <Box h={4}></Box>
 
-      <Flex my={4} justifyContent={"space-evenly"}>
+      <Flex my={4} gap={2} justifyContent={"space-evenly"}>
         {performanceMetrics.map((metric, i) => (
           <PerformanceMetricBox
             key={i}
@@ -263,14 +264,13 @@ const ClientsPerformanceWidget = (props: Props) => {
 
       <Box h={4}></Box>
       <Flex
-        maxH="60vh"
         width={"100%"}
         minWidth={"80%"}
         justifyContent={"center"}
         alignSelf="center"
         height="full"
       >
-        <ClientsPerformanceChart
+        <UserPerformanceChart
           timeframe={timeframe}
           conversions={filteredConversions}
         />
@@ -309,4 +309,4 @@ const ClientsPerformanceWidget = (props: Props) => {
   );
 };
 
-export default ClientsPerformanceWidget;
+export default UserPerformanceWidget;

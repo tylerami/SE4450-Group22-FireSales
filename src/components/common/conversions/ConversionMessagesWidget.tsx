@@ -9,7 +9,7 @@ import {
 import React, { useEffect, useRef } from "react";
 
 import { ArrowUpIcon } from "@chakra-ui/icons";
-import ConversionMessageTile from "../../admin/sales/user_management/conversion_management/ConversionMessageTile";
+import ConversionMessageTile from "./ConversionMessageTile";
 
 const messages = [
   {
@@ -53,62 +53,6 @@ const messages = [
       "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua",
   },
 ];
-
-// const ConversionMessagesWidget = () => {
-//     return (
-//         <React.Fragment>
-//             <Heading as="h1" fontSize={"1.2em"} fontWeight={700}>
-//                 Messages
-//             </Heading>
-//             <Flex
-//                 minHeight={"20em"}
-//                 maxHeight={"30em"}
-//                 borderRadius={"20px"}
-//                 border="1px solid lightgray"
-//                 p={6}
-//                 gap={4}
-//                 onWheel={handleScroll}
-//                 w="100%"
-//                 overflowY={"scroll"}
-//                 justifyContent={"end"}
-//                 alignItems={"center"}
-//                 direction={"column"}
-//             >
-//                 {messages.map((message, index) => (
-//                     <ConversionMessageTile
-//                         fromSelf={message.fromSelf}
-//                         text={message.message}
-//                         key={index}
-//                     />
-//                 ))}
-//                 <InputGroup
-//                     position={"relative"}
-//                     bottom={0}
-//                     display={"flex"}
-//                 >
-//                     <Textarea
-//                         placeholder="Type a message"
-//                         size="sm"
-//                         resize="none"
-//                         value={newMessage}
-//                         onChange={(e) => setNewMessage(e.target.value)}
-//                         onKeyPress={handleKeyPress}
-//                     />
-//                     <InputRightElement>
-//                         <IconButton
-//                             aria-label="Send message"
-//                             icon={<ArrowForwardIcon />}
-//                             onClick={handleSend}
-//                             size="sm"
-//                             colorScheme="blue"
-//                             ml={2}
-//                         />
-//                     </InputRightElement>
-//                 </InputGroup>
-//             </Flex>
-//         </React.Fragment>
-//     );
-// };
 
 const ConversionMessageWidget = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -179,37 +123,5 @@ const ConversionMessageWidget = () => {
     </Flex>
   );
 };
-
-//   return (
-//     <React.Fragment>
-//       <Heading as="h1" fontSize={"1.2em"} fontWeight={700}>
-//         Messages
-//       </Heading>
-//       <Flex
-//         minHeight={"20em"}
-//         maxHeight={"30em"}
-//         borderRadius={"20px"}
-//         border="1px solid lightgray"
-//         p={6}
-//         gap={4}
-//         onWheel={handleScroll}
-//         w="100%"
-//         overflowY={"scroll"}
-//         justifyContent={"end"}
-//         alignItems={"center"}
-//         direction={"column"}
-//       >
-//         {messages.map((message, index) => (
-//           <ConversionMessageTile
-//             fromSelf={message.fromSelf}
-//             text={message.message}
-//             key={index}
-//           />
-//         ))}
-//
-//       </Flex>
-//     </React.Fragment>
-//   );
-// };
 
 export default ConversionMessageWidget;

@@ -1,5 +1,5 @@
 import { User } from "@models/User";
-import { sampleUser } from "__mocks__/models/User.mock";
+import { generateSampleUsers, sampleUser } from "__mocks__/models/User.mock";
 import { UserService } from "services/interfaces/UserService";
 
 export class MockUserService implements UserService {
@@ -18,7 +18,9 @@ export class MockUserService implements UserService {
   async update(user: User | Partial<User>): Promise<User> {
     return user as User;
   }
-  async getAll({ includeAdmins }: { includeAdmins: boolean }): Promise<User[]> {
-    return [];
+  async getAll({
+    includeAdmins = false,
+  }: { includeAdmins?: boolean } = {}): Promise<User[]> {
+    return generateSampleUsers(50);
   }
 }
