@@ -50,20 +50,23 @@ export function percentageDifference(s: string, t: string): number {
 export function findClosestMatch<T>(
   keyword: string,
   options: T[],
-  getOptionString: (T) => string
+  getOptionString: (T) => string,
+  differenceThreshold: number = 0.3
 ): T | null {
   const optionsWithScores = options.map((option) => {
     return {
       option,
-      score: -percentageDifference(keyword, getOptionString(option)),
+      score: percentageDifference(keyword, getOptionString(option)),
     };
   });
 
   const sortedOptions = optionsWithScores.sort((a, b) => {
-    return b.score - a.score;
+    return a.score - b.score;
   });
 
-  if (sortedOptions[0].score > 0) {
+  console.log(sortedOptions);
+
+  if (sortedOptions[0].score < differenceThreshold) {
     return sortedOptions[0].option;
   } else {
     return null;

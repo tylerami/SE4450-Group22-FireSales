@@ -79,7 +79,7 @@ const SalesTeamListTable = ({
     const filteredPayouts: Payout[] = payouts.filter(
       (payout) =>
         payout.userId === uid &&
-        payout.dateOccured.getTime() >
+        payout.dateOccurred.getTime() >
           getIntervalStart(timeframeFilter).getTime()
     );
 

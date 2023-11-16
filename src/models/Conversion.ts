@@ -1,4 +1,4 @@
-import { dateFromDDMMYYYY, formatDateString } from "../utils/Date";
+import { formatDateString } from "../utils/Date";
 import { AffiliateLink } from "./AffiliateLink";
 import { Customer } from "./Customer";
 import { Message } from "./Message";
@@ -19,7 +19,7 @@ export type ConversionAttachmentGroup = {
 
 export class Conversion {
   id: string;
-  dateOccured: Date;
+  dateOccurred: Date;
   loggedAt: Date;
   userId: string;
   status: ConversionStatus;
@@ -33,7 +33,7 @@ export class Conversion {
 
   constructor({
     id,
-    dateOccured,
+    dateOccurred,
     loggedAt,
     userId,
     status,
@@ -46,7 +46,7 @@ export class Conversion {
     messages = [],
   }: {
     id: string;
-    dateOccured: Date;
+    dateOccurred: Date;
     loggedAt: Date;
     userId: string;
     status: ConversionStatus;
@@ -59,7 +59,7 @@ export class Conversion {
     messages?: Array<Message>;
   }) {
     this.id = id;
-    this.dateOccured = dateOccured;
+    this.dateOccurred = dateOccurred;
     this.loggedAt = loggedAt;
     this.userId = userId;
     this.status = status;
@@ -73,7 +73,7 @@ export class Conversion {
   }
 
   static fromManualInput({
-    dateString, // maybe modify this to accept a Date object instead
+    dateOccurred, // maybe modify this to accept a Date object instead
     userId,
     compensationGroupId,
     affiliateLink,
@@ -82,7 +82,7 @@ export class Conversion {
     attachmentUrls,
     currency = Currency.CAD,
   }: {
-    dateString: string;
+    dateOccurred: Date;
     userId: string;
     compensationGroupId: string;
     affiliateLink: AffiliateLink;
@@ -92,16 +92,16 @@ export class Conversion {
     attachmentUrls?: Array<string>;
   }) {
     const id = getConversionId({
-      dateString,
+      dateOccurred,
       clientId: affiliateLink.clientId,
       userId,
       customerId: customer.id,
     });
-    const dateOccured = dateFromDDMMYYYY(dateString);
+
     const loggedAt = new Date();
     return new Conversion({
       id,
-      dateOccured,
+      dateOccurred,
       loggedAt,
       userId,
       status: ConversionStatus.pending,
@@ -115,7 +115,7 @@ export class Conversion {
   }
 
   public description(): string {
-    return `${formatDateString(this.dateOccured)} / ${
+    return `${formatDateString(this.dateOccurred)} / ${
       this.affiliateLink.clientId
     } / ${this.customer.id} / $${this.amount} bet / $${
       this.affiliateLink.commission
@@ -125,8 +125,8 @@ export class Conversion {
   public toFirestoreDoc(): DocumentData {
     return {
       id: this.id,
-      dateOccured: this.dateOccured
-        ? Timestamp.fromDate(this.dateOccured)
+      dateOccurred: this.dateOccurred
+        ? Timestamp.fromDate(this.dateOccurred)
         : null,
       loggedAt: this.loggedAt ? Timestamp.fromDate(this.loggedAt) : null,
       userId: this.userId,
@@ -144,7 +144,7 @@ export class Conversion {
   public static fromFirestoreDoc(doc: DocumentData): Conversion {
     return new Conversion({
       id: doc.id,
-      dateOccured: doc.dateOccured ? doc.dateOccured.toDate() : new Date(),
+      dateOccurred: doc.dateOccurred ? doc.dateOccurred.toDate() : new Date(),
       loggedAt: doc.loggedAt ? doc.loggedAt.toDate() : new Date(),
       userId: doc.userId,
       status: doc.status as ConversionStatus,
@@ -290,8 +290,8 @@ export function filterConversionsByDateInterval(
 ) {
   return conversions.filter(
     (conversion) =>
-      !(fromDate && conversion.dateOccured < fromDate) &&
-      !(toDate && conversion.dateOccured > toDate)
+      !(fromDate && conversion.dateOccurred < fromDate) &&
+      !(toDate && conversion.dateOccurred > toDate)
   );
 }
 
@@ -301,20 +301,22 @@ export function filterConversionsByTimeframe(
 ): Array<Conversion> {
   const intervalStart = getIntervalStart(timeframe);
   return conversions.filter(
-    (conversion) => conversion.dateOccured >= intervalStart
+    (conversion) => conversion.dateOccurred >= intervalStart
   );
 }
 
 export function getConversionId({
-  dateString,
+  dateOccurred,
   clientId,
   userId,
   customerId,
 }: {
-  dateString: string;
+  dateOccurred: Date;
   clientId: string;
   userId: string;
   customerId: string;
 }): string {
-  return `${dateString}_${userId}_${clientId}_${customerId}`;
+  return `${formatDateString(
+    dateOccurred
+  )}_${userId}_${clientId}_${customerId}`;
 }

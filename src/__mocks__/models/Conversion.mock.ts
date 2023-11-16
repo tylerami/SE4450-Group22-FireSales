@@ -8,7 +8,7 @@ import { sampleMessages } from "./Message.mock";
 // Sample Data for Conversion
 export const conversionSample = new Conversion({
   id: "conv123",
-  dateOccured: new Date(),
+  dateOccurred: new Date(),
   loggedAt: new Date(),
   userId: "user123",
   status: ConversionStatus.pending,

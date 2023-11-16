@@ -50,7 +50,7 @@ const ConversionBrowserContent = ({
     },
     {
       label: "Date",
-      getValue: (conv: Conversion) => formatDateString(conv.dateOccured),
+      getValue: (conv: Conversion) => formatDateString(conv.dateOccurred),
     },
     {
       label: "Affilate Link",

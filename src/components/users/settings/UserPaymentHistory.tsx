@@ -38,7 +38,7 @@ const tableColumns: {
 }[] = [
   {
     label: "Date",
-    getValue: (payout: Payout) => formatDateString(payout.dateOccured),
+    getValue: (payout: Payout) => formatDateString(payout.dateOccurred),
   },
   {
     label: "Amount",
@@ -92,7 +92,7 @@ const UserPaymentHistory = (props: Props) => {
   }, [conversionsService, currentUser, payoutService]);
 
   // sort payouts reverse chronologically
-  payouts.sort((a, b) => b.dateOccured.getTime() - a.dateOccured.getTime());
+  payouts.sort((a, b) => b.dateOccurred.getTime() - a.dateOccurred.getTime());
 
   const cumulativeEarnings = payouts.reduce((acc, payout) => {
     return acc + payout.amount;

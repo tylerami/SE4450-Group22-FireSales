@@ -7,7 +7,7 @@ export class Payout {
   amount: number;
   currency: Currency;
   conversionIds?: string[];
-  dateOccured: Date;
+  dateOccurred: Date;
   dateRecorded: Date;
   paymentMethod: PaymentMethod;
   paymentAddress: string;
@@ -17,7 +17,7 @@ export class Payout {
     amount,
     currency = Currency.CAD,
     conversionIds,
-    dateOccured,
+    dateOccurred,
     dateRecorded,
     paymentMethod,
     paymentAddress,
@@ -26,7 +26,7 @@ export class Payout {
     amount: number;
     currency?: Currency;
     conversionIds?: string[];
-    dateOccured: Date;
+    dateOccurred: Date;
     dateRecorded: Date;
     paymentMethod: PaymentMethod;
     paymentAddress: string;
@@ -35,7 +35,7 @@ export class Payout {
     this.amount = amount;
     this.currency = currency;
     this.conversionIds = conversionIds;
-    this.dateOccured = dateOccured;
+    this.dateOccurred = dateOccurred;
     this.dateRecorded = dateRecorded;
     this.paymentMethod = paymentMethod;
     this.paymentAddress = paymentAddress;
@@ -46,7 +46,7 @@ export class Payout {
       userId: this.userId,
       amount: this.amount,
       currency: this.currency,
-      dateOccured: Timestamp.fromDate(this.dateOccured),
+      dateOccurred: Timestamp.fromDate(this.dateOccurred),
       dateRecorded: Timestamp.fromDate(this.dateRecorded),
       paymentMethod: this.paymentMethod,
       paymentAddress: this.paymentAddress,
@@ -58,7 +58,7 @@ export class Payout {
       userId: doc.userId,
       amount: doc.amount,
       currency: doc.currency,
-      dateOccured: doc.dateOccured.toDate(),
+      dateOccurred: doc.dateOccurred.toDate(),
       dateRecorded: doc.dateRecorded.toDate(),
       paymentMethod: doc.paymentMethod,
       paymentAddress: doc.paymentAddress,

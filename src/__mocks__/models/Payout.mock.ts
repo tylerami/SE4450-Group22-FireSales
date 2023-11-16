@@ -14,7 +14,7 @@ export function generateSamplePayouts(
       userId: userId ?? userIds[i % userIds.length],
       amount: Math.floor(Math.random() * 1000) + 100, // Random amount between 100 and 1100
       currency: Currency.CAD, // Default to CAD
-      dateOccured: new Date(),
+      dateOccurred: new Date(),
       dateRecorded: new Date(),
       paymentMethod: PaymentMethod.etransfer, // Assume all use PayPal for simplicity
       paymentAddress: paymentAddresses[i % paymentAddresses.length],

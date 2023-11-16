@@ -28,7 +28,7 @@ type Props = {
   attachments: File[];
 };
 
-const BulkRecordConversionsProcessedTable = ({
+const AdminRecordConversionsProcessedTable = ({
   conversionsByNumber,
   attachments,
 }: Props) => {
@@ -187,4 +187,4 @@ const BulkRecordConversionsProcessedTable = ({
   );
 };
 
-export default BulkRecordConversionsProcessedTable;
+export default AdminRecordConversionsProcessedTable;

@@ -13,9 +13,9 @@ import { AffiliateLink } from "models/AffiliateLink";
 import { Customer } from "models/Customer";
 import { ConversionService } from "services/interfaces/ConversionService";
 import { DependencyInjection } from "utils/DependencyInjection";
-import BulkRecordConversionsInstructions from "./BulkRecordConversionsInstructions";
-import BulkRecordConversionsProcessedTable from "./BulkRecordConversionsProcessedTable";
 import { parseDateString } from "utils/Date";
+import AdminRecordConversionsProcessedTable from "./AdminRecordConversionsProcessedTable";
+import AdminRecordConversionsInstructions from "./AdminRecordConversionsInstructions";
 
 type Props = {
   compensationGroup: CompensationGroup | null;
@@ -36,6 +36,7 @@ const BulkRecordConversionsWidgetContent = ({ compensationGroup }: Props) => {
     number,
     Conversion
   > | null>(null);
+  const [assignmentCode, setAssignmentCode] = useState("");
 
   const { currentUser } = useContext(UserContext);
 
@@ -286,12 +287,12 @@ const BulkRecordConversionsWidgetContent = ({ compensationGroup }: Props) => {
       {processing ? (
         <Spinner size="xl" />
       ) : conversions != null ? (
-        <BulkRecordConversionsProcessedTable
+        <AdminRecordConversionsProcessedTable
           attachments={attachments}
           conversionsByNumber={conversionsByNumber}
         />
       ) : (
-        <BulkRecordConversionsInstructions />
+        <AdminRecordConversionsInstructions />
       )}
 
       <Box h={4} />
@@ -314,7 +315,18 @@ const BulkRecordConversionsWidgetContent = ({ compensationGroup }: Props) => {
           </Button>
         </InputGroup>
 
-        <Box w={8} />
+        <Box h={2} />
+        <Text>
+          Enter an assignment code that a user can use to claim these
+          conversions:
+        </Text>
+        <Input
+          focusBorderColor="#ED7D31"
+          placeholder="Assignment Code..."
+          value={assignmentCode}
+          onChange={(e) => setAssignmentCode(e.target.value)}
+        />
+        <Box h={2} />
 
         <InputGroup width={"full"}>
           <Button

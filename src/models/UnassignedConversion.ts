@@ -1,4 +1,4 @@
-import { dateFromDDMMYYYY, formatDateString } from "../utils/Date";
+import { formatDateString } from "../utils/Date";
 import { AffiliateLink } from "./AffiliateLink";
 import { Conversion } from "./Conversion";
 import { Customer } from "./Customer";
@@ -15,7 +15,7 @@ export type ConversionAttachmentGroup = {
 export class UnassignedConversion {
   assignmentCode: string;
   id: string;
-  dateOccured: Date;
+  dateOccurred: Date;
   loggedAt: Date;
   status: ConversionStatus;
   compensationGroupId?: string;
@@ -29,9 +29,8 @@ export class UnassignedConversion {
   constructor({
     assignmentCode,
     id,
-    dateOccured,
+    dateOccurred,
     loggedAt,
-
     status,
     compensationGroupId,
     affiliateLink,
@@ -42,7 +41,7 @@ export class UnassignedConversion {
     messages = [],
   }: {
     id: string;
-    dateOccured: Date;
+    dateOccurred: Date;
     loggedAt: Date;
     assignmentCode: string;
     status: ConversionStatus;
@@ -55,7 +54,7 @@ export class UnassignedConversion {
     messages?: Array<Message>;
   }) {
     this.id = id;
-    this.dateOccured = dateOccured;
+    this.dateOccurred = dateOccurred;
     this.loggedAt = loggedAt;
     this.assignmentCode = assignmentCode;
     this.status = status;
@@ -69,7 +68,7 @@ export class UnassignedConversion {
   }
 
   static fromManualInput({
-    dateString, // maybe modify this to accept a Date object instead
+    dateOccurred, // maybe modify this to accept a Date object instead
     assignmentCode,
     compensationGroupId,
     affiliateLink,
@@ -78,7 +77,7 @@ export class UnassignedConversion {
     attachmentUrls,
     currency = Currency.CAD,
   }: {
-    dateString: string;
+    dateOccurred: Date;
     assignmentCode: string;
     compensationGroupId: string;
     affiliateLink: AffiliateLink;
@@ -88,16 +87,15 @@ export class UnassignedConversion {
     attachmentUrls?: Array<string>;
   }) {
     const id = getUnassignedConversionId({
-      dateString,
+      dateOccurred,
       clientId: affiliateLink.clientId,
       assignmentCode,
       customerId: customer.id,
     });
-    const dateOccured = dateFromDDMMYYYY(dateString);
     const loggedAt = new Date();
     return new UnassignedConversion({
       id,
-      dateOccured,
+      dateOccurred,
       loggedAt,
       assignmentCode,
       status: ConversionStatus.pending,
@@ -111,7 +109,7 @@ export class UnassignedConversion {
   }
 
   public description(): string {
-    return `${formatDateString(this.dateOccured)} / ${
+    return `${formatDateString(this.dateOccurred)} / ${
       this.affiliateLink.clientId
     } / ${this.customer.id} / $${this.amount} bet / $${
       this.affiliateLink.commission
@@ -121,8 +119,8 @@ export class UnassignedConversion {
   public toFirestoreDoc(): DocumentData {
     return {
       id: this.id,
-      dateOccured: this.dateOccured
-        ? Timestamp.fromDate(this.dateOccured)
+      dateOccurred: this.dateOccurred
+        ? Timestamp.fromDate(this.dateOccurred)
         : null,
       loggedAt: this.loggedAt ? Timestamp.fromDate(this.loggedAt) : null,
       assignmentCode: this.assignmentCode,
@@ -140,7 +138,7 @@ export class UnassignedConversion {
   public static fromFirestoreDoc(doc: DocumentData): UnassignedConversion {
     return new UnassignedConversion({
       id: doc.id,
-      dateOccured: doc.dateOccured ? doc.dateOccured.toDate() : new Date(),
+      dateOccurred: doc.dateOccurred ? doc.dateOccurred.toDate() : new Date(),
       loggedAt: doc.loggedAt ? doc.loggedAt.toDate() : new Date(),
       assignmentCode: doc.assignmentCode,
       status: doc.status as ConversionStatus,
@@ -173,15 +171,17 @@ export function assignConversionsToUser({
 }
 
 export function getUnassignedConversionId({
-  dateString,
+  dateOccurred,
   clientId,
   assignmentCode,
   customerId,
 }: {
-  dateString: string;
+  dateOccurred: Date;
   clientId: string;
   assignmentCode: string;
   customerId: string;
 }): string {
-  return `${dateString}_${assignmentCode}_${clientId}_${customerId}_UNASSIGNED`;
+  return `${formatDateString(
+    dateOccurred
+  )}_${assignmentCode}_${clientId}_${customerId}_UNASSIGNED`;
 }

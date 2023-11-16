@@ -83,7 +83,7 @@ const AdminConversionBrowserContent = ({
       : []),
     {
       label: "Date",
-      getValue: (conv: Conversion) => formatDateString(conv.dateOccured),
+      getValue: (conv: Conversion) => formatDateString(conv.dateOccurred),
     },
     {
       label: "Affilate Link",
@@ -264,11 +264,11 @@ const AdminConversionBrowserContent = ({
       case SortBy.Date:
         if (sortDirection === SortDirection.Descending) {
           filteredConversions.sort(
-            (a, b) => b.dateOccured.getTime() - a.dateOccured.getTime()
+            (a, b) => b.dateOccurred.getTime() - a.dateOccurred.getTime()
           );
         } else {
           filteredConversions.sort(
-            (a, b) => a.dateOccured.getTime() - b.dateOccured.getTime()
+            (a, b) => a.dateOccurred.getTime() - b.dateOccurred.getTime()
           );
         }
         break;

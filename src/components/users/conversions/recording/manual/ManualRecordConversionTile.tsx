@@ -29,6 +29,7 @@ import { Customer } from "models/Customer";
 import { CustomerService } from "services/interfaces/CustomerService";
 import { DependencyInjection } from "utils/DependencyInjection";
 import { formatMoney } from "utils/Money";
+import { parseDateString } from "utils/Date";
 
 type Props = {
   compensationGroup: CompensationGroup;
@@ -96,8 +97,10 @@ const RecordConversionTile = ({
       customerName
     );
 
+    const dateOccurred = parseDateString(dateString, "yyyy-dd-mm");
+
     const conversion: Conversion = Conversion.fromManualInput({
-      dateString,
+      dateOccurred,
       affiliateLink,
       customer: new Customer({
         fullName: customerName,
