@@ -3,7 +3,7 @@ import { AffiliateLink } from "./AffiliateLink";
 import { Conversion } from "./Conversion";
 import { Customer } from "./Customer";
 import { Message } from "./Message";
-import { ConversionsStatus } from "./enums/ConversionStatus";
+import { ConversionStatus } from "./enums/ConversionStatus";
 import { Currency } from "./enums/Currency";
 import { Timestamp, DocumentData } from "firebase/firestore";
 
@@ -17,7 +17,7 @@ export class UnassignedConversion {
   id: string;
   dateOccured: Date;
   loggedAt: Date;
-  status: ConversionsStatus;
+  status: ConversionStatus;
   compensationGroupId?: string;
   affiliateLink: AffiliateLink;
   customer: Customer;
@@ -45,7 +45,7 @@ export class UnassignedConversion {
     dateOccured: Date;
     loggedAt: Date;
     assignmentCode: string;
-    status: ConversionsStatus;
+    status: ConversionStatus;
     compensationGroupId?: string;
     affiliateLink: AffiliateLink;
     customer: Customer;
@@ -100,7 +100,7 @@ export class UnassignedConversion {
       dateOccured,
       loggedAt,
       assignmentCode,
-      status: ConversionsStatus.pending,
+      status: ConversionStatus.pending,
       compensationGroupId,
       affiliateLink,
       customer,
@@ -143,7 +143,7 @@ export class UnassignedConversion {
       dateOccured: doc.dateOccured ? doc.dateOccured.toDate() : new Date(),
       loggedAt: doc.loggedAt ? doc.loggedAt.toDate() : new Date(),
       assignmentCode: doc.assignmentCode,
-      status: doc.status as ConversionsStatus,
+      status: doc.status as ConversionStatus,
       compensationGroupId: doc.compensationGroupId,
       affiliateLink: AffiliateLink.fromFirestoreDoc(doc.affiliateLink),
       customer: Customer.fromFirestoreDoc(doc.customer),

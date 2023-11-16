@@ -28,7 +28,7 @@ import { PayoutService } from "services/interfaces/PayoutService";
 import { DependencyInjection } from "utils/DependencyInjection";
 import { getPaymentMethodLabel } from "models/enums/PaymentMethod";
 import { ConversionService } from "services/interfaces/ConversionService";
-import { ConversionsStatus } from "models/enums/ConversionStatus";
+import { ConversionStatus } from "models/enums/ConversionStatus";
 
 type Props = {};
 
@@ -100,7 +100,7 @@ const UserPaymentHistory = (props: Props) => {
 
   const outstandingBalance =
     conversions
-      .filter((conv) => conv.status !== ConversionsStatus.rejected)
+      .filter((conv) => conv.status !== ConversionStatus.rejected)
       .reduce((acc, conv) => acc + conv.affiliateLink.commission, 0) -
     cumulativeEarnings;
 

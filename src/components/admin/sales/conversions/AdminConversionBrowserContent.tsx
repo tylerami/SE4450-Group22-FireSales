@@ -1,35 +1,60 @@
 import React, { useState } from "react";
 import {
-  Button,
+  Table,
+  Thead,
+  Tbody,
+  Tr,
+  Th,
+  Td,
+  Image,
+  Box,
+  Text,
+  Circle,
   Flex,
   Heading,
+  InputGroup,
+  InputLeftElement,
+  Input,
+  Spacer,
+  useBreakpointValue,
+  MenuList,
+  MenuItem,
   Menu,
   MenuButton,
-  MenuItem,
-  MenuList,
-  Spacer,
+  Button,
   Spinner,
-  Table,
-  Tbody,
-  Td,
-  Th,
-  Thead,
-  Tr,
-  useBreakpointValue,
 } from "@chakra-ui/react";
-import { Conversion } from "models/Conversion";
-import { ChevronDownIcon } from "@chakra-ui/icons";
-import { formatDateString } from "utils/Date";
-import { Timeframe, getTimeframeLabel } from "models/enums/Timeframe";
-import { CompensationGroup } from "@models/CompensationGroup";
-import { Client } from "@models/Client";
+import { FiSearch, FiUser } from "react-icons/fi";
+import { Icon, IconButton } from "@chakra-ui/react";
+import { ChevronLeftIcon, ChevronRightIcon } from "@chakra-ui/icons";
+import { User } from "../../../../models/User";
+import {
+  Conversion,
+  averageBetSize,
+  averageCommission,
+  filterConversionsByTimeframe,
+  totalCommission,
+  totalGrossProfit,
+} from "models/Conversion";
+import { Payout } from "models/Payout";
+import {
+  Timeframe,
+  getIntervalStart,
+  getTimeframeLabel,
+} from "models/enums/Timeframe";
+import { Client } from "models/Client";
 import {
   ReferralLinkType,
   getReferralLinkTypeLabel,
 } from "models/enums/ReferralLinkType";
+import { CompensationGroup } from "models/CompensationGroup";
+import Filter, { FilterDefinition } from "components/utils/Filter";
 import { formatMoney } from "utils/Money";
-import { getConversionStatusLabel } from "models/enums/ConversionStatus";
-import { format } from "path";
+import {
+  ConversionStatus,
+  getConversionStatusLabel,
+} from "models/enums/ConversionStatus";
+import { formatDateString } from "utils/Date";
 
 type Props = {
   conversions: Conversion[];
@@ -94,26 +119,28 @@ const AdminConversionBrowserContent = ({
   const [timeframeFilter, setTimeframeFilter] = useState<Timeframe | null>(
     null
   );
-
-  const [clientFilter, setClientFilter] = useState<Client | null>();
+  const [clientFilter, setClientFilter] = useState<Client | null>(null);
   const [referralTypeFilter, setReferralTypeFilter] =
     useState<ReferralLinkType>(ReferralLinkType.casinoAndSports);
+  const [convStatusFilter, setConvStatusFilter] =
+    useState<ConversionStatus | null>(null);
 
-  const changeTimeframeFilter = (timeframe: Timeframe | null) => {
-    setTimeframeFilter(timeframe);
-  };
-
-  const changeClientFilter = (client: Client | null) => {
-    setClientFilter(client);
-  };
-
-  const changeReferralTypeFilter = (referralType: ReferralLinkType) => {
-    setReferralTypeFilter(referralType);
-  };
-
-  if (!compGroup) {
-    return <Spinner />;
+  enum SortBy {
+    Date = "Date",
+    BetSize = "Bet Size",
+    Commission = "Commission",
+    CPA = "CPA",
   }
+
+  enum SortDirection {
+    Ascending = "Ascending",
+    Descending = "Descending",
+  }
+
+  const [sortBy, setSortBy] = useState<SortBy>(SortBy.Date);
+  const [sortDirection, setSortDirection] = useState<SortDirection>(
+    SortDirection.Descending
+  );
 
   const timeframes: Timeframe[] = Object.values(Timeframe).filter(
     (t) => typeof t !== "string"
@@ -122,6 +149,165 @@ const AdminConversionBrowserContent = ({
   const referralTypes: ReferralLinkType[] = Object.values(ReferralLinkType);
   referralTypes.sort((a, b) => b.length - a.length);
 
+  const conversionStatuses: ConversionStatus[] =
+    Object.values(ConversionStatus);
+
+  const filterDropdowns: FilterDefinition<
+    Client | Timeframe | ConversionStatus | ReferralLinkType
+  >[] = [
+    {
+      options: [null, ...clients],
+      onChange: (value) => setClientFilter(value as Client | null),
+      value: clientFilter,
+      label: (value) => {
+        if (value === null) return "All Comp. Groups";
+        return (value as Client).name;
+      },
+    },
+    {
+      options: referralTypes,
+      onChange: (value) => setReferralTypeFilter(value as ReferralLinkType),
+      value: referralTypeFilter,
+      label: (value) => getReferralLinkTypeLabel(value as ReferralLinkType),
+    },
+    {
+      options: [null, ...conversionStatuses],
+      onChange: (value) => setConvStatusFilter(value as ConversionStatus),
+      value: convStatusFilter,
+      label: (value) => {
+        if (value === null) return "Any Status";
+        return getConversionStatusLabel(value as ConversionStatus);
+      },
+    },
+    {
+      options: timeframes,
+      onChange: (value) => setTimeframeFilter(value as Timeframe),
+      value: timeframeFilter,
+      label: (value) => {
+        if (value === null) return "All Time";
+        return getTimeframeLabel(value as Timeframe);
+      },
+    },
+  ];
+
+  const sortByDropdowns: FilterDefinition<SortBy | SortDirection>[] = [
+    {
+      options: Object.values(SortBy),
+      onChange: (value) => setSortBy(value as SortBy),
+      value: sortBy,
+      label: (value) => value!.toString(),
+    },
+
+    {
+      options: Object.values(SortDirection),
+      onChange: (value) => setSortDirection(value as SortDirection),
+      value: sortDirection,
+      label: (value) => value!.toString(),
+    },
+  ];
+
+  const filterAndSortConversions = (): Conversion[] => {
+    let filteredConversions: Conversion[] = Object.assign([], conversions);
+
+    if (clientFilter !== null) {
+      filteredConversions = filteredConversions.filter(
+        (conv) => conv.affiliateLink.clientId === clientFilter.id
+      );
+    }
+
+    if (referralTypeFilter !== null) {
+      filteredConversions = filteredConversions.filter(
+        (conv) => conv.affiliateLink.type === referralTypeFilter
+      );
+    }
+
+    if (convStatusFilter !== null) {
+      filteredConversions = filteredConversions.filter(
+        (conv) => conv.status === convStatusFilter
+      );
+    }
+
+    if (timeframeFilter !== null) {
+      filteredConversions = filterConversionsByTimeframe(
+        filteredConversions,
+        timeframeFilter
+      );
+    }
+
+    switch (sortBy) {
+      case SortBy.BetSize:
+        if (sortDirection === SortDirection.Descending) {
+          filteredConversions.sort((a, b) => b.amount - a.amount);
+        } else {
+          filteredConversions.sort((a, b) => a.amount - b.amount);
+        }
+
+        break;
+      case SortBy.Commission:
+        if (sortDirection === SortDirection.Descending) {
+          filteredConversions.sort(
+            (a, b) => b.affiliateLink.commission - a.affiliateLink.commission
+          );
+        } else {
+          filteredConversions.sort(
+            (a, b) => a.affiliateLink.commission - b.affiliateLink.commission
+          );
+        }
+        break;
+      case SortBy.CPA:
+        if (sortDirection === SortDirection.Descending) {
+          filteredConversions.sort((a, b) => b.affiliateLink.cpa - a.amount);
+        } else {
+          filteredConversions.sort((a, b) => a.affiliateLink.cpa - b.amount);
+        }
+        break;
+      case SortBy.Date:
+        if (sortDirection === SortDirection.Descending) {
+          filteredConversions.sort(
+            (a, b) => b.dateOccured.getTime() - a.dateOccured.getTime()
+          );
+        } else {
+          filteredConversions.sort(
+            (a, b) => a.dateOccured.getTime() - b.dateOccured.getTime()
+          );
+        }
+        break;
+    }
+
+    return filteredConversions;
+  };
+
+  const filteredConversions = filterAndSortConversions();
+
+  // Pagination
+  const [pageIndex, setPageIndex] = useState(0);
+
+  const pageLength = 20;
+
+  const pageCount = Math.max(
+    1,
+    Math.ceil(filteredConversions.length / pageLength)
+  );
+
+  const nextPage = () => {
+    if (pageIndex === pageCount - 1) return;
+    setPageIndex((prev) => prev + 1);
+  };
+
+  const prevPage = () => {
+    if (pageIndex === 0) return;
+    setPageIndex((prev) => prev - 1);
+  };
+
+  const currentPageConversions: Conversion[] = filteredConversions.slice(
+    pageIndex * pageLength,
+    (pageIndex + 1) * pageLength
+  );
+
+  if (!compGroup) {
+    return <Spinner />;
+  }
+
   return (
     <React.Fragment>
       <Flex alignItems={"center"} gap={4} justifyContent={"start"}>
@@ -129,54 +315,51 @@ const AdminConversionBrowserContent = ({
           Conversion History
         </Heading>
         <Spacer />
-
-        <Menu>
-          <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
-            {clientFilter ? clientFilter.name : "All Sportsbooks"}
-          </MenuButton>
-          <MenuList>
-            <MenuItem onClick={() => changeClientFilter(null)}>
-              All Sportsbooks
-            </MenuItem>
-            {clients.map((client, i) => (
-              <MenuItem onClick={() => changeClientFilter(client)} key={i}>
-                {client.name}
-              </MenuItem>
-            ))}
-          </MenuList>
-        </Menu>
-
-        <Menu>
-          <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
-            {getReferralLinkTypeLabel(referralTypeFilter)}
-          </MenuButton>
-          <MenuList>
-            {referralTypes.map((type, i) => (
-              <MenuItem onClick={() => changeReferralTypeFilter(type)} key={i}>
-                {getReferralLinkTypeLabel(type)}
-              </MenuItem>
-            ))}
-          </MenuList>
-        </Menu>
-
-        <Menu>
-          <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
-            {timeframeFilter ? getTimeframeLabel(timeframeFilter) : "All Time"}
-          </MenuButton>
-          <MenuList>
-            <MenuItem onClick={() => changeTimeframeFilter(null)}>
-              All time
-            </MenuItem>
-            {timeframes.map((timeframe, i) => (
-              <MenuItem
-                onClick={() => changeTimeframeFilter(timeframe)}
-                key={i}
-              >
-                {getTimeframeLabel(timeframe)}
-              </MenuItem>
-            ))}
-          </MenuList>
-        </Menu>
+        <React.Fragment>
+          <IconButton
+            isDisabled={pageIndex === 0}
+            onClick={prevPage}
+            icon={<ChevronLeftIcon />}
+            aria-label={""}
+          />
+          <Text>
+            Page {pageIndex + 1} / {pageCount}
+          </Text>
+          <IconButton
+            isDisabled={pageIndex === pageCount - 1}
+            onClick={nextPage}
+            icon={<ChevronRightIcon />}
+            aria-label={""}
+          />
+        </React.Fragment>
+      </Flex>
+      <Flex
+        gap={4}
+        alignItems={"left"}
+        width={"100%"}
+        direction={{ base: "column", "2xl": "row" }}
+      >
+        <Flex gap={4} flex={1} alignItems={"center"}>
+          <Heading size="xs" fontWeight={400}>
+            Filter By:
+          </Heading>
+          {filterDropdowns.map((filter, i) => (
+            <Filter key={i} filter={filter} />
+          ))}
+        </Flex>
+        <Flex
+          gap={4}
+          flex={1}
+          alignItems={"center"}
+          justifyContent={{ base: "start", "2xl": "end" }}
+        >
+          <Heading minW="4em" size="xs" fontWeight={400}>
+            Sort By:
+          </Heading>
+          {sortByDropdowns.map((filter, i) => (
+            <Filter key={i} filter={filter} />
+          ))}
+        </Flex>
       </Flex>
 
       <Table size="sm">
@@ -192,7 +375,7 @@ const AdminConversionBrowserContent = ({
           </Tr>
         </Thead>
         <Tbody>
-          {conversions.map((sale, i) => (
+          {currentPageConversions.map((sale, i) => (
             <Tr
               key={i}
               cursor={"pointer"}

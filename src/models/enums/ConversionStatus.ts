@@ -1,19 +1,19 @@
-export enum ConversionsStatus {
+export enum ConversionStatus {
   approvedPaid = "approvedPaid",
   approvedUnpaid = "approvedUnpaid",
   rejected = "rejected",
   pending = "pending",
 }
 
-export function getConversionStatusLabel(status: ConversionsStatus) {
+export function getConversionStatusLabel(status: ConversionStatus) {
   switch (status) {
-    case ConversionsStatus.approvedPaid:
+    case ConversionStatus.approvedPaid:
       return "Approved / Paid";
-    case ConversionsStatus.approvedUnpaid:
+    case ConversionStatus.approvedUnpaid:
       return "Approved / Unpaid";
-    case ConversionsStatus.rejected:
+    case ConversionStatus.rejected:
       return "Rejected";
-    case ConversionsStatus.pending:
+    case ConversionStatus.pending:
       return "Pending";
     default:
       return "Unknown";

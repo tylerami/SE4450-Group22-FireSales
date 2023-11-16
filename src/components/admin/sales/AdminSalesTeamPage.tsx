@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import SalesTeamListWidget from "./SalesTeamListWidget";
+import SalesTeamListWidget from "./team/SalesTeamListWidget";
 import { Box, Flex, Heading, IconButton } from "@chakra-ui/react";
 import { User } from "../../../models/User";
 import { ChevronLeftIcon } from "@chakra-ui/icons";

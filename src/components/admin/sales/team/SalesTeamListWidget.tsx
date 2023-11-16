@@ -26,7 +26,7 @@ import {
 import { FiSearch, FiUser } from "react-icons/fi";
 import { Icon, IconButton } from "@chakra-ui/react";
 import { ChevronLeftIcon, ChevronRightIcon } from "@chakra-ui/icons";
-import { User } from "../../../models/User";
+import { User } from "../../../../models/User";
 import {
   Conversion,
   averageBetSize,
@@ -46,7 +46,8 @@ import { ReferralLinkType } from "models/enums/ReferralLinkType";
 import { CompensationGroup } from "models/CompensationGroup";
 import Filter, { FilterDefinition } from "components/utils/Filter";
 import { formatMoney } from "utils/Money";
-import { ConversionsStatus } from "models/enums/ConversionStatus";
+import { ConversionStatus } from "models/enums/ConversionStatus";
+import SalesTeamListTable from "./SalesTeamListTable";
 
 enum SortBy {
   Conversions = "Conversions",
@@ -172,93 +173,9 @@ const SalesTeamListWidget = ({
     return filteredUsers;
   };
 
-  const getUser = (uid: string): User => {
-    const user = users.find((user) => user.uid === uid);
-    if (!user) {
-      throw new Error(`User with uid ${uid} not found`);
-    }
-    return user;
-  };
-
   const getUserConversions = (uid: string): Conversion[] => {
     return getFilteredConversions().filter((conv) => conv.userId === uid);
   };
-
-  const getAccountBalance = (uid: string): number => {
-    const filteredPayouts: Payout[] = payouts.filter(
-      (payout) =>
-        payout.userId === uid &&
-        payout.dateOccured.getTime() >
-          getIntervalStart(timeframeFilter).getTime()
-    );
-
-    const totalPayout = filteredPayouts.reduce(
-      (total, payout) => total + payout.amount,
-      0
-    );
-
-    const totalEarnings = totalCommission(getUserConversions(uid));
-    return totalEarnings - totalPayout;
-  };
-
-  const tableColumns: {
-    header: string;
-    getValue?: (uid: string) => string;
-  }[] = [
-    {
-      header: "Name",
-    },
-    {
-      header: "Conversions",
-      getValue: (uid) => getUserConversions(uid).length.toString(),
-    },
-    ...(useBreakpointValue({ base: false, lg: true })
-      ? [
-          {
-            header: "Earnings",
-            getValue: (uid) =>
-              formatMoney(totalCommission(getUserConversions(uid))),
-          },
-        ]
-      : []),
-    {
-      header: "Profit",
-      getValue: (uid) => formatMoney(totalGrossProfit(getUserConversions(uid))),
-    },
-    {
-      header: "Amount Due",
-      getValue: (uid) => formatMoney(getAccountBalance(uid)),
-    },
-    {
-      header: "Sales Group",
-      getValue: (uid) => getUser(uid).compensationGroupId ?? "N/A",
-    },
-    ...(useBreakpointValue({ base: false, "2xl": true })
-      ? [
-          {
-            header: "Avg. Commission",
-            getValue: (uid) =>
-              formatMoney(averageCommission(getUserConversions(uid))),
-          },
-        ]
-      : []),
-    ...(useBreakpointValue({ base: false, "2xl": true })
-      ? [
-          {
-            header: "Avg. Bet Size",
-            getValue: (uid) =>
-              formatMoney(averageBetSize(getUserConversions(uid))),
-          },
-        ]
-      : []),
-    {
-      header: "Unverified conv.",
-      getValue: (uid) =>
-        getUserConversions(uid)
-          .filter((conv) => conv.status === ConversionsStatus.pending)
-          .length.toString(),
-    },
-  ];
 
   const timeframes: Timeframe[] = Object.values(Timeframe).filter(
     (value): value is Timeframe => typeof value === "number"
@@ -309,7 +226,7 @@ const SalesTeamListWidget = ({
   // Pagination
   const [pageIndex, setPageIndex] = useState(0);
 
-  const pageLength = 20;
+  const pageLength = 10;
 
   const pageCount = Math.max(1, Math.ceil(filteredUsers.length / pageLength));
 
@@ -345,10 +262,9 @@ const SalesTeamListWidget = ({
       >
         <Flex gap={4} w="100%" alignItems={"center"}>
           {" "}
-          <Heading as="h1" fontSize={"1.2em"} fontWeight={700}>
+          <Heading minW="30%" as="h1" fontSize={"1.2em"} fontWeight={700}>
             Manage Sales Team
           </Heading>
-          <Box w={10} />
           <Spacer />
           <InputGroup w="full" maxW="50%">
             <InputLeftElement>
@@ -412,61 +328,13 @@ const SalesTeamListWidget = ({
       </Flex>
 
       <Box h={10}></Box>
-      <Table size="sm" variant="simple" alignSelf={"center"} width={"100%"}>
-        <Thead>
-          <Tr>
-            {tableColumns.map((column, index) => (
-              <Th textAlign={"center"} key={index}>
-                {column.header}
-              </Th>
-            ))}
-          </Tr>
-        </Thead>
-        <Tbody>
-          {currentPageUsers.map((user, index) => (
-            <Tr
-              _hover={{ background: "rgba(237, 125, 49, 0.26)" }}
-              textAlign={"center"}
-              key={index}
-              transition={"all 0.2s ease-in-out"}
-              cursor={"pointer"}
-              onClick={(e) => setSelectedUser({} as User)}
-              height={"5em"}
-            >
-              <Td maxWidth={"10em"} textAlign="center">
-                <Flex justifyContent={"center"}>
-                  {user.profilePictureSrc ? (
-                    <Image
-                      borderRadius="full"
-                      boxSize="40px"
-                      src={user.profilePictureSrc}
-                      alt={""}
-                      mr={2}
-                    />
-                  ) : (
-                    <Circle size="40px" bg="gray.200" mr="2">
-                      <Icon as={FiUser} />
-                    </Circle>
-                  )}
-
-                  <Text ml={2} textAlign={"left"}>
-                    {user.getFullName()}
-                  </Text>
-                </Flex>
-              </Td>
-
-              {tableColumns.map(
-                (column, index) =>
-                  column.getValue && (
-                    <Td textAlign={"center"} key={index}>
-                      {column.getValue(user.uid)}
-                    </Td>
-                  )
-              )}
-            </Tr>
-          ))}
-        </Tbody>
-      </Table>
+      <SalesTeamListTable
+        currentPageUsers={currentPageUsers}
+        conversions={getFilteredConversions()}
+        selectUser={setSelectedUser}
+        payouts={payouts}
+        timeframeFilter={timeframeFilter}
+      />
     </Flex>
   );
 };

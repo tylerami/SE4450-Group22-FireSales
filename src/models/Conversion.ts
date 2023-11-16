@@ -2,7 +2,7 @@ import { dateFromDDMMYYYY, formatDateString } from "../utils/Date";
 import { AffiliateLink } from "./AffiliateLink";
 import { Customer } from "./Customer";
 import { Message } from "./Message";
-import { ConversionsStatus } from "./enums/ConversionStatus";
+import { ConversionStatus } from "./enums/ConversionStatus";
 import { Currency } from "./enums/Currency";
 import {
   Timeframe,
@@ -22,7 +22,7 @@ export class Conversion {
   dateOccured: Date;
   loggedAt: Date;
   userId: string;
-  status: ConversionsStatus;
+  status: ConversionStatus;
   compensationGroupId?: string;
   affiliateLink: AffiliateLink;
   customer: Customer;
@@ -49,7 +49,7 @@ export class Conversion {
     dateOccured: Date;
     loggedAt: Date;
     userId: string;
-    status: ConversionsStatus;
+    status: ConversionStatus;
     compensationGroupId?: string;
     affiliateLink: AffiliateLink;
     customer: Customer;
@@ -104,7 +104,7 @@ export class Conversion {
       dateOccured,
       loggedAt,
       userId,
-      status: ConversionsStatus.pending,
+      status: ConversionStatus.pending,
       compensationGroupId,
       affiliateLink,
       customer,
@@ -147,7 +147,7 @@ export class Conversion {
       dateOccured: doc.dateOccured ? doc.dateOccured.toDate() : new Date(),
       loggedAt: doc.loggedAt ? doc.loggedAt.toDate() : new Date(),
       userId: doc.userId,
-      status: doc.status as ConversionsStatus,
+      status: doc.status as ConversionStatus,
       compensationGroupId: doc.compensationGroupId,
       affiliateLink: AffiliateLink.fromFirestoreDoc(doc.affiliateLink),
       customer: Customer.fromFirestoreDoc(doc.customer),
