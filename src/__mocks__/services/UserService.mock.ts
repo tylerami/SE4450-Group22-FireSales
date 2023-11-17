@@ -18,7 +18,11 @@ export class MockUserService implements UserService {
   async update(user: User | Partial<User>): Promise<User> {
     return user as User;
   }
-  async getAll({ includeAdmins }: { includeAdmins: boolean }): Promise<User[]> {
+  async getAll({
+    includeAdmins = false,
+  }: {
+    includeAdmins?: boolean;
+  } = {}): Promise<User[]> {
     return generateSampleUsers(10);
   }
 }
