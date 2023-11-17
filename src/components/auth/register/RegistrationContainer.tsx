@@ -1,9 +1,5 @@
 import React, { useState } from "react";
-import { createUserWithEmailAndPassword } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
-import { Providers, auth } from "../../../config/firebase";
-import Center from "../../utils/Center";
-import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
 import {
   Box,
   Button,
@@ -14,52 +10,116 @@ import {
   Input,
   InputGroup,
   InputRightElement,
-  Stack,
   Text,
   Link,
 } from "@chakra-ui/react";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 
 import { FcGoogle } from "react-icons/fc";
+import { authService } from "services/implementations/AuthFirebaseService";
 
 const RegistrationContainer = ({ goToLogin = () => {} }) => {
   const navigate = useNavigate();
   const [errorMessage, setErrorMessage] = useState("");
   const [disabled, setDisabled] = useState(false);
-  const [fullName, setFullName] = useState("");
+
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [birthdate, setBirthdate] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [registrationCode, setRegistrationCode] = useState("");
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   // implement auth service here
-  const signInWithGoogle = () => {
+  const signInWithGoogle = async () => {
     setDisabled(true);
-    signInWithPopup(auth, Providers.google)
-      .then(() => {
-        setDisabled(false);
-        console.info("TODO: navigate to authenticated screen");
-        navigate("/");
-      })
-      .catch((error) => {
-        setErrorMessage(error.code + ": " + error.message);
-        setDisabled(false);
-      });
+    let user;
+    try {
+      user = await authService.signInWithGoogle();
+    } catch (e: any) {
+      setErrorMessage(e.message);
+      setDisabled(false);
+      return;
+    }
+
+    if (user) {
+      navigate("/");
+    } else {
+      setErrorMessage("Error signing in with Google");
+    }
+    setDisabled(false);
   };
 
-  const register = () => {
+  const validateEmail = (email: string): boolean => {
+    const re = /\S+@\S+\.\S+/;
+    return re.test(email);
+  };
+
+  const validatePassword = (password: string): boolean => {
+    return password.length >= 6;
+  };
+
+  const validateRegistration = (): boolean => {
+    if (
+      [
+        firstName.trim(),
+        lastName.trim(),
+        email.trim(),
+        password.trim(),
+        confirmPassword.trim(),
+      ].includes("")
+    ) {
+      setErrorMessage("Please fill in all required fields.");
+      return false;
+    }
+    if (!validateEmail(email)) {
+      setErrorMessage("Please enter a valid email address.");
+      return false;
+    }
+    if (!validatePassword(password)) {
+      setErrorMessage("Password must be at least 6 characters long.");
+      return false;
+    }
+    if (password !== confirmPassword) {
+      setErrorMessage("Passwords do not match");
+      return false;
+    }
+    if (!acceptedTerms) {
+      setErrorMessage("Please accept the terms and conditions");
+      return false;
+    }
+    return true;
+  };
+
+  const register = async () => {
+    if (!validateRegistration()) return;
+
     setDisabled(true);
-    createUserWithEmailAndPassword(auth, email, password)
-      .then(() => {
-        setDisabled(false);
-        console.info("TODO: navigate to authenticated screen");
-        navigate("/");
-      })
-      .catch((error) => {
-        setErrorMessage(error.code + ": " + error.message);
-        setDisabled(false);
+    let user;
+    try {
+      user = await authService.registerWithEmail({
+        email,
+        password,
+        firstName,
+        lastName,
       });
+    } catch (e: any) {
+      setErrorMessage(e.message);
+      setDisabled(false);
+      return;
+    }
+    if (user) {
+      navigate("/");
+      if (registrationCode.trim() !== "") {
+      }
+    } else {
+      setErrorMessage("Error occurred during registration.");
+    }
+
+    setDisabled(false);
   };
 
   const handleShowPassword = () => {
@@ -102,7 +162,7 @@ const RegistrationContainer = ({ goToLogin = () => {} }) => {
       <Flex width={"100%"} justifyContent={"space-between"}>
         <Flex width={"48%"} flexDirection={"column"}>
           <Text color="gray" fontSize="0.8em">
-            First name
+            First name*
           </Text>
           <Box h={1}></Box>
 
@@ -111,13 +171,15 @@ const RegistrationContainer = ({ goToLogin = () => {} }) => {
               focusBorderColor="#ED7D31"
               variant={"outline"}
               placeholder="First name"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
             ></Input>
           </InputGroup>
         </Flex>
 
         <Flex width={"48%"} flexDirection={"column"}>
           <Text color="gray" fontSize="0.8em">
-            Last name
+            Last name*
           </Text>
           <Box h={1}></Box>
 
@@ -126,6 +188,8 @@ const RegistrationContainer = ({ goToLogin = () => {} }) => {
               focusBorderColor="#ED7D31"
               variant={"outline"}
               placeholder="Last name"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
             ></Input>
           </InputGroup>
         </Flex>
@@ -136,7 +200,7 @@ const RegistrationContainer = ({ goToLogin = () => {} }) => {
       {/* email input group */}
       <Flex width={"100%"} flexDirection={"column"}>
         <Text color="gray" fontSize="0.8em">
-          Email
+          Email*
         </Text>
         <Box h={1}></Box>
 
@@ -145,6 +209,8 @@ const RegistrationContainer = ({ goToLogin = () => {} }) => {
             focusBorderColor="#ED7D31"
             variant={"outline"}
             placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
           ></Input>
         </InputGroup>
       </Flex>
@@ -154,7 +220,7 @@ const RegistrationContainer = ({ goToLogin = () => {} }) => {
       {/* password input group  */}
       <Flex width={"100%"} flexDirection={"column"}>
         <Text color="gray" fontSize="0.8em">
-          Password
+          Password*
         </Text>
         <Box h={1}></Box>
 
@@ -184,7 +250,7 @@ const RegistrationContainer = ({ goToLogin = () => {} }) => {
 
       <Flex width={"100%"} flexDirection={"column"}>
         <Text color="gray" fontSize="0.8em">
-          Confirm password
+          Confirm password*
         </Text>
         <Box h={1}></Box>
 
@@ -194,8 +260,8 @@ const RegistrationContainer = ({ goToLogin = () => {} }) => {
             variant={"outline"}
             type={showConfirmPassword ? "text" : "password"}
             placeholder="Confirm password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
           ></Input>
           <InputRightElement>
             <Icon
@@ -208,10 +274,35 @@ const RegistrationContainer = ({ goToLogin = () => {} }) => {
         </InputGroup>
       </Flex>
 
+      <Box h={4} />
+
+      {/* Registration code  */}
+
+      <Flex width={"100%"} flexDirection={"column"}>
+        <Text color="gray" fontSize="0.8em">
+          Do you have a registration code? (Optional)
+        </Text>
+        <Box h={1}></Box>
+
+        <InputGroup>
+          <Input
+            focusBorderColor="#ED7D31"
+            variant={"outline"}
+            placeholder="Registration code"
+            value={registrationCode}
+            onChange={(e) => setRegistrationCode(e.target.value)}
+          ></Input>
+        </InputGroup>
+      </Flex>
+
       <Box h={6} />
 
       <Flex align="center" mt={4}>
-        <Checkbox mr={4} />
+        <Checkbox
+          isChecked={acceptedTerms}
+          onChange={(e) => setAcceptedTerms(e.target.checked)}
+          mr={4}
+        />
         <Text fontSize="sm">
           By clicking Create an account, I agree that I have read and accepted
           the{" "}
@@ -235,15 +326,22 @@ const RegistrationContainer = ({ goToLogin = () => {} }) => {
       {/* sign up button */}
       <Button
         width={"100%"}
+        isLoading={disabled}
         background="#ED7D31"
         color="white"
+        onClick={register}
         _hover={{ filter: "brightness(1.1)" }}
         cursor={"pointer"}
       >
         Create an account
       </Button>
+      <Box h={2} />
 
-      <Box h={4} />
+      {errorMessage && (
+        <Text color="red" my={1}>
+          {errorMessage}
+        </Text>
+      )}
 
       {/* button divider */}
       <Flex w="100%" alignItems={"center"} justifyContent={"space-between"}>

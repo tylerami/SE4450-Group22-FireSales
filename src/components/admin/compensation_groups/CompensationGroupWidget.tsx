@@ -1,7 +1,6 @@
 import { Button, Heading, Spinner } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 import { Flex } from "@chakra-ui/react";
-import { ClientService } from "services/interfaces/ClientService";
 import { DependencyInjection } from "utils/DependencyInjection";
 import CompensationGroupEditor from "./CompensationGroupEditor";
 import { CompensationGroup } from "@models/CompensationGroup";

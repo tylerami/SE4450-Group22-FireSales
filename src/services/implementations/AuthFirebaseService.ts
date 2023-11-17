@@ -11,7 +11,7 @@ import {
 } from "firebase/auth";
 import { UserService } from "services/interfaces/UserService";
 
-class AuthService {
+export class AuthFirebaseService {
   userService: UserService;
 
   constructor(userService: UserService) {
@@ -163,4 +163,4 @@ class AuthService {
   }
 }
 
-export const authService = new AuthService(new MockUserService());
+export const authService = new AuthFirebaseService(new MockUserService());
