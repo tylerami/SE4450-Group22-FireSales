@@ -121,7 +121,7 @@ const AdminConversionBrowserContent = ({
   );
   const [clientFilter, setClientFilter] = useState<Client | null>(null);
   const [referralTypeFilter, setReferralTypeFilter] =
-    useState<ReferralLinkType>(ReferralLinkType.casinoAndSports);
+    useState<ReferralLinkType | null>(null);
   const [convStatusFilter, setConvStatusFilter] =
     useState<ConversionStatus | null>(null);
 

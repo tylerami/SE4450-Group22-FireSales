@@ -12,18 +12,11 @@ export function generateSampleClients(count: number): Client[] {
     return new Client({
       id: ids[i % ids.length],
       name: names[i % names.length],
-      affiliateDeals: {
-        sports: generateAffiliateDeal(
-          clientId,
-          clientName,
-          ReferralLinkType.sports
-        ),
-        casino: generateAffiliateDeal(
-          clientId,
-          clientName,
-          ReferralLinkType.casino
-        ),
-      },
+      affiliateDeals: [
+        generateAffiliateDeal(clientId, clientName, ReferralLinkType.sports),
+        generateAffiliateDeal(clientId, clientName, ReferralLinkType.casino),
+        generateAffiliateDeal(clientId, clientName, null),
+      ],
     });
   });
 }

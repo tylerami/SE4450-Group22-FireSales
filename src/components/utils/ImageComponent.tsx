@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Box, Flex, Image, Spinner } from "@chakra-ui/react";
 import ImageFirebaseService from "services/implementations/ImageFirebaseService";
+import { ImageService } from "services/interfaces/ImageService";
+import { DependencyInjection } from "utils/DependencyInjection";
 
 interface ImageComponentProps {
   imagePath: string;
@@ -21,7 +23,7 @@ const ImageComponent: React.FC<ImageComponentProps> = ({
   maxHeight = "100%",
   margin = "auto",
 }: ImageComponentProps) => {
-  const imageService = new ImageFirebaseService();
+  const imageService: ImageService = DependencyInjection.imageService();
 
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);

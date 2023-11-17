@@ -1,15 +1,18 @@
 export enum ReferralLinkType {
   casino = "casino",
   sports = "sports",
-  casinoAndSports = "casinoAndSports",
 }
 
 const ReferralLinkTypeLabel: Record<ReferralLinkType, string> = {
   [ReferralLinkType.casino]: "Casino",
   [ReferralLinkType.sports]: "Sports",
-  [ReferralLinkType.casinoAndSports]: "Casino & Sports",
 };
 
-export function getReferralLinkTypeLabel(referralLinkType: ReferralLinkType) {
+export function getReferralLinkTypeLabel(
+  referralLinkType: ReferralLinkType | null | undefined
+) {
+  if (!referralLinkType) {
+    return "Casino & Sports";
+  }
   return ReferralLinkTypeLabel[referralLinkType];
 }

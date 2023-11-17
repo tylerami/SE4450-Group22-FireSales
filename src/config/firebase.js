@@ -7,8 +7,10 @@ import {
   GoogleAuthProvider,
   signInWithEmailAndPassword,
 } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
 
 export const firebase = initializeApp(firebaseConfig);
+export const firestore = getFirestore(firebase);
 export const analytics = getAnalytics(firebase);
 export const auth = getAuth();
 export const storage = getStorage(firebase);

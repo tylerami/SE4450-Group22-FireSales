@@ -29,6 +29,7 @@ export class Customer {
     return {
       id: this.id,
       fullName: this.fullName,
+      fullnameLowercase: this.fullName.toLowerCase(),
       email: this.email,
     };
   }

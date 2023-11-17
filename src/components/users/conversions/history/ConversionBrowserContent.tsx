@@ -80,7 +80,7 @@ const ConversionBrowserContent = ({
 
   const [clientFilter, setClientFilter] = useState<Client | null>();
   const [referralTypeFilter, setReferralTypeFilter] =
-    useState<ReferralLinkType>(ReferralLinkType.casinoAndSports);
+    useState<ReferralLinkType | null>(null);
 
   const changeTimeframeFilter = (timeframe: Timeframe | null) => {
     setTimeframeFilter(timeframe);

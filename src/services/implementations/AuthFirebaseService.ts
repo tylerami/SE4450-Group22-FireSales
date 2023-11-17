@@ -10,8 +10,9 @@ import {
   createUserWithEmailAndPassword,
 } from "firebase/auth";
 import { UserService } from "services/interfaces/UserService";
+import { AuthService } from "services/interfaces/AuthService";
 
-export class AuthFirebaseService {
+export class AuthFirebaseService implements AuthService {
   userService: UserService;
 
   constructor(userService: UserService) {

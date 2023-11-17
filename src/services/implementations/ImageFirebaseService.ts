@@ -1,11 +1,16 @@
 import { ImageService } from "services/interfaces/ImageService";
-import { storage } from "../../config/firebase"; // Import your firebase configuration
-import { ref, getDownloadURL } from "firebase/storage";
+import { ref, getDownloadURL, FirebaseStorage } from "firebase/storage";
 
 class ImageFirebaseService implements ImageService {
+  private storage: FirebaseStorage;
+
+  constructor(storage: FirebaseStorage) {
+    this.storage = storage;
+  }
+
   async getImageUrl(path: string): Promise<string> {
     try {
-      const storageRef = ref(storage, path);
+      const storageRef = ref(this.storage, path);
       const url = await getDownloadURL(storageRef);
       return url;
     } catch (error) {

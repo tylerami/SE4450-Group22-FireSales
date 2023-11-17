@@ -4,8 +4,15 @@ import { MockConversionService } from "__mocks__/services/ConversionService.mock
 import { MockCustomerService } from "__mocks__/services/CustomerService.mock";
 import { MockPayoutService } from "__mocks__/services/PayoutService.mock";
 import { MockUserService } from "__mocks__/services/UserService.mock";
+import { firebase, firestore, storage } from "config/firebase";
 import "reflect-metadata";
+import { ClientFirebaseService } from "services/implementations/ClientFirebaseService";
+import { CompensationGroupFirebaseService } from "services/implementations/CompensationGroupFirebaseService";
+import { ConversionFirebaseService } from "services/implementations/ConversionFirebaseService";
+import { CustomerFirebaseService } from "services/implementations/CustomerFirebaseService";
 import ImageFirebaseService from "services/implementations/ImageFirebaseService";
+import { PayoutFirebaseService } from "services/implementations/PayoutFirebaseService";
+import { UserFirebaseService } from "services/implementations/UserFirebaseService";
 import { ClientService } from "services/interfaces/ClientService";
 import { CompensationGroupService } from "services/interfaces/CompensationGroupService";
 import { ConversionService } from "services/interfaces/ConversionService";
@@ -24,7 +31,21 @@ const mockDependencies: Record<string, any> = {
   CustomerService: new MockCustomerService(),
   PayoutService: new MockPayoutService(),
   // Firebase image service already implemented
-  ImageService: new ImageFirebaseService(),
+  ImageService: new ImageFirebaseService(storage),
+};
+
+const dependencies: Record<string, any> = {
+  ClientService: new ClientFirebaseService(firestore),
+  ConversionService: new ConversionFirebaseService(
+    firestore,
+    new ImageFirebaseService(storage)
+  ),
+  UserService: new UserFirebaseService(firestore),
+  CompensationGroupService: new CompensationGroupFirebaseService(firestore),
+  CustomerService: new CustomerFirebaseService(firestore),
+  PayoutService: new PayoutFirebaseService(firestore),
+  // Firebase image service already implemented
+  ImageService: new ImageFirebaseService(storage),
 };
 
 // Use singleton pattern to inject dependencies
@@ -38,9 +59,17 @@ export class DependencyInjection {
     });
   }
 
+  private setupDependencies(): void {
+    Object.entries(dependencies).forEach(([key, value]) => {
+      this.register(key, value);
+    });
+  }
+
   private constructor() {
     if (USE_MOCKS) {
       this.setupMockDependencies();
+    } else {
+      this.setupDependencies();
     }
   }
 

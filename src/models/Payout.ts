@@ -3,6 +3,7 @@ import { PaymentMethod } from "./enums/PaymentMethod";
 import { Timestamp, DocumentData } from "firebase/firestore";
 
 export class Payout {
+  id: string;
   userId: string;
   amount: number;
   currency: Currency;
@@ -13,24 +14,27 @@ export class Payout {
   paymentAddress: string;
 
   constructor({
+    id,
     userId,
     amount,
     currency = Currency.CAD,
     conversionIds,
     dateOccurred,
-    dateRecorded,
+    dateRecorded = new Date(),
     paymentMethod,
     paymentAddress,
   }: {
+    id?: string;
     userId: string;
     amount: number;
     currency?: Currency;
     conversionIds?: string[];
     dateOccurred: Date;
-    dateRecorded: Date;
+    dateRecorded?: Date;
     paymentMethod: PaymentMethod;
     paymentAddress: string;
   }) {
+    this.id = id ?? this.getPayoutId({ dateOccurred, dateRecorded, userId });
     this.userId = userId;
     this.amount = amount;
     this.currency = currency;
@@ -41,8 +45,21 @@ export class Payout {
     this.paymentAddress = paymentAddress;
   }
 
+  private getPayoutId({
+    dateOccurred,
+    dateRecorded,
+    userId,
+  }: {
+    dateOccurred: Date;
+    dateRecorded: Date;
+    userId: string;
+  }): string {
+    return `${dateOccurred.toISOString()}_${dateRecorded.toISOString()}_${userId}`;
+  }
+
   toFirestoreDoc(): DocumentData {
     return {
+      id: this.id,
       userId: this.userId,
       amount: this.amount,
       currency: this.currency,
@@ -55,6 +72,7 @@ export class Payout {
 
   static fromFirestoreDoc(doc: DocumentData): Payout {
     return new Payout({
+      id: doc.id,
       userId: doc.userId,
       amount: doc.amount,
       currency: doc.currency,

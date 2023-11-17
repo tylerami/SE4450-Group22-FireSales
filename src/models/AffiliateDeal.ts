@@ -5,7 +5,7 @@ import { Timestamp, DocumentData } from "firebase/firestore";
 export class AffiliateDeal {
   clientId: string;
   clientName: string;
-  type: ReferralLinkType;
+  type: ReferralLinkType | null;
   link: string;
   enabled: boolean;
   createdAt: Date;
@@ -30,7 +30,7 @@ export class AffiliateDeal {
   }: {
     clientId: string;
     clientName: string;
-    type: ReferralLinkType;
+    type: ReferralLinkType | null;
     link: string;
     enabled?: boolean;
     createdAt?: Date;
@@ -53,23 +53,19 @@ export class AffiliateDeal {
     this.targetMonthlyConversions = targetMonthlyConversions;
   }
 
-  toFirestoreDoc(affiliateDeal: AffiliateDeal): DocumentData {
+  toFirestoreDoc(): DocumentData {
     return {
-      clientId: affiliateDeal.clientId,
-      clientName: affiliateDeal.clientName,
-      type: affiliateDeal.type,
-      link: affiliateDeal.link,
-      enabled: affiliateDeal.enabled,
-      createdAt: affiliateDeal.createdAt
-        ? Timestamp.fromDate(affiliateDeal.createdAt)
-        : null,
-      updatedAt: affiliateDeal.updatedAt
-        ? Timestamp.fromDate(affiliateDeal.updatedAt)
-        : null,
-      cpa: affiliateDeal.cpa,
-      currency: affiliateDeal.currency,
-      targetBetSize: affiliateDeal.targetBetSize,
-      targetMonthlyConversions: affiliateDeal.targetMonthlyConversions,
+      clientId: this.clientId,
+      clientName: this.clientName,
+      type: this.type,
+      link: this.link,
+      enabled: this.enabled,
+      createdAt: this.createdAt ? Timestamp.fromDate(this.createdAt) : null,
+      updatedAt: this.updatedAt ? Timestamp.fromDate(this.updatedAt) : null,
+      cpa: this.cpa,
+      currency: this.currency,
+      targetBetSize: this.targetBetSize,
+      targetMonthlyConversions: this.targetMonthlyConversions,
     };
   }
 
@@ -77,7 +73,7 @@ export class AffiliateDeal {
     return new AffiliateDeal({
       clientId: doc.clientId,
       clientName: doc.clientName,
-      type: doc.type as ReferralLinkType,
+      type: doc.type as ReferralLinkType | null,
       link: doc.link,
       enabled: doc.enabled,
       createdAt: doc.createdAt ? doc.createdAt.toDate() : new Date(),

@@ -27,7 +27,7 @@ export const sportsAffiliateDeal1 = new AffiliateDeal({
 export const generateAffiliateDeal = (
   clientId: string,
   clientName: string,
-  type: ReferralLinkType
+  type: ReferralLinkType | null
 ): AffiliateDeal => {
   return new AffiliateDeal({
     clientId: clientId,

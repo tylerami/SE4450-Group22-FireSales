@@ -57,7 +57,7 @@ const ClientsPerformanceWidget = (props: Props) => {
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
 
   const [selectedReferralLinkType, setSelectedReferralLinkType] =
-    useState<ReferralLinkType>(ReferralLinkType.casinoAndSports);
+    useState<ReferralLinkType | null>(null);
 
   const [compensationGroups, setCompensationGroups] = useState<
     CompensationGroup[]

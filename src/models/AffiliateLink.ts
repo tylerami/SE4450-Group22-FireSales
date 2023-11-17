@@ -7,7 +7,7 @@ import { Timestamp, DocumentData } from "firebase/firestore";
 export class AffiliateLink {
   clientId: string;
   clientName: string;
-  type: ReferralLinkType;
+  type: ReferralLinkType | null;
   link: string;
   enabled: boolean;
   createdAt: Date;
@@ -28,7 +28,7 @@ export class AffiliateLink {
   }: {
     clientId: string;
     clientName: string;
-    type: ReferralLinkType;
+    type: ReferralLinkType | null;
     link: string;
     enabled?: boolean;
     createdAt?: Date;

@@ -7,6 +7,7 @@ import {
   InputGroup,
   InputLeftElement,
   Spacer,
+  Select,
 } from "@chakra-ui/react";
 import React, { useState } from "react";
 import {
@@ -40,6 +41,8 @@ type Props = {
 };
 
 const ClientSettingsEditor = ({ existingClient, exit }: Props) => {
+  const editMode = existingClient !== null;
+
   const [sportsbookLogo, setSportsbookLogo] = useState<File | null>(null);
   const [sportsbookId, setSportsbookId] = useState<string>(
     existingClient?.id ?? ""
@@ -48,47 +51,44 @@ const ClientSettingsEditor = ({ existingClient, exit }: Props) => {
     existingClient?.name ?? ""
   );
 
-  const [averagePaymentDays, setAveragePaymentDays] = useState<string | null>(
-    ""
-  );
-
   const [enabled, setEnabled] = useState(existingClient?.enabled ?? true);
 
-  const initialDeal = (linkType: ReferralLinkType): Partial<AffiliateDeal> => {
-    const existingDeal: AffiliateDeal | undefined =
-      existingClient?.affiliateDeals[linkType];
-
-    return {
-      type: linkType,
-      link: existingDeal?.link ?? "",
-      enabled: existingDeal?.enabled ?? false,
-      cpa: existingDeal?.cpa ?? undefined,
-      targetBetSize: existingDeal?.targetBetSize ?? undefined,
-      targetMonthlyConversions:
-        existingDeal?.targetMonthlyConversions ?? undefined,
-    };
-  };
-
-  const [affiliateDeals, setAffiliateDeals] = useState<{
-    [key in ReferralLinkType]: Partial<AffiliateDeal>;
-  }>({
-    [ReferralLinkType.sports]: initialDeal(ReferralLinkType.sports),
-    [ReferralLinkType.casino]: initialDeal(ReferralLinkType.casino),
-    [ReferralLinkType.casinoAndSports]: initialDeal(
-      ReferralLinkType.casinoAndSports
-    ),
+  const blankDeal = (): {
+    enabled: boolean;
+    link: string;
+    cpa: number | undefined;
+    targetBetSize: number | undefined;
+    targetMonthlyConversions: number | undefined;
+  } => ({
+    enabled: true,
+    link: "",
+    cpa: undefined,
+    targetBetSize: undefined,
+    targetMonthlyConversions: undefined,
   });
 
+  const [affiliateDeals, setAffiliateDeals] = useState<
+    Partial<AffiliateDeal>[]
+  >(existingClient?.affiliateDeals ?? [blankDeal()]);
+
   const setDealProperty = (
-    type: ReferralLinkType,
+    index: number,
     modify: (deal: Partial<AffiliateDeal>) => Partial<AffiliateDeal>
   ) => {
-    let newAffiliateDeals = Object.assign({}, affiliateDeals);
-    newAffiliateDeals[type] = modify(newAffiliateDeals[type]);
-    setAffiliateDeals(newAffiliateDeals);
+    const newDeals = [...affiliateDeals];
+    newDeals[index] = modify(newDeals[index]);
+    setAffiliateDeals(newDeals);
   };
 
-  const editMode = existingClient !== null;
+  const addNewDeal = () => {
+    setAffiliateDeals([...affiliateDeals, blankDeal()]);
+  };
+
+  const removeDeal = (index: number) => {
+    const newDeals = [...affiliateDeals];
+    newDeals.splice(index, 1);
+    setAffiliateDeals(newDeals);
+  };
 
   const triggerAttachmentsUpload = () => {
     const fileInput = document.getElementById("attachments-upload");
@@ -115,7 +115,7 @@ const ClientSettingsEditor = ({ existingClient, exit }: Props) => {
     let client: Client = new Client({
       id: sportsbookId,
       name: displayName,
-      affiliateDeals: {},
+      affiliateDeals: [],
       enabled: enabled,
       updatedAt: new Date(),
       createdAt: editMode ? existingClient?.createdAt : new Date(),
@@ -133,10 +133,10 @@ const ClientSettingsEditor = ({ existingClient, exit }: Props) => {
     exit();
   };
 
-  const referralLinkTypes: ReferralLinkType[] = [
+  const referralLinkTypes: (ReferralLinkType | null)[] = [
+    null,
     ReferralLinkType.sports,
     ReferralLinkType.casino,
-    ReferralLinkType.casinoAndSports,
   ];
 
   return (
@@ -254,29 +254,46 @@ const ClientSettingsEditor = ({ existingClient, exit }: Props) => {
           </Tr>
         </Thead>
         <Tbody>
-          {referralLinkTypes.map((linkType, index) => (
+          {affiliateDeals.map((deal, index) => (
             <Tr key={index}>
               <Td maxW={"5em"} textAlign={"center"}>
-                {getReferralLinkTypeLabel(linkType as ReferralLinkType)}
+                <Select
+                  value={deal.type ?? undefined}
+                  onChange={(e) => {
+                    const newLinkType = e.target.value as
+                      | ReferralLinkType
+                      | undefined;
+                    setDealProperty(index, (deal) => ({
+                      ...deal,
+                      linkType: newLinkType ?? null,
+                    }));
+                  }}
+                >
+                  {[null, ...referralLinkTypes].map((linkType) => (
+                    <option key={linkType} value={linkType ?? undefined}>
+                      {getReferralLinkTypeLabel(linkType)}
+                    </option>
+                  ))}
+                </Select>
               </Td>
               <Td textAlign="center">
                 <Switch
-                  isChecked={affiliateDeals[linkType].enabled}
-                  onChange={(e) =>
-                    setDealProperty(linkType, (deal) => ({
+                  isChecked={affiliateDeals[index].enabled}
+                  onChange={(e) => {
+                    setDealProperty(index, (deal) => ({
                       ...deal,
                       enabled: e.target.checked,
-                    }))
-                  }
+                    }));
+                  }}
                 ></Switch>
               </Td>
               <Td textAlign={"center"}>
                 <Input
-                  isDisabled={!affiliateDeals[linkType].enabled}
+                  isDisabled={!affiliateDeals[index].enabled}
                   placeholder="Link"
-                  value={affiliateDeals[linkType].link}
+                  value={affiliateDeals[index].link}
                   onChange={(e) => {
-                    setDealProperty(linkType, (deal) => ({
+                    setDealProperty(index, (deal) => ({
                       ...deal,
                       link: e.target.value,
                     }));
@@ -290,13 +307,13 @@ const ClientSettingsEditor = ({ existingClient, exit }: Props) => {
                   </InputLeftElement>
                   <Input
                     pl={8}
-                    isDisabled={!affiliateDeals[linkType].enabled}
                     type="number"
+                    isDisabled={!affiliateDeals[index].enabled}
                     placeholder="CPA"
-                    value={affiliateDeals[linkType].cpa}
+                    value={affiliateDeals[index].cpa}
                     onChange={(e) => {
                       const numericValue = Number(e.target.value);
-                      setDealProperty(linkType, (deal) => ({
+                      setDealProperty(index, (deal) => ({
                         ...deal,
                         cpa: numericValue === 0 ? undefined : numericValue,
                       }));
@@ -313,14 +330,15 @@ const ClientSettingsEditor = ({ existingClient, exit }: Props) => {
                   <Input
                     pl={8}
                     type="number"
-                    isDisabled={!affiliateDeals[linkType].enabled}
-                    placeholder="Bet size"
-                    value={affiliateDeals[linkType].targetBetSize}
+                    isDisabled={!affiliateDeals[index].enabled}
+                    placeholder="Avg. Bet Size"
+                    value={affiliateDeals[index].targetBetSize}
                     onChange={(e) => {
                       const numericValue = Number(e.target.value);
-                      setDealProperty(linkType, (deal) => ({
+                      setDealProperty(index, (deal) => ({
                         ...deal,
-                        betSize: numericValue === 0 ? undefined : numericValue,
+                        targetBetSize:
+                          numericValue === 0 ? undefined : numericValue,
                       }));
                     }}
                   />
@@ -330,12 +348,12 @@ const ClientSettingsEditor = ({ existingClient, exit }: Props) => {
                 <Input
                   width="6em"
                   type="number"
-                  isDisabled={!affiliateDeals[linkType].enabled}
-                  placeholder="# Conv."
-                  value={affiliateDeals[linkType].targetMonthlyConversions}
+                  isDisabled={!affiliateDeals[index].enabled}
+                  placeholder="Monthly Conv."
+                  value={affiliateDeals[index].targetMonthlyConversions}
                   onChange={(e) => {
                     const numericValue = Number(e.target.value);
-                    setDealProperty(linkType, (deal) => ({
+                    setDealProperty(index, (deal) => ({
                       ...deal,
                       targetMonthlyConversions:
                         numericValue === 0 ? undefined : numericValue,
