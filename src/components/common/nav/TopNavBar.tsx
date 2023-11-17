@@ -13,6 +13,7 @@ import {
 import { FiUser } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "components/auth/UserProvider";
+import { useGlobalState } from "components/utils/GlobalState";
 
 const profilePictureSrc = null;
 
@@ -24,6 +25,8 @@ const TopNavBar: React.FC<TopNavBarProps> = ({ pageName }) => {
   const navigate = useNavigate();
 
   const { currentUser } = useContext(UserContext);
+
+  const { activeTabIndex, setActiveTabIndex } = useGlobalState();
 
   return (
     <Flex
@@ -40,8 +43,22 @@ const TopNavBar: React.FC<TopNavBarProps> = ({ pageName }) => {
         </Heading>
       </Box>
 
-      <Button onClick={() => navigate("/admin")}>Admin Dashboard</Button>
-      <Button onClick={() => navigate("/")}>User Dashboard</Button>
+      <Button
+        onClick={() => {
+          setActiveTabIndex(0);
+          navigate("/admin");
+        }}
+      >
+        Admin Dashboard
+      </Button>
+      <Button
+        onClick={() => {
+          setActiveTabIndex(0);
+          navigate("/");
+        }}
+      >
+        User Dashboard
+      </Button>
 
       {/* Right-aligned Profile section */}
       <Flex mx={8}>

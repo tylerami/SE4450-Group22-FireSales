@@ -22,9 +22,10 @@ import {
 } from "@chakra-ui/icons";
 import { formatMoney } from "utils/Money";
 import { getConversionStatusLabel } from "models/enums/ConversionStatus";
+import { UnassignedConversion } from "models/UnassignedConversion";
 
 type Props = {
-  conversionsByNumber: Record<number, Conversion> | null;
+  conversionsByNumber: Record<number, UnassignedConversion> | null;
   attachments: File[];
 };
 
@@ -36,7 +37,7 @@ const AdminRecordConversionsProcessedTable = ({
 
   const conversions = Object.values(conversionsByNumber ?? []);
 
-  const getConversionNumber = (conv: Conversion): number | null => {
+  const getConversionNumber = (conv: UnassignedConversion): number | null => {
     const numString: string | undefined = Object.entries(
       conversionsByNumber ?? {}
     ).find(([_, value]) => value.id === conv.id)?.[0];
@@ -70,37 +71,39 @@ const AdminRecordConversionsProcessedTable = ({
 
   const tableColumns: {
     label: string;
-    getValue: (conv: Conversion) => string | number;
+    getValue: (conv: UnassignedConversion) => string | number;
   }[] = [
     {
       label: "Number",
-      getValue: (conv: Conversion) =>
+      getValue: (conv: UnassignedConversion) =>
         getConversionNumber(conv)?.toString() ?? "Error",
     },
     {
       label: "Date",
-      getValue: (conv: Conversion) => formatDateString(conv.dateOccurred),
+      getValue: (conv: UnassignedConversion) =>
+        formatDateString(conv.dateOccurred),
     },
     {
       label: "Affilate Link",
-      getValue: (conv: Conversion) => conv.affiliateLink.description(),
+      getValue: (conv: UnassignedConversion) =>
+        conv.affiliateLink.description(),
     },
     {
       label: "Bet size",
-      getValue: (conv: Conversion) => formatMoney(conv.amount),
+      getValue: (conv: UnassignedConversion) => formatMoney(conv.amount),
     },
     {
       label: "Customer Name",
-      getValue: (conv: Conversion) => conv.customer.fullName,
+      getValue: (conv: UnassignedConversion) => conv.customer.fullName,
     },
     {
       label: "Commission",
-      getValue: (conv: Conversion) =>
+      getValue: (conv: UnassignedConversion) =>
         formatMoney(conv.affiliateLink.commission),
     },
     {
       label: "Attachments",
-      getValue: (conv: Conversion) => {
+      getValue: (conv: UnassignedConversion) => {
         const convNumber = getConversionNumber(conv);
         if (convNumber === null) return "None";
         const attachmentNames: string[] = getAttachmentNames(convNumber);

@@ -11,13 +11,22 @@ const AdminRecordConversionsInstructions = (props: Props) => {
     "Sportsbook",
     "Type ('Casino' or 'Sportsbook')",
     "Bet Size ($CAD)",
+    "Commission ($CAD)",
     "Customer name",
   ];
 
   const rows = [
-    ["1", "2023-10-05", "PointsBet", "sportsbook", "80", "Mitch Marner"],
-    ["2", "2023-10-06", "PointsBet", "sportsbook", "100", "Auston Matthews"],
-    ["3", "2023-10-06", "UniBet", "casino", "100", "Auston Matthews"],
+    ["1", "2023-10-05", "PointsBet", "sportsbook", "80", "30", "Mitch Marner"],
+    [
+      "2",
+      "2023-10-06",
+      "PointsBet",
+      "sportsbook",
+      "100",
+      "30",
+      "Auston Matthews",
+    ],
+    ["3", "2023-10-06", "UniBet", "casino", "100", "30", "Auston Matthews"],
   ];
 
   const textSize = "0.8em";

@@ -79,7 +79,7 @@ export class UnassignedConversion {
   }: {
     dateOccurred: Date;
     assignmentCode: string;
-    compensationGroupId: string;
+    compensationGroupId?: string;
     affiliateLink: AffiliateLink;
     currency?: Currency;
     customer: Customer;

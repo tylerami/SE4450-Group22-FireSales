@@ -1,13 +1,11 @@
 import React, { useContext, useState } from "react";
-import { Button, Input, InputGroup, Spinner } from "@chakra-ui/react";
+import { Button, Heading, Input, InputGroup, Spinner } from "@chakra-ui/react";
 import { Box, Text, Flex } from "@chakra-ui/react";
 import { Conversion, ConversionAttachmentGroup } from "models/Conversion";
 import { filterCsvHeaders, getCsvFileContent } from "utils/File";
 import { generateSampleClients } from "__mocks__/models/Client.mock";
 import { findClosestMatch } from "utils/String";
 import { Client } from "models/Client";
-import { UserContext } from "components/auth/UserProvider";
-import { CompensationGroup } from "models/CompensationGroup";
 import { ReferralLinkType } from "models/enums/ReferralLinkType";
 import { AffiliateLink } from "models/AffiliateLink";
 import { Customer } from "models/Customer";
@@ -16,12 +14,12 @@ import { DependencyInjection } from "utils/DependencyInjection";
 import { parseDateString } from "utils/Date";
 import AdminRecordConversionsProcessedTable from "./AdminRecordConversionsProcessedTable";
 import AdminRecordConversionsInstructions from "./AdminRecordConversionsInstructions";
+import { UnassignedConversion } from "models/UnassignedConversion";
+import { AffiliateDeal } from "@models/AffiliateDeal";
 
-type Props = {
-  compensationGroup: CompensationGroup | null;
-};
+type Props = {};
 
-const BulkRecordConversionsWidgetContent = ({ compensationGroup }: Props) => {
+const AdminRecordConversionsWidgetContent = (props: Props) => {
   // Services
   const conversionService: ConversionService =
     DependencyInjection.conversionService();
@@ -34,16 +32,14 @@ const BulkRecordConversionsWidgetContent = ({ compensationGroup }: Props) => {
   const [attachments, setAttachments] = useState<File[]>([]);
   const [conversionsByNumber, setConversionsByNumber] = useState<Record<
     number,
-    Conversion
+    UnassignedConversion
   > | null>(null);
   const [assignmentCode, setAssignmentCode] = useState("");
-
-  const { currentUser } = useContext(UserContext);
 
   // Process the CSV file into conversions
   const processCsvFile = async (
     csvFile: File
-  ): Promise<Record<number, Conversion>> => {
+  ): Promise<Record<number, UnassignedConversion>> => {
     setProcessing(true);
     let csvContent = await getCsvFileContent(csvFile);
 
@@ -62,13 +58,9 @@ const BulkRecordConversionsWidgetContent = ({ compensationGroup }: Props) => {
     });
     console.log(csvContent);
 
-    const mapCsvRowToConversion = (csvRow: string): Conversion | null => {
-      const userId = currentUser?.uid;
-      if (!userId || compensationGroup === null) {
-        console.log("No user or compensation group");
-        return null;
-      }
-
+    const mapCsvRowToConversion = (
+      csvRow: string
+    ): UnassignedConversion | null => {
       const values: string[] = csvRow.split(",");
       const clients: Client[] = generateSampleClients(5);
 
@@ -91,37 +83,47 @@ const BulkRecordConversionsWidgetContent = ({ compensationGroup }: Props) => {
         return null;
       }
 
-      const amount = Number(values[4]);
-      const customerName = values[5];
+      const betSize = Number(values[4]);
+      const commission = Number(values[5]);
+      const customerName = values[6];
 
-      const matchedAffiliateLink: AffiliateLink | undefined =
-        compensationGroup.affiliateLinks.find(
-          (affiliateLink) =>
-            affiliateLink.clientId === matchedClient.id &&
-            affiliateLink.type === referralType
-        );
-
-      if (matchedAffiliateLink === undefined) {
-        console.log("No affiliate link match");
+      const matchedAffiliateDeal: AffiliateDeal | undefined = Object.values(
+        matchedClient.affiliateDeals
+      ).find(
+        (deal) =>
+          deal.clientId === matchedClient.id && deal.type === referralType
+      );
+      if (matchedAffiliateDeal === undefined) {
+        console.log("No affiliate deal match");
         return null;
       }
 
-      const conversion: Conversion = Conversion.fromManualInput({
-        dateOccurred,
-        userId,
-        affiliateLink: matchedAffiliateLink,
-        compensationGroupId: compensationGroup.id,
-        amount,
-        customer: new Customer({
-          fullName: customerName,
-        }),
+      const affiliateLink: AffiliateLink = new AffiliateLink({
+        clientId: matchedClient.id,
+        clientName: matchedClient.name,
+        type: referralType,
+        link: matchedAffiliateDeal.link,
+        commission,
+        minBetSize: betSize,
+        cpa: matchedAffiliateDeal.cpa,
       });
+
+      const conversion: UnassignedConversion =
+        UnassignedConversion.fromManualInput({
+          dateOccurred,
+          assignmentCode,
+          affiliateLink,
+          amount: betSize,
+          customer: new Customer({
+            fullName: customerName,
+          }),
+        });
 
       return conversion;
     };
 
     const rows: string[] = csvContent.split("\n");
-    const conversionsByNumber: Record<number, Conversion> = {};
+    const conversionsByNumber: Record<number, UnassignedConversion> = {};
 
     for (let i = 0; i < rows.length; i++) {
       const row = rows[i];
@@ -145,22 +147,29 @@ const BulkRecordConversionsWidgetContent = ({ compensationGroup }: Props) => {
     return conversionsByNumber;
   };
 
+  type UnassignedConversionAttachmentGroup = {
+    conversion: UnassignedConversion;
+    attachments: File[];
+  };
+
   // Create groups of conversions with attachments for recording
   const createConversionGroups = async (): Promise<
-    ConversionAttachmentGroup[]
+    UnassignedConversionAttachmentGroup[]
   > => {
     if (conversionsByNumber == null) {
       throw new Error("No conversions to record");
     }
 
+    const getAttachmentNumber = (attachment: File): number => {
+      const numString = attachment.name.split("_")[0].replace("conv", "");
+      const num = Number.parseInt(numString);
+      return num;
+    };
+
     const getAttachmentsForConversion = (convNumber: number): File[] => {
       const attachmentsForConv: File[] = [];
       for (let attachment of attachments) {
-        const attachmentName = attachment.name;
-        const attachmentNumber = Number(
-          attachmentName.split("_")[0].replace("conv", "")
-        );
-
+        const attachmentNumber = getAttachmentNumber(attachment);
         if (attachmentNumber === convNumber) {
           attachmentsForConv.push(attachment);
         }
@@ -168,25 +177,23 @@ const BulkRecordConversionsWidgetContent = ({ compensationGroup }: Props) => {
       return attachmentsForConv;
     };
 
-    const conversionGroups: ConversionAttachmentGroup[] = [];
+    const conversionGroups: UnassignedConversionAttachmentGroup[] = [];
     for (const convNumber of Object.keys(conversionsByNumber)) {
-      const conversion = conversionsByNumber[convNumber];
+      const conversion: UnassignedConversion = conversionsByNumber[convNumber];
       const attachments = getAttachmentsForConversion(Number(convNumber));
-      const conversionGroup: ConversionAttachmentGroup = {
+      const conversionGroup: UnassignedConversionAttachmentGroup = {
         conversion,
         attachments,
       };
       conversionGroups.push(conversionGroup);
     }
 
-    setProcessing(false);
-
     return conversionGroups;
   };
 
   // Record the conversions once ready
   async function recordConversions() {
-    let conversionGroups: ConversionAttachmentGroup[];
+    let conversionGroups: UnassignedConversionAttachmentGroup[];
     try {
       conversionGroups = await createConversionGroups();
     } catch (e: any) {
@@ -195,7 +202,9 @@ const BulkRecordConversionsWidgetContent = ({ compensationGroup }: Props) => {
       return;
     }
 
-    const result = await conversionService.createBulk(conversionGroups);
+    const result = await conversionService.createBulkUnassigned(
+      conversionGroups
+    );
     if (result !== undefined && result !== null) {
       setErrorText(null);
     } else {
@@ -209,6 +218,7 @@ const BulkRecordConversionsWidgetContent = ({ compensationGroup }: Props) => {
     if (csvFile !== null) {
       console.log("Removing CSV file");
       setCsvFile(null);
+      setConversionsByNumber(null);
       return;
     }
     const fileInput = document.getElementById("csv-upload");
@@ -225,6 +235,7 @@ const BulkRecordConversionsWidgetContent = ({ compensationGroup }: Props) => {
     } else {
       console.log("No file uploaded");
       setCsvFile(null);
+      setConversionsByNumber(null);
     }
   };
 
@@ -255,20 +266,6 @@ const BulkRecordConversionsWidgetContent = ({ compensationGroup }: Props) => {
     return num;
   };
 
-  const areAttachmentsValid = (): boolean => {
-    if (conversionsByNumber == null) return false;
-
-    for (let [convNumber, _] of Object.entries(conversionsByNumber)) {
-      const attachmentsForConv = attachments.filter(
-        (attachment) => getAttachmentNumber(attachment) === Number(convNumber)
-      );
-
-      if (attachmentsForConv.length === 0) return false;
-    }
-
-    return true;
-  };
-
   const csvUploaded = csvFile !== null;
   const attachmentsUploaded = attachments.length > 0;
 
@@ -276,14 +273,22 @@ const BulkRecordConversionsWidgetContent = ({ compensationGroup }: Props) => {
     conversionsByNumber == null ? null : Object.values(conversionsByNumber);
 
   const conversionsReadyToRecord =
-    !processing &&
-    conversions !== null &&
-    conversions.length > 0 &&
-    attachments &&
-    areAttachmentsValid();
+    !processing && conversions !== null && conversions.length > 0;
 
   return (
-    <React.Fragment>
+    <Flex
+      p={26}
+      borderRadius={"20px"}
+      width={"95%"}
+      flexDirection={"column"}
+      boxShadow={"3px 4px 12px rgba(0, 0, 0, 0.2)"}
+      gap={2}
+    >
+      <Flex justifyContent={"start"} gap={4}>
+        <Heading as="h1" fontSize={"1.2em"} fontWeight={700}>
+          Manually Upload Conversions
+        </Heading>
+      </Flex>
       {processing ? (
         <Spinner size="xl" />
       ) : conversions != null ? (
@@ -295,8 +300,18 @@ const BulkRecordConversionsWidgetContent = ({ compensationGroup }: Props) => {
         <AdminRecordConversionsInstructions />
       )}
 
-      <Box h={4} />
-      <Flex justifyContent={"space-evenly"} alignItems={"start"}>
+      <Box h={2} />
+      <Text>
+        Enter an assignment code that a user can use to claim these conversions:
+      </Text>
+      <Input
+        focusBorderColor="#ED7D31"
+        placeholder="Assignment Code..."
+        value={assignmentCode}
+        onChange={(e) => setAssignmentCode(e.target.value)}
+      />
+      <Box h={2} />
+      <Flex gap={4} justifyContent={"space-evenly"} alignItems={"start"}>
         <InputGroup width={"full"}>
           <Button
             colorScheme={csvUploaded ? "red" : undefined}
@@ -314,19 +329,6 @@ const BulkRecordConversionsWidgetContent = ({ compensationGroup }: Props) => {
             {csvUploaded ? "Remove " + csvFile.name : "Upload CSV"}
           </Button>
         </InputGroup>
-
-        <Box h={2} />
-        <Text>
-          Enter an assignment code that a user can use to claim these
-          conversions:
-        </Text>
-        <Input
-          focusBorderColor="#ED7D31"
-          placeholder="Assignment Code..."
-          value={assignmentCode}
-          onChange={(e) => setAssignmentCode(e.target.value)}
-        />
-        <Box h={2} />
 
         <InputGroup width={"full"}>
           <Button
@@ -349,7 +351,7 @@ const BulkRecordConversionsWidgetContent = ({ compensationGroup }: Props) => {
           </Button>
         </InputGroup>
       </Flex>
-
+      <Box />
       <Button
         isDisabled={!csvFile || !conversionsReadyToRecord}
         size="lg"
@@ -360,14 +362,12 @@ const BulkRecordConversionsWidgetContent = ({ compensationGroup }: Props) => {
         {csvFile
           ? conversionsReadyToRecord
             ? "Record Conversions"
-            : areAttachmentsValid()
-            ? "Fix Errors"
-            : "Missing Attachments"
+            : "Fix Errors"
           : "Upload CSV to Record Conversions"}
       </Button>
       {errorText && <Text color={"red"}>{errorText}</Text>}
-    </React.Fragment>
+    </Flex>
   );
 };
 
-export default BulkRecordConversionsWidgetContent;
+export default AdminRecordConversionsWidgetContent;

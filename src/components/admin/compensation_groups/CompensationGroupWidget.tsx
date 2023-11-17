@@ -57,8 +57,9 @@ const CompensationGroupWidget = (props: Props) => {
           {!compGroups ? (
             <Spinner />
           ) : (
-            compGroups.map((compGroup: CompensationGroup) => (
+            compGroups.map((compGroup: CompensationGroup, i: number) => (
               <CompensationGroupDetailsTile
+                key={i}
                 compGroup={compGroup}
                 selectCompGroup={setEditingGroup}
               />

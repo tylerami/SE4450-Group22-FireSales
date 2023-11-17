@@ -24,6 +24,23 @@ export const sportsAffiliateDeal1 = new AffiliateDeal({
   targetMonthlyConversions: 250,
 });
 
+export const generateAffiliateDeal = (
+  clientId: string,
+  clientName: string,
+  type: ReferralLinkType
+): AffiliateDeal => {
+  return new AffiliateDeal({
+    clientId: clientId,
+    clientName: clientName,
+    type: type,
+    link: "https://casinoroyale.com/deal",
+    cpa: 200,
+    currency: Currency.CAD,
+    targetBetSize: 50,
+    targetMonthlyConversions: 200,
+  });
+};
+
 export const sampleAffiliateDeals = [
   casinoAffiliateDeal1,
   sportsAffiliateDeal1,
