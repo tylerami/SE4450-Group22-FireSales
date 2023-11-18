@@ -36,9 +36,16 @@ export class ConversionFirebaseService implements ConversionService {
       const userId = conversion.userId;
       const path = `/conversions/${userId}/${conversion.id}`;
 
-      conversion.attachmentUrls = (
-        await this.imageService.bulkUploadImages(path, attachments)
-      ).map((item) => item.url);
+      const attachmentUrls: string[] = [];
+      for (const attachment of attachments) {
+        const attachmentUrl = await this.imageService.uploadImage(
+          path,
+          attachment
+        );
+        attachmentUrls.push(attachmentUrl);
+      }
+
+      conversion.attachmentUrls = attachmentUrls;
     }
 
     await setDoc(docRef, conversion.toFirestoreDoc());
@@ -58,9 +65,16 @@ export class ConversionFirebaseService implements ConversionService {
         const userId = conversion.userId;
         const path = `/conversions/${userId}/${conversion.id}`;
 
-        conversion.attachmentUrls = (
-          await this.imageService.bulkUploadImages(path, attachments)
-        ).map((item) => item.url);
+        const attachmentUrls: string[] = [];
+        for (const attachment of attachments) {
+          const attachmentUrl = await this.imageService.uploadImage(
+            path,
+            attachment
+          );
+          attachmentUrls.push(attachmentUrl);
+        }
+
+        conversion.attachmentUrls = attachmentUrls;
       }
 
       batch.set(docRef, conversion.toFirestoreDoc());
@@ -161,9 +175,16 @@ export class ConversionFirebaseService implements ConversionService {
       if (attachments) {
         const path = `/conversions/unassigned/${conversion.assignmentCode}/${conversion.id}`;
 
-        conversion.attachmentUrls = (
-          await this.imageService.bulkUploadImages(path, attachments)
-        ).map((item) => item.url);
+        const attachmentUrls: string[] = [];
+        for (const attachment of attachments) {
+          const attachmentUrl = await this.imageService.uploadImage(
+            path,
+            attachment
+          );
+          attachmentUrls.push(attachmentUrl);
+        }
+
+        conversion.attachmentUrls = attachmentUrls;
       }
 
       batch.set(docRef, conversion.toFirestoreDoc());

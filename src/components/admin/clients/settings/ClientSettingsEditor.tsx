@@ -9,7 +9,7 @@ import {
   Spacer,
   Select,
 } from "@chakra-ui/react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Table,
   Thead,
@@ -24,7 +24,7 @@ import {
   Flex,
 } from "@chakra-ui/react";
 import { CloseIcon } from "@chakra-ui/icons";
-import { FaDollarSign, FaTrash } from "react-icons/fa";
+import { FaDollarSign, FaPlus, FaTrash } from "react-icons/fa";
 import { ClientService } from "services/interfaces/ClientService";
 import { DependencyInjection } from "utils/DependencyInjection";
 import { Client } from "models/Client";
@@ -34,6 +34,7 @@ import {
   getReferralLinkTypeLabel,
 } from "models/enums/ReferralLinkType";
 import { AffiliateDeal } from "models/AffiliateDeal";
+import { ImageService } from "services/interfaces/ImageService";
 
 type Props = {
   existingClient?: Client | null;
@@ -41,25 +42,30 @@ type Props = {
 };
 
 const ClientSettingsEditor = ({ existingClient, exit }: Props) => {
+  const clientService: ClientService = DependencyInjection.clientService();
+
   const editMode = existingClient !== null;
 
-  const [sportsbookLogo, setSportsbookLogo] = useState<File | null>(null);
-  const [sportsbookId, setSportsbookId] = useState<string>(
-    existingClient?.id ?? ""
-  );
+  const [clientLogo, setClientLogo] = useState<File | null>(null);
+  const [clientLogoUrl, setClientLogoUrl] = useState<string | null>(null);
+  const [clientId, setClientId] = useState<string>(existingClient?.id ?? "");
   const [displayName, setDisplayName] = useState<string>(
     existingClient?.name ?? ""
   );
 
+  const [errorText, setErrorText] = useState<string | null>(null);
+
   const [enabled, setEnabled] = useState(existingClient?.enabled ?? true);
 
   const blankDeal = (): {
+    type: ReferralLinkType | null;
     enabled: boolean;
     link: string;
     cpa: number | undefined;
     targetBetSize: number | undefined;
     targetMonthlyConversions: number | undefined;
   } => ({
+    type: null,
     enabled: true,
     link: "",
     cpa: undefined,
@@ -70,6 +76,16 @@ const ClientSettingsEditor = ({ existingClient, exit }: Props) => {
   const [affiliateDeals, setAffiliateDeals] = useState<
     Partial<AffiliateDeal>[]
   >(existingClient?.affiliateDeals ?? [blankDeal()]);
+
+  useEffect(() => {
+    const fetchLogo = async () => {
+      if (existingClient) {
+        const logoUrl = await clientService.getLogoUrl(existingClient.id);
+        setClientLogoUrl(logoUrl);
+      }
+    };
+    fetchLogo();
+  }, [clientService, existingClient]);
 
   const setDealProperty = (
     index: number,
@@ -101,35 +117,69 @@ const ClientSettingsEditor = ({ existingClient, exit }: Props) => {
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     if (event.target.files) {
-      setSportsbookLogo(Array.from(event.target.files)[0]);
+      setClientLogo(Array.from(event.target.files)[0]);
     } else {
-      setSportsbookLogo(null);
+      setClientLogo(null);
     }
   };
 
-  const clientService: ClientService = DependencyInjection.clientService();
-
   const showSuccess = useSuccessNotification();
 
+  const validateClient = (): boolean => {
+    if (!clientId.trim() || clientId.includes(" ")) {
+      setErrorText("Client ID is invalid.");
+      return false;
+    }
+    if (!displayName.trim()) {
+      setErrorText("Display Name is required");
+      return false;
+    }
+    if (!clientLogo && !editMode) {
+      setErrorText("Client Logo is required");
+      return false;
+    }
+    return true;
+  };
+
   const saveOrCreateNew = async () => {
+    if (!validateClient()) {
+      return;
+    }
+
+    const deals: AffiliateDeal[] = affiliateDeals
+      .map((deal) =>
+        AffiliateDeal.fromPartial(deal, {
+          clientId: clientId,
+          clientName: displayName,
+        })
+      )
+      .filter((deal) => deal !== null) as AffiliateDeal[];
+
     let client: Client = new Client({
-      id: sportsbookId,
+      id: clientId,
       name: displayName,
-      affiliateDeals: [],
+      affiliateDeals: deals,
       enabled: enabled,
       updatedAt: new Date(),
       createdAt: editMode ? existingClient?.createdAt : new Date(),
     });
     let result;
+    let imageResult;
     if (editMode) {
       result = await clientService.update(client);
     } else {
       result = await clientService.create(client);
     }
-    if (result) {
+    if (clientLogo) {
+      imageResult = await clientService.uploadLogo(client.id, clientLogo);
+    }
+    if (result && imageResult) {
       console.log("Upserted client", result);
       showSuccess({ message: "Client saved successfully" });
+    } else {
+      setErrorText("Error saving client");
     }
+
     exit();
   };
 
@@ -169,8 +219,8 @@ const ClientSettingsEditor = ({ existingClient, exit }: Props) => {
                 focusBorderColor="#ED7D31"
                 variant={"outline"}
                 placeholder="Sportsbook ID"
-                value={sportsbookId}
-                onChange={(e) => setSportsbookId(e.target.value)}
+                value={clientId}
+                onChange={(e) => setClientId(e.target.value)}
               />
             </InputGroup>
           </React.Fragment>
@@ -194,7 +244,7 @@ const ClientSettingsEditor = ({ existingClient, exit }: Props) => {
 
           <Box h={6}></Box>
 
-          {sportsbookLogo === null ? (
+          {clientLogo === null ? (
             <InputGroup w="100%">
               <Button size="md" w="100%" onClick={triggerAttachmentsUpload}>
                 <Input
@@ -209,7 +259,7 @@ const ClientSettingsEditor = ({ existingClient, exit }: Props) => {
             </InputGroup>
           ) : (
             <Button
-              onClick={(_) => setSportsbookLogo(null)}
+              onClick={(_) => setClientLogo(null)}
               leftIcon={<FaTrash />}
               w="100%"
               colorScheme="red"
@@ -225,57 +275,52 @@ const ClientSettingsEditor = ({ existingClient, exit }: Props) => {
           h={"12em"}
           w="50%"
         >
-          {sportsbookLogo && (
+          {clientLogo ? (
             <Image
               m={8}
               maxH="12em"
               maxW="45%"
               alt="asdf"
-              src={URL.createObjectURL(sportsbookLogo)}
+              src={URL.createObjectURL(clientLogo)}
             />
-          )}
+          ) : clientLogoUrl ? (
+            <Image
+              m={8}
+              maxH="12em"
+              maxW="45%"
+              alt="asdf"
+              src={clientLogoUrl}
+            />
+          ) : null}
         </Flex>
       </Flex>
 
       <Box h={4}></Box>
-      <Text fontSize={"1.2em"} fontWeight={700}>
-        Affiliate Deals
-      </Text>
+      <Flex w="100%" alignItems={"center"}>
+        <Text fontSize={"1.2em"} fontWeight={700}>
+          Affiliate Deals
+        </Text>
+        <Spacer />
+        <Button leftIcon={<FaPlus />} size="sm" onClick={addNewDeal}>
+          Add New Deal
+        </Button>
+      </Flex>
+
       <Box h={4}></Box>
       <Table size="sm" variant="simple" alignSelf={"center"} width={"100%"}>
         <Thead>
           <Tr>
-            <Th textAlign="center">Link Type</Th>
             <Th textAlign="center">Enabled</Th>
+            <Th textAlign="center">Link Type</Th>
             <Th textAlign="center">Link</Th>
             <Th textAlign="center">CPA</Th>
-            <Th textAlign="center">Target Avg. Bet Size</Th>
+            <Th textAlign="center">Target Avg. Bet</Th>
             <Th textAlign="center">Target Monthly Conv.</Th>
           </Tr>
         </Thead>
         <Tbody>
           {affiliateDeals.map((deal, index) => (
             <Tr key={index}>
-              <Td maxW={"5em"} textAlign={"center"}>
-                <Select
-                  value={deal.type ?? undefined}
-                  onChange={(e) => {
-                    const newLinkType = e.target.value as
-                      | ReferralLinkType
-                      | undefined;
-                    setDealProperty(index, (deal) => ({
-                      ...deal,
-                      linkType: newLinkType ?? null,
-                    }));
-                  }}
-                >
-                  {[null, ...referralLinkTypes].map((linkType) => (
-                    <option key={linkType} value={linkType ?? undefined}>
-                      {getReferralLinkTypeLabel(linkType)}
-                    </option>
-                  ))}
-                </Select>
-              </Td>
               <Td textAlign="center">
                 <Switch
                   isChecked={affiliateDeals[index].enabled}
@@ -288,10 +333,33 @@ const ClientSettingsEditor = ({ existingClient, exit }: Props) => {
                 ></Switch>
               </Td>
               <Td textAlign={"center"}>
+                <Select
+                  size="sm"
+                  value={deal.type ?? undefined}
+                  onChange={(e) => {
+                    const newLinkType = e.target.value as
+                      | ReferralLinkType
+                      | undefined;
+                    setDealProperty(index, (deal) => ({
+                      ...deal,
+                      linkType: newLinkType ?? null,
+                    }));
+                  }}
+                >
+                  {referralLinkTypes.map((linkType) => (
+                    <option key={linkType} value={linkType ?? undefined}>
+                      {getReferralLinkTypeLabel(linkType)}
+                    </option>
+                  ))}
+                </Select>
+              </Td>
+
+              <Td textAlign={"center"}>
                 <Input
-                  isDisabled={!affiliateDeals[index].enabled}
+                  size={"sm"}
+                  isDisabled={!affiliateDeals[index].enabled ?? true}
                   placeholder="Link"
-                  value={affiliateDeals[index].link}
+                  value={affiliateDeals[index].link ?? ""}
                   onChange={(e) => {
                     setDealProperty(index, (deal) => ({
                       ...deal,
@@ -307,10 +375,11 @@ const ClientSettingsEditor = ({ existingClient, exit }: Props) => {
                   </InputLeftElement>
                   <Input
                     pl={8}
+                    size={"sm"}
                     type="number"
-                    isDisabled={!affiliateDeals[index].enabled}
+                    isDisabled={!affiliateDeals[index].enabled ?? true}
                     placeholder="CPA"
-                    value={affiliateDeals[index].cpa}
+                    value={affiliateDeals[index].cpa ?? ""}
                     onChange={(e) => {
                       const numericValue = Number(e.target.value);
                       setDealProperty(index, (deal) => ({
@@ -329,10 +398,11 @@ const ClientSettingsEditor = ({ existingClient, exit }: Props) => {
                   </InputLeftElement>
                   <Input
                     pl={8}
+                    size={"sm"}
                     type="number"
-                    isDisabled={!affiliateDeals[index].enabled}
+                    isDisabled={!affiliateDeals[index].enabled ?? true}
                     placeholder="Avg. Bet Size"
-                    value={affiliateDeals[index].targetBetSize}
+                    value={affiliateDeals[index].targetBetSize ?? ""}
                     onChange={(e) => {
                       const numericValue = Number(e.target.value);
                       setDealProperty(index, (deal) => ({
@@ -348,9 +418,10 @@ const ClientSettingsEditor = ({ existingClient, exit }: Props) => {
                 <Input
                   width="6em"
                   type="number"
-                  isDisabled={!affiliateDeals[index].enabled}
-                  placeholder="Monthly Conv."
-                  value={affiliateDeals[index].targetMonthlyConversions}
+                  size={"sm"}
+                  isDisabled={!affiliateDeals[index].enabled ?? true}
+                  placeholder="# Conv."
+                  value={affiliateDeals[index].targetMonthlyConversions ?? ""}
                   onChange={(e) => {
                     const numericValue = Number(e.target.value);
                     setDealProperty(index, (deal) => ({
@@ -359,6 +430,13 @@ const ClientSettingsEditor = ({ existingClient, exit }: Props) => {
                         numericValue === 0 ? undefined : numericValue,
                     }));
                   }}
+                />
+              </Td>
+              <Td textAlign={"center"}>
+                <IconButton
+                  aria-label="Close"
+                  icon={<FaTrash />}
+                  onClick={() => removeDeal(index)}
                 />
               </Td>
             </Tr>
@@ -371,6 +449,11 @@ const ClientSettingsEditor = ({ existingClient, exit }: Props) => {
       <Button onClick={saveOrCreateNew} w="full" colorScheme="orange">
         {editMode ? "Save Changes" : "Create New Client"}
       </Button>
+      {errorText && (
+        <Text color="red" fontSize="sm">
+          {errorText}
+        </Text>
+      )}
     </Flex>
   );
 };

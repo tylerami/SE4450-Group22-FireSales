@@ -6,27 +6,27 @@ export class Client {
   id: string;
   name: string;
   createdAt: Date;
-  updatedAt?: Date;
+  updatedAt: Date | null;
   affiliateDeals: AffiliateDeal[];
   enabled: boolean;
-  avgPaymentDays?: number;
+  avgPaymentDays: number | null;
 
   constructor({
     id,
     name,
     createdAt = new Date(),
-    updatedAt,
+    updatedAt = null,
     affiliateDeals,
     enabled = true,
-    avgPaymentDays,
+    avgPaymentDays = null,
   }: {
     id: string;
     name: string;
     createdAt?: Date;
-    updatedAt?: Date;
+    updatedAt?: Date | null;
     affiliateDeals?: AffiliateDeal[];
     enabled?: boolean;
-    avgPaymentDays?: number;
+    avgPaymentDays?: number | null;
   }) {
     this.id = id;
     this.name = name;

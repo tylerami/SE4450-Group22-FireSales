@@ -84,4 +84,42 @@ export class AffiliateDeal {
       targetMonthlyConversions: doc.targetMonthlyConversions,
     });
   }
+
+  static fromPartial(
+    partial: Partial<AffiliateDeal>,
+    { clientName, clientId }: { clientName?: string; clientId?: string } = {}
+  ): AffiliateDeal | null {
+    partial.clientId = clientId ?? partial.clientId;
+    partial.clientName = clientName ?? partial.clientName;
+    if (
+      !partial.clientId ||
+      !partial.clientName ||
+      partial.type === undefined ||
+      !partial.link ||
+      !partial.cpa
+    ) {
+      console.log("Invalid partial AffiliateDeal:", partial);
+      console.log("Missing required fields", {
+        clientId: !partial.clientId,
+        clientName: !partial.clientName,
+        type: !partial.type,
+        link: !partial.link,
+        cpa: !partial.cpa,
+      });
+      return null;
+    }
+    return new AffiliateDeal({
+      clientId: partial.clientId,
+      clientName: partial.clientName,
+      type: partial.type,
+      link: partial.link,
+      enabled: partial.enabled,
+      createdAt: partial.createdAt,
+      updatedAt: partial.updatedAt,
+      cpa: partial.cpa,
+      currency: partial.currency,
+      targetBetSize: partial.targetBetSize,
+      targetMonthlyConversions: partial.targetMonthlyConversions,
+    });
+  }
 }

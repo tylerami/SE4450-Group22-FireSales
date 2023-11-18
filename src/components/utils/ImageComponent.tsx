@@ -5,7 +5,8 @@ import { ImageService } from "services/interfaces/ImageService";
 import { DependencyInjection } from "utils/DependencyInjection";
 
 interface ImageComponentProps {
-  imagePath: string;
+  imagePath?: string;
+  imageUrl?: string | null;
   height?: string;
   width?: string;
   maxWidth?: string;
@@ -17,6 +18,7 @@ interface ImageComponentProps {
 
 const ImageComponent: React.FC<ImageComponentProps> = ({
   imagePath,
+  imageUrl,
   height = "100%",
   width = "100%",
   maxWidth = "100%",
@@ -25,23 +27,24 @@ const ImageComponent: React.FC<ImageComponentProps> = ({
 }: ImageComponentProps) => {
   const imageService: ImageService = DependencyInjection.imageService();
 
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [imageSrc, setImageSrc] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
     setIsLoading(true);
 
-    imageService
-      .getImageUrl(imagePath)
-      .then((url) => {
-        setImageUrl(url);
-        setIsLoading(false);
-      })
-      .catch((error) => {
-        console.error("Error loading image", error);
-        setIsLoading(false);
-      });
-  }, [imagePath]);
+    async function fetchImage() {
+      if (imageUrl) {
+        setImageSrc(imageUrl);
+      } else if (imagePath) {
+        const imageUrl = await imageService.getImageUrl(imagePath);
+        setImageSrc(imageUrl);
+      }
+      setIsLoading(false);
+    }
+
+    fetchImage();
+  }, [imagePath, imageService, imageUrl]);
 
   return (
     <Box
@@ -55,13 +58,13 @@ const ImageComponent: React.FC<ImageComponentProps> = ({
       justifyContent={"center"}
       alignItems={"center"}
     >
-      {isLoading || !imageUrl ? (
+      {isLoading || !imageSrc ? (
         <Spinner size="xl" />
       ) : (
         <Image
           maxHeight={"100%"}
           maxWidth={"100%"}
-          src={imageUrl}
+          src={imageSrc}
           alt="Not found"
         />
       )}

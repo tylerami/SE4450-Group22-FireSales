@@ -12,6 +12,7 @@ type Props = {};
 const ClientsSettingsWidget = (props: Props) => {
   const [createMode, setCreateMode] = useState<boolean>(false);
   const [editingClient, setEditingClient] = useState<Client | null>(null);
+  const [triggerUpdate, setTriggerUpdate] = useState<number>(0);
 
   const [clients, setClients] = useState<Client[]>([]);
 
@@ -24,7 +25,13 @@ const ClientsSettingsWidget = (props: Props) => {
     };
 
     fetchClients();
-  }, [clientService]);
+  }, [clientService, triggerUpdate]);
+
+  const exit = () => {
+    setCreateMode(false);
+    setEditingClient(null);
+    setTriggerUpdate(triggerUpdate + 1);
+  };
 
   return (
     <Flex
@@ -36,13 +43,7 @@ const ClientsSettingsWidget = (props: Props) => {
       boxShadow={"3px 4px 12px rgba(0, 0, 0, 0.2)"}
     >
       {createMode || editingClient ? (
-        <ClientSettingsEditor
-          existingClient={editingClient}
-          exit={() => {
-            setCreateMode(false);
-            setEditingClient(null);
-          }}
-        />
+        <ClientSettingsEditor existingClient={editingClient} exit={exit} />
       ) : (
         <React.Fragment>
           <Flex justifyContent={"start"}>
@@ -54,8 +55,9 @@ const ClientsSettingsWidget = (props: Props) => {
           {!clients ? (
             <Spinner />
           ) : (
-            clients.map((client: Client) => (
+            clients.map((client: Client, key: number) => (
               <ClientDetailsTile
+                key={key}
                 client={client}
                 selectClient={setEditingClient}
               />

@@ -11,7 +11,7 @@ import {
   Spacer,
   Box,
 } from "@chakra-ui/react";
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 import { Button } from "@chakra-ui/react";
 import { Client } from "models/Client";
@@ -19,6 +19,9 @@ import { getReferralLinkTypeLabel } from "models/enums/ReferralLinkType";
 import { formatMoney } from "utils/Money";
 import { AffiliateDeal } from "@models/AffiliateDeal";
 import ImageComponent from "components/utils/ImageComponent";
+import { ImageService } from "services/interfaces/ImageService";
+import { ClientService } from "services/interfaces/ClientService";
+import { DependencyInjection } from "utils/DependencyInjection";
 
 type Props = {
   client: Client;
@@ -26,6 +29,19 @@ type Props = {
 };
 
 const ClientDetailsTile = ({ client, selectClient }: Props) => {
+  const [logoUrl, setLogoUrl] = useState<string | null>(null);
+
+  const clientService: ClientService = DependencyInjection.clientService();
+
+  useEffect(() => {
+    const fetchLogo = async () => {
+      const logoUrl = await clientService.getLogoUrl(client.id);
+      setLogoUrl(logoUrl);
+    };
+
+    fetchLogo();
+  });
+
   return (
     <Flex
       borderRadius={"12px"}
@@ -33,7 +49,7 @@ const ClientDetailsTile = ({ client, selectClient }: Props) => {
       pt={2}
       gap={2}
       border="1px solid #E2E8F0"
-      opacity={client.enabled ? 1 : 0.7}
+      opacity={client.enabled ? 1 : 0.4}
       w="100%"
       direction={"column"}
     >
@@ -42,7 +58,7 @@ const ClientDetailsTile = ({ client, selectClient }: Props) => {
           height="3em"
           width="10em"
           margin={"2"}
-          imagePath={`/sportsbooks/logos/${client.id}-logo-dark.png`}
+          imageUrl={logoUrl}
         />
         <ClientProperty label={"Display Name"} value={client.name} />
         <ClientProperty label={"ID"} value={client.id} />

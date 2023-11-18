@@ -10,12 +10,15 @@ import {
   setDoc,
   updateDoc,
 } from "firebase/firestore";
+import { ImageService } from "services/interfaces/ImageService";
 
 export class ClientFirebaseService implements ClientService {
   private db: Firestore;
+  private imageService: ImageService;
 
-  constructor(db: Firestore) {
+  constructor(db: Firestore, imageService: ImageService) {
     this.db = db;
+    this.imageService = imageService;
   }
 
   async create(client: Client): Promise<Client> {
@@ -45,5 +48,15 @@ export class ClientFirebaseService implements ClientService {
 
   private clientsCollection(): CollectionReference {
     return collection(this.db, "clients");
+  }
+
+  async uploadLogo(clientId: string, logo: File): Promise<string> {
+    return await this.imageService.uploadImage(
+      `clients/logos/${clientId}.png`,
+      logo
+    );
+  }
+  async getLogoUrl(clientId: string): Promise<string | null> {
+    return await this.imageService.getImageUrl(`clients/logos/${clientId}.png`);
   }
 }

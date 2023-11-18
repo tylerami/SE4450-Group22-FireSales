@@ -21,7 +21,7 @@ import { ImageService } from "services/interfaces/ImageService";
 import { PayoutService } from "services/interfaces/PayoutService";
 import { UserService } from "services/interfaces/UserService";
 
-const USE_MOCKS = true;
+const USE_MOCKS = false;
 
 const mockDependencies: Record<string, any> = {
   ClientService: new MockClientService(),
@@ -35,7 +35,10 @@ const mockDependencies: Record<string, any> = {
 };
 
 const dependencies: Record<string, any> = {
-  ClientService: new ClientFirebaseService(firestore),
+  ClientService: new ClientFirebaseService(
+    firestore,
+    new ImageFirebaseService(storage)
+  ),
   ConversionService: new ConversionFirebaseService(
     firestore,
     new ImageFirebaseService(storage)

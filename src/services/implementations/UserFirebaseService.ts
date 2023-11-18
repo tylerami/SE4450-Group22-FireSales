@@ -53,11 +53,13 @@ export class UserFirebaseService implements UserService {
     await updateDoc(docRef, user.toFirestoreDoc());
     return user;
   }
-  async getAll({
-    includeAdmins = false,
-  }: {
-    includeAdmins?: boolean;
-  }): Promise<User[]> {
+  async getAll(
+    {
+      includeAdmins = false,
+    }: {
+      includeAdmins?: boolean;
+    } = { includeAdmins: false }
+  ): Promise<User[]> {
     let userQuery = query(this.usersCollection());
     if (!includeAdmins) {
       // roles array must contain admin
