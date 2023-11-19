@@ -265,8 +265,7 @@ const SalesTeamListWidget = ({
           <Heading minW="30%" as="h1" fontSize={"1.2em"} fontWeight={700}>
             Manage Sales Team
           </Heading>
-          <Spacer />
-          <InputGroup w="full" maxW="50%">
+          <InputGroup w="full" maxW="40%">
             <InputLeftElement>
               <Icon _hover={{ color: "#434343" }} as={FiSearch} />
             </InputLeftElement>

@@ -129,7 +129,6 @@ const AdminRecordConversionsWidgetContent = (props: Props) => {
       const convNumber = Number(row.split(",")[0]);
 
       const conversion = mapCsvRowToConversion(row.replace("\r", ""));
-      console.log(`Conversion ${convNumber}: `, conversion);
       if (conversion !== null) {
         conversionsByNumber[convNumber] = conversion;
       }
@@ -138,8 +137,6 @@ const AdminRecordConversionsWidgetContent = (props: Props) => {
         console.log("Conversion number mismatch");
       }
     }
-
-    console.log(conversionsByNumber);
 
     setConversionsByNumber(conversionsByNumber);
     setProcessing(false);

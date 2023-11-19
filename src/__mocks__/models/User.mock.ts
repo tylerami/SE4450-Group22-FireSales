@@ -8,7 +8,7 @@ export const sampleUser: User = User.create({
   email: "tamirau@uwo.ca",
   firstName: "Tyler",
   lastName: "Amirault",
-  compensationGroupId: "group123",
+  compensationGroupId: "diamond-A",
 });
 
 export function generateSampleUsers(count: number): User[] {
@@ -22,7 +22,7 @@ export function generateSampleUsers(count: number): User[] {
     const registeredAt = new Date();
     const profilePictureSrc = undefined;
     const phone = Math.random() > 0.5 ? `123-456-789${i}` : undefined;
-    const compensationGroupId = `compGroup${i}`;
+    const compensationGroupId = `diamond-A`;
 
     users.push(
       new User({

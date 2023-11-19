@@ -24,7 +24,6 @@ const CompensationGroupWidget = (props: Props) => {
   useEffect(() => {
     const fetchCompGroups = async () => {
       const compGroups = await compGroupService.getAll();
-      console.log("fetched comp groups...", compGroups);
       setCompGroups(compGroups);
     };
     fetchCompGroups();
@@ -35,8 +34,6 @@ const CompensationGroupWidget = (props: Props) => {
     setEditingGroup(null);
     setUpdateTrigger(updateTrigger + 1);
   };
-
-  console.log("editing group...", editingGroup);
 
   return (
     <Flex

@@ -1,5 +1,5 @@
 import { Flex, Heading, Text, useBreakpointValue } from "@chakra-ui/react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import { Button } from "@chakra-ui/react";
 import ImageComponent from "../../../utils/ImageComponent";
@@ -7,6 +7,8 @@ import { Client } from "@models/Client";
 import { getReferralLinkTypeLabel } from "models/enums/ReferralLinkType";
 import { AffiliateLink } from "models/AffiliateLink";
 import { formatMoney } from "utils/Money";
+import { ClientService } from "services/interfaces/ClientService";
+import { DependencyInjection } from "utils/DependencyInjection";
 
 const AffiliateLinksContainer = ({
   client,
@@ -15,6 +17,19 @@ const AffiliateLinksContainer = ({
   client: Client;
   affiliateLinks: AffiliateLink[];
 }) => {
+  const [logoSrc, setLogoSrc] = useState<string | undefined>(undefined);
+
+  const clientService: ClientService = DependencyInjection.clientService();
+
+  useEffect(() => {
+    const fetchLogo = async () => {
+      const logoUrl = await clientService.getLogoUrl(client.id);
+      if (logoUrl) setLogoSrc(logoUrl);
+    };
+
+    fetchLogo();
+  }, [client.id, clientService]);
+
   return (
     <Flex
       direction={{ base: "column" }}
@@ -30,7 +45,7 @@ const AffiliateLinksContainer = ({
         maxHeight="5em"
         maxWidth="10em"
         minWidth="5em"
-        imagePath={`/sportsbooks/logos/${client.id}-logo-dark.png`}
+        imagePath={logoSrc}
       />
       <Flex gap={6} w="full">
         {affiliateLinks.map((affiliateLink, i) => (

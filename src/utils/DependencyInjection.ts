@@ -43,7 +43,7 @@ const dependencies: Record<string, any> = {
     firestore,
     new ImageFirebaseService(storage)
   ),
-  UserService: new UserFirebaseService(firestore),
+  UserService: new MockUserService(), //new UserFirebaseService(firestore),
   CompensationGroupService: new CompensationGroupFirebaseService(firestore),
   CustomerService: new CustomerFirebaseService(firestore),
   PayoutService: new PayoutFirebaseService(firestore),

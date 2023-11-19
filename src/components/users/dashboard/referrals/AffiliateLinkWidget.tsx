@@ -40,7 +40,8 @@ const useFetchData = (currentUser) => {
           setCompensationGroup(compGroup);
         }
 
-        const clients = await clientService.getAll();
+        let clients = await clientService.getAll();
+
         setClients(clients);
       } catch (err: any) {
         setError(err);
@@ -95,7 +96,15 @@ const AffiliateLinkWidget = () => {
   const clientLinkGroups: ClientLinkGroup[] = useMemo(() => {
     if (!clients || !compensationGroup) return [];
 
-    return clients.map((client) => ({
+    const filteredClients = clients.filter(
+      (client) =>
+        client.enabled &&
+        compensationGroup.affiliateLinks.filter(
+          (link) => link.clientId === client.id
+        ).length > 0
+    );
+
+    return filteredClients.map((client) => ({
       client,
       affiliateLinks: compensationGroup.affiliateLinks.filter(
         (link) => link.clientId === client.id

@@ -44,8 +44,6 @@ type Props = {
 };
 
 const CompensationGroupEditor = ({ exisitingGroup, exit }: Props) => {
-  console.log(exisitingGroup);
-
   const clientService: ClientService = DependencyInjection.clientService();
   const compGroupService: CompensationGroupService =
     DependencyInjection.compensationGroupService();
@@ -74,7 +72,6 @@ const CompensationGroupEditor = ({ exisitingGroup, exit }: Props) => {
       let existingLink: AffiliateLink | undefined;
       if (existingLinkIndex !== undefined && existingLinkIndex !== -1) {
         existingLink = existingLinks[existingLinkIndex];
-        // existingLinks.splice(existingLinkIndex, 1);
       }
 
       return {
@@ -88,8 +85,6 @@ const CompensationGroupEditor = ({ exisitingGroup, exit }: Props) => {
     };
 
     const fetchClients = async () => {
-      console.log("compensation group", exisitingGroup);
-
       let clients = await clientService.getAll();
       clients = clients.filter(
         (client) => client.enabled && client.affiliateDeals.length > 0
@@ -114,7 +109,7 @@ const CompensationGroupEditor = ({ exisitingGroup, exit }: Props) => {
     };
 
     fetchClients();
-  }, [clientService, exisitingGroup?.affiliateLinks]);
+  }, [clientService, exisitingGroup]);
 
   const setLinkProperty = (
     index: number,
@@ -123,7 +118,6 @@ const CompensationGroupEditor = ({ exisitingGroup, exit }: Props) => {
     const newLinks = [...affiliateLinks];
     newLinks[index] = modify(newLinks[index]);
     setAffiliateLinks(newLinks);
-    console.log(newLinks);
   };
 
   const editMode = exisitingGroup !== null;
@@ -144,8 +138,6 @@ const CompensationGroupEditor = ({ exisitingGroup, exit }: Props) => {
     if (!deal) {
       throw new Error("Deal not found");
     }
-
-    console.log(link);
 
     if (link.minBetSize === undefined) {
       throw new Error("Min bet size is required");
@@ -178,7 +170,6 @@ const CompensationGroupEditor = ({ exisitingGroup, exit }: Props) => {
         enabled: enabled,
         affiliateLinks: enabledLinks,
       });
-      console.log("group: ", group);
       let result = await compGroupService.set(group);
 
       if (result) {

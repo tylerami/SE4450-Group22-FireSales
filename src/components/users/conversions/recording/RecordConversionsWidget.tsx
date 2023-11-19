@@ -8,7 +8,7 @@ import { DependencyInjection } from "utils/DependencyInjection";
 import { CompensationGroup } from "models/CompensationGroup";
 import { UserContext } from "components/auth/UserProvider";
 
-const ENABLE_BULK_MODE = true;
+const ENABLE_BULK_MODE = false;
 
 type Props = {};
 

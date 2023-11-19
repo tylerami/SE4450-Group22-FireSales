@@ -93,11 +93,11 @@ const RecordConversionTile = ({
     }
 
     // merge customers if needed
-    const customerSearch: Customer[] = await customerService.searchByName(
-      customerName
-    );
+    // const customerSearch: Customer[] = await customerService.searchByName(
+    //   customerName
+    // );
 
-    const dateOccurred = parseDateString(dateString, "yyyy-dd-mm");
+    const dateOccurred = parseDateString(dateString, "yyyy-mm-dd");
 
     const conversion: Conversion = Conversion.fromManualInput({
       dateOccurred,

@@ -90,7 +90,10 @@ const ManualRecordConversionsWidgetContent = ({
       }
     }
     if (foundError) {
+      console.log(errorsByRow);
       return;
+    } else {
+      console.log("no conversion  errors");
     }
 
     const conversionAttachmentGroups: ConversionAttachmentGroup[] =
