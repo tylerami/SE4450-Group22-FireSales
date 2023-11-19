@@ -9,15 +9,13 @@ export class MockClientService implements ClientService {
   getLogoUrl(clientId: string): Promise<string> {
     throw new Error("Method not implemented.");
   }
-  async create(client: Client): Promise<Client> {
+  async set(client: Client): Promise<Client> {
     return client;
   }
   async get(clientId: string): Promise<Client | null> {
     return null;
   }
-  async update(client: Client | Partial<Client>): Promise<Client> {
-    return client as Client;
-  }
+
   async getAll(): Promise<Client[]> {
     return generateSampleClients(6);
   }

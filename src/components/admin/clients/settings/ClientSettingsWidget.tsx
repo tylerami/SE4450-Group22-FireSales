@@ -21,6 +21,10 @@ const ClientsSettingsWidget = (props: Props) => {
   useEffect(() => {
     const fetchClients = async () => {
       const clients = await clientService.getAll();
+      clients.sort((a, b) => b.averageCpa() - a.averageCpa());
+      // move enabled clients to the top
+      clients.sort((a, b) => (a.enabled && !b.enabled ? -1 : 0));
+
       setClients(clients);
     };
 

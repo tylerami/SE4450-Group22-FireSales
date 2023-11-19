@@ -21,9 +21,9 @@ export class ClientFirebaseService implements ClientService {
     this.imageService = imageService;
   }
 
-  async create(client: Client): Promise<Client> {
+  async set(client: Client): Promise<Client> {
     const docRef = doc(this.clientsCollection(), client.id);
-    await setDoc(docRef, client.toFirestoreDoc());
+    await setDoc(docRef, client.toFirestoreDoc(), { merge: true });
     return client;
   }
   async get(clientId: string): Promise<Client | null> {
@@ -34,11 +34,7 @@ export class ClientFirebaseService implements ClientService {
     }
     return Client.fromFirestoreDoc(docSnap.data());
   }
-  async update(client: Client): Promise<Client> {
-    const docRef = doc(this.clientsCollection(), client.id);
-    await updateDoc(docRef, client.toFirestoreDoc());
-    return client;
-  }
+
   async getAll(): Promise<Client[]> {
     const clientQuerySnapshot = await getDocs(this.clientsCollection());
     return clientQuerySnapshot.docs.map((doc) =>

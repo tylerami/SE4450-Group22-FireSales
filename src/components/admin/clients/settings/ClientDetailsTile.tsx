@@ -49,7 +49,7 @@ const ClientDetailsTile = ({ client, selectClient }: Props) => {
       pt={2}
       gap={2}
       border="1px solid #E2E8F0"
-      opacity={client.enabled ? 1 : 0.4}
+      opacity={client.enabled ? 1 : 0.6}
       w="100%"
       direction={"column"}
     >
@@ -130,7 +130,7 @@ const AffiliateDealTable = ({
         {affiliateDeals.map((deal: AffiliateDeal, i: number) => (
           <Tr key={i}>
             {tableColumns.map((column, i) => (
-              <Td key={i} textAlign={"center"}>
+              <Td maxW="40vw" key={i} textAlign={"center"}>
                 {column.getValue(deal)}
               </Td>
             ))}

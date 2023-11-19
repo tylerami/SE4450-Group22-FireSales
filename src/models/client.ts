@@ -37,7 +37,7 @@ export class Client {
     this.avgPaymentDays = avgPaymentDays;
   }
 
-  getDealsByType = (type: ReferralLinkType | null): AffiliateDeal[] =>
+  public getDealsByType = (type: ReferralLinkType | null): AffiliateDeal[] =>
     this.affiliateDeals.filter((deal) => deal.type === type);
 
   public getSportsbookAffiliateDeal = (): AffiliateDeal | null =>
@@ -56,6 +56,16 @@ export class Client {
 
   public addAffiliateDeal = (affiliateDeal: AffiliateDeal): void => {
     this.affiliateDeals.push(affiliateDeal);
+  };
+
+  public averageCpa = (): number => {
+    if (this.affiliateDeals.length === 0) {
+      return 0;
+    }
+    return (
+      this.affiliateDeals.reduce((prev, deal) => prev + deal.cpa, 0) /
+      this.affiliateDeals.length
+    );
   };
 
   toFirestoreDoc(): DocumentData {

@@ -36,6 +36,7 @@ import { CompensationGroup } from "models/CompensationGroup";
 import { AffiliateLink } from "models/AffiliateLink";
 import { CompensationGroupService } from "services/interfaces/CompensationGroupService";
 import { AffiliateDeal } from "models/AffiliateDeal";
+import { error } from "console";
 
 type Props = {
   exisitingGroup?: CompensationGroup | null;
@@ -43,6 +44,8 @@ type Props = {
 };
 
 const CompensationGroupEditor = ({ exisitingGroup, exit }: Props) => {
+  console.log(exisitingGroup);
+
   const clientService: ClientService = DependencyInjection.clientService();
   const compGroupService: CompensationGroupService =
     DependencyInjection.compensationGroupService();
@@ -54,17 +57,25 @@ const CompensationGroupEditor = ({ exisitingGroup, exit }: Props) => {
   const [clients, setClients] = useState<Client[]>([]);
 
   const [affiliateLinks, setAffiliateLinks] = useState<
-    Record<string, Partial<AffiliateLink>>
-  >({});
+    Partial<AffiliateLink>[]
+  >([]);
 
   const [errorText, setErrorText] = useState<string | null>(null);
 
   useEffect(() => {
-    const initialLink = (deal: AffiliateDeal): Partial<AffiliateLink> => {
-      const existingLink: AffiliateLink | undefined =
-        exisitingGroup?.affiliateLinks.find(
-          (link) => link.type === deal.type && link.clientId === deal.clientId
-        );
+    const initialLink = (
+      deal: AffiliateDeal,
+      existingLinks: AffiliateLink[]
+    ): Partial<AffiliateLink> => {
+      const existingLinkIndex: number | undefined = existingLinks.findIndex(
+        (link) => link.type === deal.type && link.clientId === deal.clientId
+      );
+
+      let existingLink: AffiliateLink | undefined;
+      if (existingLinkIndex !== undefined && existingLinkIndex !== -1) {
+        existingLink = existingLinks[existingLinkIndex];
+        // existingLinks.splice(existingLinkIndex, 1);
+      }
 
       return {
         clientId: deal.clientId,
@@ -77,41 +88,42 @@ const CompensationGroupEditor = ({ exisitingGroup, exit }: Props) => {
     };
 
     const fetchClients = async () => {
-      const clients = await clientService.getAll();
-      setClients(clients);
+      console.log("compensation group", exisitingGroup);
 
-      const links: Record<string, Partial<AffiliateLink>> = {};
+      let clients = await clientService.getAll();
+      clients = clients.filter(
+        (client) => client.enabled && client.affiliateDeals.length > 0
+      );
+      setClients(clients);
 
       const affiliateDeals: AffiliateDeal[] = getAllAffiliateDeals(clients);
 
-      affiliateDeals.forEach((deal: AffiliateDeal) => {
-        links[`${deal.clientId}-${deal.type}`] = initialLink(deal);
-      });
+      affiliateDeals.sort((a, b) => b.cpa - a.cpa);
+      affiliateDeals.sort((a, b) => a.clientName.localeCompare(b.clientName));
 
-      setAffiliateLinks(links);
+      let existingLinks: AffiliateLink[] = Object.assign(
+        exisitingGroup?.affiliateLinks ?? [],
+        []
+      );
+
+      const editableLinks: Partial<AffiliateLink>[] = affiliateDeals.map(
+        (deal) => initialLink(deal, existingLinks)
+      );
+
+      setAffiliateLinks(editableLinks);
     };
 
     fetchClients();
   }, [clientService, exisitingGroup?.affiliateLinks]);
 
-  const getAffiliateLink = (
-    clientId: string,
-    type: ReferralLinkType
-  ): Partial<AffiliateLink> => {
-    const key = `${clientId}-${type}`;
-    return affiliateLinks[key];
-  };
-
   const setLinkProperty = (
-    clientId: string,
-    linkType: ReferralLinkType,
+    index: number,
     modify: (link: Partial<AffiliateLink>) => Partial<AffiliateLink>
   ) => {
-    const key = `${clientId}-${linkType}`;
-    setAffiliateLinks((links) => ({
-      ...links,
-      [key]: modify(links[key]),
-    }));
+    const newLinks = [...affiliateLinks];
+    newLinks[index] = modify(newLinks[index]);
+    setAffiliateLinks(newLinks);
+    console.log(newLinks);
   };
 
   const editMode = exisitingGroup !== null;
@@ -126,10 +138,14 @@ const CompensationGroupEditor = ({ exisitingGroup, exit }: Props) => {
       throw new Error("Client not found");
     }
 
-    const deal: AffiliateDeal | undefined = client?.affiliateDeals[link.type!];
+    const type: ReferralLinkType | null = link.type ?? null;
+
+    const deal: AffiliateDeal | undefined = client?.getDealsByType(type)[0];
     if (!deal) {
       throw new Error("Deal not found");
     }
+
+    console.log(link);
 
     if (link.minBetSize === undefined) {
       throw new Error("Min bet size is required");
@@ -153,19 +169,18 @@ const CompensationGroupEditor = ({ exisitingGroup, exit }: Props) => {
 
   const saveOrCreateNew = async () => {
     try {
+      const enabledLinks: AffiliateLink[] = affiliateLinks
+        .filter((link) => link.enabled ?? false)
+        .map(affiliateLinkFromPartial);
+
       const group: CompensationGroup = new CompensationGroup({
         id: groupId,
         enabled: enabled,
-        affiliateLinks: Object.values(affiliateLinks).map(
-          affiliateLinkFromPartial
-        ),
+        affiliateLinks: enabledLinks,
       });
-      let result;
-      if (editMode) {
-        result = await compGroupService.update(group);
-      } else {
-        result = await compGroupService.create(group);
-      }
+      console.log("group: ", group);
+      let result = await compGroupService.set(group);
+
       if (result) {
         showSuccess({ message: "Compensation group saved successfully" });
         exit();
@@ -209,6 +224,7 @@ const CompensationGroupEditor = ({ exisitingGroup, exit }: Props) => {
           <Box h={1}></Box>
           <InputGroup>
             <Input
+              isReadOnly={editMode}
               focusBorderColor="#ED7D31"
               variant={"outline"}
               placeholder="Group ID"
@@ -243,11 +259,9 @@ const CompensationGroupEditor = ({ exisitingGroup, exit }: Props) => {
               </Td>
               <Td textAlign="center">
                 <Switch
-                  isChecked={
-                    getAffiliateLink(link.clientId!, link.type!).enabled
-                  }
+                  isChecked={link.enabled}
                   onChange={(e) =>
-                    setLinkProperty(link.clientId!, link.type!, (link) => ({
+                    setLinkProperty(index, (link) => ({
                       ...link,
                       enabled: e.target.checked,
                     }))
@@ -262,16 +276,12 @@ const CompensationGroupEditor = ({ exisitingGroup, exit }: Props) => {
                   <Input
                     pl={8}
                     type="number"
-                    isDisabled={
-                      !getAffiliateLink(link.clientId!, link.type!).enabled
-                    }
+                    isDisabled={!link.enabled}
                     placeholder="Commission"
-                    value={
-                      getAffiliateLink(link.clientId!, link.type!).commission
-                    }
+                    value={link.commission ?? ""}
                     onChange={(e) => {
                       const numericValue = Number(e.target.value);
-                      setLinkProperty(link.clientId!, link.type!, (link) => ({
+                      setLinkProperty(index, (link) => ({
                         ...link,
                         commission:
                           numericValue === 0 ? undefined : numericValue,
@@ -288,16 +298,12 @@ const CompensationGroupEditor = ({ exisitingGroup, exit }: Props) => {
                   <Input
                     pl={8}
                     type="number"
-                    isDisabled={
-                      !getAffiliateLink(link.clientId!, link.type!).enabled
-                    }
+                    isDisabled={!link.enabled}
                     placeholder="Min. bet size"
-                    value={
-                      getAffiliateLink(link.clientId!, link.type!).minBetSize
-                    }
+                    value={link.minBetSize ?? ""}
                     onChange={(e) => {
                       const numericValue = Number(e.target.value);
-                      setLinkProperty(link.clientId!, link.type!, (link) => ({
+                      setLinkProperty(index, (link) => ({
                         ...link,
                         minBetSize:
                           numericValue === 0 ? undefined : numericValue,
@@ -314,8 +320,13 @@ const CompensationGroupEditor = ({ exisitingGroup, exit }: Props) => {
       <Box h={6}></Box>
 
       <Button onClick={saveOrCreateNew} w="full" colorScheme="orange">
-        {editMode ? "Save Changes" : "Create New Client"}
+        {editMode ? "Save Changes" : "Create New Group"}
       </Button>
+      {errorText && (
+        <Text color="red" fontSize="sm">
+          {errorText}
+        </Text>
+      )}
     </Flex>
   );
 };

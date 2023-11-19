@@ -3,6 +3,9 @@ import { generateSampleCompensationGroups } from "__mocks__/models/CompensationG
 import { CompensationGroupService } from "services/interfaces/CompensationGroupService";
 
 export class MockCompensationGroupService implements CompensationGroupService {
+  set(compensationGroup: CompensationGroup): Promise<CompensationGroup> {
+    throw new Error("Method not implemented.");
+  }
   async create(
     compensationGroup: CompensationGroup
   ): Promise<CompensationGroup> {

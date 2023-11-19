@@ -15,6 +15,7 @@ const CompensationGroupWidget = (props: Props) => {
     null
   );
 
+  const [updateTrigger, setUpdateTrigger] = useState<number>(0);
   const [compGroups, setCompGroups] = useState<CompensationGroup[]>([]);
 
   const compGroupService: CompensationGroupService =
@@ -23,10 +24,19 @@ const CompensationGroupWidget = (props: Props) => {
   useEffect(() => {
     const fetchCompGroups = async () => {
       const compGroups = await compGroupService.getAll();
+      console.log("fetched comp groups...", compGroups);
       setCompGroups(compGroups);
     };
     fetchCompGroups();
-  }, [compGroupService]);
+  }, [compGroupService, updateTrigger]);
+
+  const exit = () => {
+    setCreateMode(false);
+    setEditingGroup(null);
+    setUpdateTrigger(updateTrigger + 1);
+  };
+
+  console.log("editing group...", editingGroup);
 
   return (
     <Flex
@@ -38,13 +48,7 @@ const CompensationGroupWidget = (props: Props) => {
       boxShadow={"3px 4px 12px rgba(0, 0, 0, 0.2)"}
     >
       {createMode || editingGroup ? (
-        <CompensationGroupEditor
-          exisitingGroup={editingGroup}
-          exit={() => {
-            setCreateMode(false);
-            setEditingGroup(null);
-          }}
-        />
+        <CompensationGroupEditor exisitingGroup={editingGroup} exit={exit} />
       ) : (
         <React.Fragment>
           <Flex justifyContent={"start"}>

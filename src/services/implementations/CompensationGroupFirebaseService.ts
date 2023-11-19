@@ -32,6 +32,16 @@ export class CompensationGroupFirebaseService
     await setDoc(docRef, compensationGroup.toFirestoreDoc());
     return compensationGroup;
   }
+
+  async set(compensationGroup: CompensationGroup): Promise<CompensationGroup> {
+    console.log("compensationGroup", compensationGroup);
+    const docRef = doc(
+      this.compensationGroupsCollection(),
+      compensationGroup.id
+    );
+    await setDoc(docRef, compensationGroup.toFirestoreDoc(), { merge: true });
+    return compensationGroup;
+  }
   async get(compensationGroupId: string): Promise<CompensationGroup | null> {
     const docRef = doc(
       this.compensationGroupsCollection(),

@@ -55,6 +55,8 @@ const ClientSettingsEditor = ({ existingClient, exit }: Props) => {
 
   const [errorText, setErrorText] = useState<string | null>(null);
 
+  const [loading, setLoading] = useState<boolean>(false);
+
   const [enabled, setEnabled] = useState(existingClient?.enabled ?? true);
 
   const blankDeal = (): {
@@ -146,6 +148,8 @@ const ClientSettingsEditor = ({ existingClient, exit }: Props) => {
       return;
     }
 
+    setLoading(true);
+
     const deals: AffiliateDeal[] = affiliateDeals
       .map((deal) =>
         AffiliateDeal.fromPartial(deal, {
@@ -163,24 +167,19 @@ const ClientSettingsEditor = ({ existingClient, exit }: Props) => {
       updatedAt: new Date(),
       createdAt: editMode ? existingClient?.createdAt : new Date(),
     });
-    let result;
-    let imageResult;
-    if (editMode) {
-      result = await clientService.update(client);
-    } else {
-      result = await clientService.create(client);
-    }
+    const result = await clientService.set(client);
+    console.log("Upserted client", result);
     if (clientLogo) {
-      imageResult = await clientService.uploadLogo(client.id, clientLogo);
+      await clientService.uploadLogo(client.id, clientLogo);
     }
-    if (result && imageResult) {
+    if (result) {
       console.log("Upserted client", result);
       showSuccess({ message: "Client saved successfully" });
+      exit();
     } else {
       setErrorText("Error saving client");
     }
-
-    exit();
+    setLoading(false);
   };
 
   const referralLinkTypes: (ReferralLinkType | null)[] = [
@@ -216,6 +215,7 @@ const ClientSettingsEditor = ({ existingClient, exit }: Props) => {
             <Box h={1}></Box>
             <InputGroup>
               <Input
+                isReadOnly={editMode}
                 focusBorderColor="#ED7D31"
                 variant={"outline"}
                 placeholder="Sportsbook ID"
@@ -337,12 +337,14 @@ const ClientSettingsEditor = ({ existingClient, exit }: Props) => {
                   size="sm"
                   value={deal.type ?? undefined}
                   onChange={(e) => {
-                    const newLinkType = e.target.value as
-                      | ReferralLinkType
-                      | undefined;
+                    const newLinkType: ReferralLinkType | undefined =
+                      ReferralLinkType[
+                        e.target.value as keyof typeof ReferralLinkType
+                      ];
+                    console.log("New link type", newLinkType);
                     setDealProperty(index, (deal) => ({
                       ...deal,
-                      linkType: newLinkType ?? null,
+                      type: newLinkType ?? null,
                     }));
                   }}
                 >
@@ -446,7 +448,12 @@ const ClientSettingsEditor = ({ existingClient, exit }: Props) => {
 
       <Box h={6}></Box>
 
-      <Button onClick={saveOrCreateNew} w="full" colorScheme="orange">
+      <Button
+        isLoading={loading}
+        onClick={saveOrCreateNew}
+        w="full"
+        colorScheme="orange"
+      >
         {editMode ? "Save Changes" : "Create New Client"}
       </Button>
       {errorText && (
