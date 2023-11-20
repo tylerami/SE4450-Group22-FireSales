@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   Flex,
   Input,
@@ -21,7 +21,6 @@ import {
   ConversionAttachmentGroup,
 } from "../../../../../models/Conversion";
 import { FaDollarSign } from "react-icons/fa";
-import { customerSample } from "__mocks__/models/Customer.mock";
 import { AffiliateLink } from "models/AffiliateLink";
 import { UserContext } from "components/auth/UserProvider";
 import { CompensationGroup } from "models/CompensationGroup";
@@ -33,18 +32,18 @@ import { parseDateString } from "utils/Date";
 
 type Props = {
   compensationGroup: CompensationGroup;
-  deleteRow: () => void;
   errorText?: string;
   setConversionGroup: (conversionGroup: ConversionAttachmentGroup) => void;
   rowIndex?: number;
+  setIsValid: (bool: boolean) => void;
 };
 
 const RecordConversionTile = ({
   compensationGroup,
   errorText,
-  deleteRow,
   setConversionGroup,
-  rowIndex: rowNumber,
+  rowIndex,
+  setIsValid,
 }: Props) => {
   const customerService: CustomerService =
     DependencyInjection.customerService();
@@ -54,8 +53,26 @@ const RecordConversionTile = ({
     null
   );
   const [customerName, setCustomerName] = useState<string>("");
+  const [customer, setCustomer] = useState<Customer | null>(null);
   const [saleAmount, setSaleAmount] = useState<string>("");
   const [attachments, setAttachments] = useState<File[]>([]);
+
+  const changeCustomer = async (customerName: string) => {
+    setCustomerName(customerName);
+    let customer: Customer = new Customer({
+      fullName: customerName,
+    });
+    if (customerName.length > 5) {
+      const customerSearch: Customer[] = await customerService.searchByName(
+        customerName
+      );
+      if (customerSearch.length > 0) {
+        customer = customerSearch[0];
+      }
+    }
+
+    setCustomer(customer);
+  };
 
   const handleSelectAffiliateLink = (affiliateLink: AffiliateLink) => {
     setAffiliateLink(affiliateLink);
@@ -68,7 +85,7 @@ const RecordConversionTile = ({
   };
 
   const triggerFileUpload = () => {
-    const fileInput = document.getElementById(`file-upload-${rowNumber}`);
+    const fileInput = document.getElementById(`file-upload-${rowIndex}`);
     if (fileInput) {
       (fileInput as HTMLInputElement).click();
     }
@@ -87,24 +104,27 @@ const RecordConversionTile = ({
   const handleSave = async () => {
     if (!currentUser) return;
 
-    if (!affiliateLink) {
-      // set error
+    if (customer == null) {
+      setIsValid(false);
       return;
     }
 
-    // merge customers if needed
-    // const customerSearch: Customer[] = await customerService.searchByName(
-    //   customerName
-    // );
+    if (!affiliateLink) {
+      setIsValid(false);
+      return;
+    }
+
+    if (dateString.trim() === "") {
+      setIsValid(false);
+      return;
+    }
 
     const dateOccurred = parseDateString(dateString, "yyyy-mm-dd");
 
     const conversion: Conversion = Conversion.fromManualInput({
       dateOccurred,
       affiliateLink,
-      customer: new Customer({
-        fullName: customerName,
-      }),
+      customer,
       amount: Number(saleAmount),
       compensationGroupId: compensationGroup.id,
       userId: currentUser.uid,
@@ -126,6 +146,19 @@ const RecordConversionTile = ({
     affiliateLink != null &&
     Number(saleAmount) < affiliateLink?.minBetSize;
 
+  const attachmentsValid = attachments.length > 0;
+  const dateValid = dateString.trim() !== "";
+  const customerValid = customer != null;
+  const affiliateLinkValid = affiliateLink != null;
+
+  useEffect(() => {
+    const validateConversion = () =>
+      attachmentsValid && dateValid && customerValid && affiliateLinkValid;
+    const isValid = validateConversion();
+    console.log("isValid", isValid);
+    setIsValid(isValid);
+  }, [affiliateLinkValid, attachmentsValid, customerValid, dateValid]);
+
   return (
     // Entire component row
     <React.Fragment>
@@ -138,13 +171,13 @@ const RecordConversionTile = ({
         w="100%"
         gap={4}
       >
-        {rowNumber && (
+        {rowIndex && (
           <Heading
             alignSelf={{ base: "start", xl: "start" }}
             mt={{ base: 0, xl: 3 }}
             size="sm"
           >
-            {rowNumber}
+            {rowIndex}
           </Heading>
         )}
 
@@ -227,7 +260,7 @@ const RecordConversionTile = ({
             placeholder="Customer Name"
             value={customerName}
             onChange={(e) => {
-              setCustomerName(e.target.value);
+              changeCustomer(e.target.value);
               handleSave();
             }}
           />
@@ -246,7 +279,7 @@ const RecordConversionTile = ({
                   multiple
                   hidden
                   onChange={handleFilesChange}
-                  id={`file-upload-${rowNumber}`}
+                  id={`file-upload-${rowIndex}`}
                 />
                 {attachments.length <= 0 ? " Upload Files" : "Remove Files"}
               </Button>

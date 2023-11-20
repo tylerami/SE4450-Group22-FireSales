@@ -9,6 +9,7 @@ import {
   Circle,
   Image,
   Button,
+  Spinner,
 } from "@chakra-ui/react";
 import { FiUser } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
@@ -63,14 +64,14 @@ const TopNavBar: React.FC<TopNavBarProps> = ({ pageName }) => {
       {/* Right-aligned Profile section */}
       <Flex mx={8}>
         <Box mx={4} textAlign="right">
-          <Text fontWeight="bold">{currentUser?.firstName}</Text>
+          <Text fontWeight="bold">{currentUser?.getFullName()}</Text>
           <Text fontSize="sm" color="gray.500">
-            {currentUser?.roles[0]}
+            {currentUser?.isAdmin() ? "Administrator" : "Affiliate Agent"}
           </Text>
         </Box>
 
         {!currentUser ? (
-          <Image borderRadius="full" boxSize="40px" src={""} />
+          <Spinner />
         ) : (
           <Circle size="40px" bg="gray.200" mr={4}>
             <Icon as={FiUser} />

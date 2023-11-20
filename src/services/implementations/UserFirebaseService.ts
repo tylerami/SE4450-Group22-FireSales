@@ -41,6 +41,7 @@ export class UserFirebaseService implements UserService {
     return user;
   }
   async get(userId: string): Promise<User | null> {
+    console.log(`Getting user with id ${userId}`);
     const docRef = doc(this.usersCollection(), userId);
     const docSnap = await getDoc(docRef);
     if (!docSnap.exists()) {

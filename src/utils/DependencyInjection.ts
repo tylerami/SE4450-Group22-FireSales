@@ -24,14 +24,14 @@ import { UserService } from "services/interfaces/UserService";
 const USE_MOCKS = false;
 
 const mockDependencies: Record<string, any> = {
-  ClientService: new MockClientService(),
-  ConversionService: new MockConversionService(),
-  UserService: new MockUserService(),
-  CompensationGroupService: new MockCompensationGroupService(),
-  CustomerService: new MockCustomerService(),
-  PayoutService: new MockPayoutService(),
-  // Firebase image service already implemented
-  ImageService: new ImageFirebaseService(storage),
+  // ClientService: new MockClientService(),
+  // ConversionService: new MockConversionService(),
+  // UserService: new MockUserService(),
+  // CompensationGroupService: new MockCompensationGroupService(),
+  // CustomerService: new MockCustomerService(),
+  // PayoutService: new MockPayoutService(),
+  // // Firebase image service already implemented
+  // ImageService: new ImageFirebaseService(storage),
 };
 
 const dependencies: Record<string, any> = {
@@ -43,7 +43,7 @@ const dependencies: Record<string, any> = {
     firestore,
     new ImageFirebaseService(storage)
   ),
-  UserService: new MockUserService(), //new UserFirebaseService(firestore),
+  UserService: new UserFirebaseService(firestore),
   CompensationGroupService: new CompensationGroupFirebaseService(firestore),
   CustomerService: new CustomerFirebaseService(firestore),
   PayoutService: new PayoutFirebaseService(firestore),

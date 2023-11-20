@@ -15,7 +15,7 @@ import PerformancePage from "./performance/PerformancePage";
 import AdminSalesTeamPage from "./sales/AdminSalesTeamPage";
 import AdminClientsPage from "./clients/AdminClientsPage";
 import CompensationGroupsPage from "./compensation_groups/CompensationGroupsPage";
-import { Tab } from "@components/common/nav/Tab";
+import { Tab } from "components/common/nav/Tab";
 import AdminRecordConversionsPage from "./conversions/AdminRecordConversionsPage";
 
 const AdminDashboard = (props) => {

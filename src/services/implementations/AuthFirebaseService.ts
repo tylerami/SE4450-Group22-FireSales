@@ -11,6 +11,7 @@ import {
 } from "firebase/auth";
 import { UserService } from "services/interfaces/UserService";
 import { AuthService } from "services/interfaces/AuthService";
+import { DependencyInjection } from "utils/DependencyInjection";
 
 export class AuthFirebaseService implements AuthService {
   userService: UserService;
@@ -110,6 +111,9 @@ export class AuthFirebaseService implements AuthService {
         return;
       }
       let user: User | null = await this.userService.get(firebaseUser.uid);
+      if (user === null) {
+        user = await this.handleGoogleUserRegistration(firebaseUser);
+      }
       callback(user);
     });
   }
@@ -164,4 +168,6 @@ export class AuthFirebaseService implements AuthService {
   }
 }
 
-export const authService = new AuthFirebaseService(new MockUserService());
+const userService: UserService = DependencyInjection.userService();
+
+export const authService = new AuthFirebaseService(userService);

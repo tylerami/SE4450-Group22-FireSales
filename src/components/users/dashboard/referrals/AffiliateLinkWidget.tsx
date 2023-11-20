@@ -130,7 +130,7 @@ const AffiliateLinkWidget = () => {
 
   const currentRow = clientLinkGroupRows[pageIndex];
 
-  if (isLoading || !currentRow) {
+  if (isLoading) {
     return <Spinner />;
   }
 
@@ -148,41 +148,49 @@ const AffiliateLinkWidget = () => {
       flexDirection="column"
       boxShadow="3px 4px 12px rgba(0, 0, 0, 0.2)"
     >
-      <Flex gap={8} w="100%" alignItems={"center"}>
-        <Heading as="h1" fontSize="1.2em" fontWeight={700}>
-          My Referral Links:
+      {currentRow ? (
+        <React.Fragment>
+          <Flex gap={8} w="100%" alignItems={"center"}>
+            <Heading as="h1" fontSize="1.2em" fontWeight={700}>
+              My Referral Links:
+            </Heading>
+            <Spacer />
+            {clientLinkGroupRows.length > 1 && (
+              <React.Fragment>
+                <IconButton
+                  isDisabled={pageIndex === 0}
+                  onClick={prevPage}
+                  icon={<ChevronLeftIcon />}
+                  aria-label={""}
+                />
+                <Text>
+                  Page {pageIndex + 1} / {clientLinkGroupRows.length}
+                </Text>
+                <IconButton
+                  isDisabled={pageIndex === clientLinkGroupRows.length - 1}
+                  onClick={nextPage}
+                  icon={<ChevronRightIcon />}
+                  aria-label={""}
+                />
+              </React.Fragment>
+            )}
+          </Flex>
+          <Flex w="100%" gap={8} justifyContent="space-evenly">
+            {currentRow.map((group, j) => (
+              <AffiliateLinksContainer
+                client={group.client}
+                affiliateLinks={group.affiliateLinks}
+                key={j}
+              />
+            ))}
+          </Flex>{" "}
+        </React.Fragment>
+      ) : (
+        <Heading size="sm">
+          You're account have not been activated yet. Check back in 1-2 business
+          days!
         </Heading>
-        <Spacer />
-        {clientLinkGroupRows.length > 1 && (
-          <React.Fragment>
-            <IconButton
-              isDisabled={pageIndex === 0}
-              onClick={prevPage}
-              icon={<ChevronLeftIcon />}
-              aria-label={""}
-            />
-            <Text>
-              Page {pageIndex + 1} / {clientLinkGroupRows.length}
-            </Text>
-            <IconButton
-              isDisabled={pageIndex === clientLinkGroupRows.length - 1}
-              onClick={nextPage}
-              icon={<ChevronRightIcon />}
-              aria-label={""}
-            />
-          </React.Fragment>
-        )}
-      </Flex>
-
-      <Flex w="100%" gap={8} justifyContent="space-evenly">
-        {currentRow.map((group, j) => (
-          <AffiliateLinksContainer
-            client={group.client}
-            affiliateLinks={group.affiliateLinks}
-            key={j}
-          />
-        ))}
-      </Flex>
+      )}
     </Flex>
   );
 };

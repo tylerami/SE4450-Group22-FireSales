@@ -11,6 +11,7 @@ import { ConversionService } from "services/interfaces/ConversionService";
 import { DependencyInjection } from "utils/DependencyInjection";
 import { RiSubtractLine } from "react-icons/ri";
 import useSuccessNotification from "components/utils/SuccessNotification";
+import { error } from "console";
 
 // Since the Props type is empty, we can omit it and also the props parameter
 const ManualRecordConversionsWidgetContent = ({
@@ -31,13 +32,45 @@ const ManualRecordConversionsWidgetContent = ({
     Record<number, string | undefined>
   >({});
 
+  const [conversionValidity, setConversionValidity] = useState<
+    Record<number, boolean>
+  >({});
+
   const [loading, setLoading] = useState<boolean>(false);
 
-  function resetErrors() {
-    setErrorsByRow({});
+  function errorsPresent() {
+    return Object.values(errorsByRow).some((error) => error !== undefined);
+  }
+
+  function allConversionsValid() {
+    console.log(conversionValidity);
+    return (
+      Object.values(conversionValidity).every((valid) => valid ?? true) &&
+      !errorsPresent()
+    );
+  }
+
+  function setConversionValid(rowNumber: number, valid: boolean) {
+    setConversionValidity((currentValid) => {
+      return {
+        ...currentValid,
+        [rowNumber]: valid,
+      };
+    });
   }
 
   const showSuccess = useSuccessNotification();
+
+  const reset = () => {
+    console.log("resetting");
+    setRowCount(0);
+    setConversions({});
+    setErrorsByRow({});
+    setConversionValidity({});
+    setTimeout(() => {
+      setRowCount(1);
+    }, 100);
+  };
 
   function setRowError(rowNumber: number, error: string | null | undefined) {
     if (error === null) {
@@ -57,6 +90,11 @@ const ManualRecordConversionsWidgetContent = ({
 
   const deleteRow = useCallback(() => {
     setRowError(rowCount - 1, undefined);
+    setConversionValidity((currentValidity) => {
+      const newValidity = { ...currentValidity };
+      delete newValidity[rowCount - 1];
+      return newValidity;
+    });
     setRowCount((currentRowCount) => currentRowCount - 1);
   }, [rowCount]);
 
@@ -78,22 +116,42 @@ const ManualRecordConversionsWidgetContent = ({
     []
   );
 
-  async function recordConversions() {
-    if (loading) return;
-
-    resetErrors();
+  const checkConversionErrors = (): boolean => {
     let foundError = false;
+
+    if (!allConversionsValid()) {
+      foundError = true;
+    }
+
+    for (const [row, isValid] of Object.entries(conversionValidity)) {
+      if (!isValid) {
+        setRowError(Number(row), "Please fill out all fields");
+        foundError = true;
+      }
+    }
+
     for (let i = 0; i < rowCount; i++) {
       if (!conversions[i]) {
         setRowError(i, "Please fill out all fields");
         foundError = true;
+      } else {
+        setRowError(i, undefined);
       }
     }
-    if (foundError) {
-      console.log(errorsByRow);
+
+    if (!foundError) {
+      setErrorsByRow({});
+      setConversionValidity({});
+    }
+
+    return !foundError;
+  };
+
+  async function recordConversions() {
+    if (loading) return;
+
+    if (!checkConversionErrors()) {
       return;
-    } else {
-      console.log("no conversion  errors");
     }
 
     const conversionAttachmentGroups: ConversionAttachmentGroup[] =
@@ -105,6 +163,13 @@ const ManualRecordConversionsWidgetContent = ({
     const result = await conversionService.createBulk(
       conversionAttachmentGroups
     );
+    console.log("result", result);
+    if (result) {
+      showSuccess({
+        message: `Successfully recorded ${result.length} conversions`,
+      });
+      reset();
+    }
     setLoading(false);
   }
 
@@ -116,8 +181,8 @@ const ManualRecordConversionsWidgetContent = ({
         errorText={errorsByRow[i]}
         rowIndex={i + 1}
         setConversionGroup={(conversion) => setConversion(i, conversion)}
-        deleteRow={deleteRow}
         key={i}
+        setIsValid={(bool) => setConversionValid(i, bool)}
       />
     </Box>
   ));
@@ -147,7 +212,7 @@ const ManualRecordConversionsWidgetContent = ({
         colorScheme="orange"
         onClick={recordConversions}
       >
-        Record Conversions
+        {"Record Conversions"}
       </Button>
     </React.Fragment>
   );

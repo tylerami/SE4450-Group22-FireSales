@@ -1,24 +1,9 @@
 import React, { useState, useEffect, useContext } from "react";
-import {
-  Button,
-  Flex,
-  Heading,
-  IconButton,
-  Table,
-  Tbody,
-  Td,
-  Th,
-  Thead,
-  Tr,
-} from "@chakra-ui/react";
+import { Flex } from "@chakra-ui/react";
 import { Conversion } from "models/Conversion";
 import { ConversionService } from "services/interfaces/ConversionService";
 import { DependencyInjection } from "utils/DependencyInjection";
 import { UserContext } from "components/auth/UserProvider";
-import { CloseIcon } from "@chakra-ui/icons";
-import ImageComponent from "components/utils/ImageComponent";
-import ConversionMessageWidget from "components/common/conversions/ConversionMessagesWidget";
-import { formatDateString } from "utils/Date";
 import { sampleConversions } from "__mocks__/models/Conversion.mock";
 import SelectedConversionContent from "./SelectedConversionContent";
 import ConversionBrowserContent from "./ConversionBrowserContent";

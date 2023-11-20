@@ -9,16 +9,16 @@ export function customerIdFromName(fullName: string) {
 export class Customer {
   id: string;
   fullName: string;
-  email?: string;
+  email: string | null;
 
   constructor({
     fullName,
     id = generateUserID(),
-    email,
+    email = null,
   }: {
     id?: string;
     fullName: string;
-    email?: string;
+    email?: string | null;
   }) {
     this.id = id;
     this.fullName = fullName;

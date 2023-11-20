@@ -1,5 +1,5 @@
-import React from "react";
-import { Box, Flex, Spinner } from "@chakra-ui/react";
+import React, { useContext } from "react";
+import { Box, Flex, Heading, Spinner } from "@chakra-ui/react";
 import TopNavBar from "../common/nav/TopNavBar";
 import UserDashboardPage from "./dashboard/UserDashboardPage";
 import { useGlobalState } from "../utils/GlobalState";
@@ -13,6 +13,7 @@ import { Tab } from "components/common/nav/Tab";
 import SideNavBar from "components/common/nav/SideNavBar";
 import { auth } from "config/firebase";
 import { useNavigate } from "react-router-dom";
+import { UserContext } from "components/auth/UserProvider";
 
 type Props = {};
 
@@ -20,6 +21,8 @@ const UserDashboard = (props: Props) => {
   const sideNavWidth = "14em"; // or 224px, or any other unit
 
   const { activeTabIndex, setActiveTabIndex } = useGlobalState();
+
+  const { currentUser } = useContext(UserContext);
 
   const navigate = useNavigate();
 
@@ -85,15 +88,30 @@ const UserDashboard = (props: Props) => {
         </Box>
 
         {/* Main page content */}
-        <Flex
-          direction="column"
-          alignItems={"center"}
-          overflowY="auto" // Scrollable vertically if content overflows
-          overflowX={"hidden"}
-          flex="1"
-        >
-          {userTabs[activeTabIndex].content}
-        </Flex>
+        {currentUser ? (
+          <Flex
+            direction="column"
+            alignItems={"center"}
+            overflowY="auto" // Scrollable vertically if content overflows
+            overflowX={"hidden"}
+            flex="1"
+          >
+            {userTabs[activeTabIndex].content}
+          </Flex>
+        ) : (
+          <Flex
+            w="100%"
+            alignItems={"center"}
+            justifyContent={"center"}
+            direction={"column"}
+            gap={6}
+            h="100%"
+          >
+            <Heading>Loading Account...</Heading>
+
+            <Spinner size="xl" />
+          </Flex>
+        )}
       </Flex>
     </Flex>
   );
