@@ -35,9 +35,9 @@ export class AuthFirebaseService implements AuthService {
       return null;
     }
 
-    const user = await this.userService.get(firebaseUser.uid);
+    let user = await this.userService.get(firebaseUser.uid);
     if (!user) {
-      return this.handleHotTakesUserRegistration(firebaseUser);
+      user = await this.handleHotTakesUserRegistration(firebaseUser);
     }
     return null;
   }
@@ -112,6 +112,7 @@ export class AuthFirebaseService implements AuthService {
       }
       let user: User | null = await this.userService.get(firebaseUser.uid);
       if (user === null) {
+        console.log("User not found, registering new user");
         user = await this.handleGoogleUserRegistration(firebaseUser);
       }
       callback(user);
@@ -138,7 +139,7 @@ export class AuthFirebaseService implements AuthService {
       email: firebaseUser.email,
     });
 
-    return newUser;
+    return await this.userService.create(newUser);
   }
 
   private async handleHotTakesUserRegistration(

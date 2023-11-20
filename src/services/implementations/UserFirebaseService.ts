@@ -3,6 +3,7 @@ import { UserService } from "services/interfaces/UserService";
 
 import {
   CollectionReference,
+  DocumentData,
   Firestore,
   collection,
   doc,
@@ -36,6 +37,7 @@ export class UserFirebaseService implements UserService {
     };
   }
   async create(user: User): Promise<User> {
+    console.log("creating user, ", user);
     const docRef = doc(this.usersCollection(), user.uid);
     await setDoc(docRef, user.toFirestoreDoc());
     return user;
@@ -47,6 +49,7 @@ export class UserFirebaseService implements UserService {
     if (!docSnap.exists()) {
       return null;
     }
+    console.log(`Found user with id ${userId}`);
     return User.fromFirestoreDoc(docSnap.data());
   }
   async update(user: User): Promise<User> {
@@ -62,14 +65,14 @@ export class UserFirebaseService implements UserService {
     } = { includeAdmins: false }
   ): Promise<User[]> {
     let userQuery = query(this.usersCollection());
-    if (!includeAdmins) {
-      // roles array must contain admin
-      userQuery = query(userQuery, where("roles", "array-contains", "admin"));
-    }
     const userQuerySnapshot = await getDocs(userQuery);
-    return userQuerySnapshot.docs.map((doc) =>
+    let users = userQuerySnapshot.docs.map((doc) =>
       User.fromFirestoreDoc(doc.data())
     );
+    if (!includeAdmins) {
+      users = users.filter((user) => !user.isAdmin());
+    }
+    return users;
   }
 
   private hotTakesAccountsCollection(): CollectionReference {

@@ -1,51 +1,32 @@
 import React, { useState } from "react";
 import {
-  Table,
-  Thead,
-  Tbody,
-  Tr,
-  Th,
-  Td,
-  Image,
   Box,
   Text,
-  Circle,
   Flex,
   Heading,
   InputGroup,
   InputLeftElement,
   Input,
   Spacer,
-  useBreakpointValue,
-  MenuList,
-  MenuItem,
-  Menu,
-  MenuButton,
-  Button,
+  Switch,
 } from "@chakra-ui/react";
-import { FiSearch, FiUser } from "react-icons/fi";
+import { FiSearch } from "react-icons/fi";
 import { Icon, IconButton } from "@chakra-ui/react";
 import { ChevronLeftIcon, ChevronRightIcon } from "@chakra-ui/icons";
 import { User } from "../../../../models/User";
 import {
   Conversion,
-  averageBetSize,
   averageCommission,
   filterConversionsByTimeframe,
   totalCommission,
   totalGrossProfit,
 } from "models/Conversion";
 import { Payout } from "models/Payout";
-import {
-  Timeframe,
-  getIntervalStart,
-  getTimeframeLabel,
-} from "models/enums/Timeframe";
+import { Timeframe, getTimeframeLabel } from "models/enums/Timeframe";
 import { Client } from "models/Client";
 import { ReferralLinkType } from "models/enums/ReferralLinkType";
 import { CompensationGroup } from "models/CompensationGroup";
 import Filter, { FilterDefinition } from "components/utils/Filter";
-import { formatMoney } from "utils/Money";
 import { ConversionStatus } from "models/enums/ConversionStatus";
 import SalesTeamListTable from "./SalesTeamListTable";
 
@@ -86,6 +67,11 @@ const SalesTeamListWidget = ({
 
   const [compGroupFilter, setCompGroupFilter] =
     useState<CompensationGroup | null>(null);
+
+  const [showUnassignedUsers, setShowUnassignedUsers] = useState<boolean>(true);
+  const toggleUnassignedUsers = () => {
+    setShowUnassignedUsers((prev) => !prev);
+  };
 
   // Sorting
   const [sortBy, setSortBy] = useState<SortBy>(SortBy.UnverifiedConversions);
@@ -159,7 +145,38 @@ const SalesTeamListWidget = ({
         });
         break;
       case SortBy.UnverifiedConversions:
+        filteredUsers.sort((a, b) => {
+          const aUnverifiedConversions = getUserConversions(a.uid).filter(
+            (conv) => conv.status === ConversionStatus.pending
+          );
+          const bUnverifiedConversions = getUserConversions(b.uid).filter(
+            (conv) => conv.status === ConversionStatus.pending
+          );
+          return (
+            (sortDirection === SortDirection.Ascending ? 1 : -1) *
+            (aUnverifiedConversions.length - bUnverifiedConversions.length)
+          );
+        });
         break;
+    }
+
+    // bring all users without a compensationGroupId to the top. order remains untouched otherwise
+    if (showUnassignedUsers) {
+      filteredUsers.sort((a, b) => {
+        if (a.compensationGroupId === null && b.compensationGroupId === null) {
+          return 0;
+        } else if (a.compensationGroupId === null) {
+          return -1;
+        } else if (b.compensationGroupId === null) {
+          return 1;
+        } else {
+          return 0;
+        }
+      });
+    } else {
+      filteredUsers = filteredUsers.filter(
+        (user) => user.compensationGroupId !== null
+      );
     }
 
     if (userSearch.trim() !== "") {
@@ -309,6 +326,13 @@ const SalesTeamListWidget = ({
             {filterDropdowns.map((filter, i) => (
               <Filter key={i} filter={filter} />
             ))}
+            <Heading minW="4em" size="xs" fontWeight={400}>
+              Unassigned Users:
+            </Heading>
+            <Switch
+              isChecked={showUnassignedUsers}
+              onChange={toggleUnassignedUsers}
+            />
           </Flex>
           <Flex
             gap={4}

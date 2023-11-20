@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Table,
   Thead,
@@ -6,42 +6,16 @@ import {
   Tr,
   Th,
   Td,
-  Image,
-  Box,
   Text,
-  Circle,
   Flex,
   Heading,
-  InputGroup,
-  InputLeftElement,
-  Input,
   Spacer,
   useBreakpointValue,
-  MenuList,
-  MenuItem,
-  Menu,
-  MenuButton,
-  Button,
-  Spinner,
 } from "@chakra-ui/react";
-import { FiSearch, FiUser } from "react-icons/fi";
-import { Icon, IconButton } from "@chakra-ui/react";
+import { IconButton } from "@chakra-ui/react";
 import { ChevronLeftIcon, ChevronRightIcon } from "@chakra-ui/icons";
-import { User } from "../../../../models/User";
-import {
-  Conversion,
-  averageBetSize,
-  averageCommission,
-  filterConversionsByTimeframe,
-  totalCommission,
-  totalGrossProfit,
-} from "models/Conversion";
-import { Payout } from "models/Payout";
-import {
-  Timeframe,
-  getIntervalStart,
-  getTimeframeLabel,
-} from "models/enums/Timeframe";
+import { Conversion, filterConversionsByTimeframe } from "models/Conversion";
+import { Timeframe, getTimeframeLabel } from "models/enums/Timeframe";
 import { Client } from "models/Client";
 import {
   ReferralLinkType,
@@ -55,6 +29,8 @@ import {
   getConversionStatusLabel,
 } from "models/enums/ConversionStatus";
 import { formatDateString } from "utils/Date";
+import { CompensationGroupService } from "services/interfaces/CompensationGroupService";
+import { DependencyInjection } from "@utils/DependencyInjection";
 
 type Props = {
   conversions: Conversion[];
@@ -303,10 +279,6 @@ const AdminConversionBrowserContent = ({
     pageIndex * pageLength,
     (pageIndex + 1) * pageLength
   );
-
-  if (!compGroup) {
-    return <Spinner />;
-  }
 
   return (
     <React.Fragment>

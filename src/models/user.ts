@@ -4,37 +4,37 @@ import { Timestamp, DocumentData } from "firebase/firestore";
 
 export class User {
   uid: string;
-  profilePictureSrc?: string;
+  profilePictureSrc: string | null;
   firstName: string;
   lastName: string;
   email: string;
   roles: Role[];
-  phone?: string;
+  phone: string | null;
   registeredAt: Date;
-  compensationGroupId?: string;
+  compensationGroupId: string | null;
   payoutPreferrences?: PayoutPreferrences;
 
   constructor({
     uid,
-    profilePictureSrc,
+    profilePictureSrc = null,
     firstName,
     lastName,
     email,
-    phone,
+    phone = null,
     roles = [Role.salesperson],
     registeredAt,
-    compensationGroupId,
+    compensationGroupId = null,
     payoutPreferrences,
   }: {
     uid: string;
-    profilePictureSrc?: string;
+    profilePictureSrc?: string | null;
     firstName: string;
     lastName: string;
     email: string;
-    phone?: string;
+    phone?: string | null;
     roles: Role[];
     registeredAt: Date;
-    compensationGroupId?: string;
+    compensationGroupId?: string | null;
     payoutPreferrences?: PayoutPreferrences;
   }) {
     this.uid = uid;
@@ -81,7 +81,7 @@ export class User {
 
   public getFullName = () => `${this.firstName} ${this.lastName}`;
 
-  public toFirestoreDoc(): DocumentData {
+  public toFirestoreDoc = (): DocumentData => {
     return {
       uid: this.uid,
       profilePictureSrc: this.profilePictureSrc,
@@ -95,9 +95,9 @@ export class User {
       compensationGroupId: this.compensationGroupId,
       payoutPreferrences: this.payoutPreferrences?.toFirestoreDoc() ?? null,
     };
-  }
+  };
 
-  public static fromFirestoreDoc(doc: DocumentData): User {
+  public static fromFirestoreDoc = (doc: DocumentData): User => {
     return new User({
       uid: doc.uid,
       profilePictureSrc: doc.profilePictureSrc,
@@ -111,5 +111,5 @@ export class User {
         ? PayoutPreferrences.fromFirestoreDoc(doc.payoutPreferrences)
         : undefined,
     });
-  }
+  };
 }

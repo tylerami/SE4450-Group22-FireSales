@@ -26,6 +26,7 @@ import { CompensationGroupService } from "services/interfaces/CompensationGroupS
 import { CompensationGroup } from "@models/CompensationGroup";
 import { ClientService } from "services/interfaces/ClientService";
 import { Client } from "models/Client";
+import { UserService } from "services/interfaces/UserService";
 
 type Props = {
   conversions: Conversion[];

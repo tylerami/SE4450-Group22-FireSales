@@ -122,7 +122,7 @@ const SalesTeamListTable = ({
     },
     {
       header: "Sales Group",
-      getValue: (uid) => getUser(uid).compensationGroupId ?? "N/A",
+      getValue: (uid) => getUser(uid).compensationGroupId ?? "UNASSIGNED",
     },
     ...(useBreakpointValue({ base: false, "2xl": true })
       ? [
