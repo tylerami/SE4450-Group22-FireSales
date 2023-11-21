@@ -106,6 +106,7 @@ const AdminConversionBrowserContent = ({
     BetSize = "Bet Size",
     Commission = "Commission",
     CPA = "CPA",
+    CustomerName = "Customer Name",
   }
 
   enum SortDirection {
@@ -232,9 +233,13 @@ const AdminConversionBrowserContent = ({
         break;
       case SortBy.CPA:
         if (sortDirection === SortDirection.Descending) {
-          filteredConversions.sort((a, b) => b.affiliateLink.cpa - a.amount);
+          filteredConversions.sort(
+            (a, b) => b.affiliateLink.cpa - a.affiliateLink.cpa
+          );
         } else {
-          filteredConversions.sort((a, b) => a.affiliateLink.cpa - b.amount);
+          filteredConversions.sort(
+            (a, b) => a.affiliateLink.cpa - b.affiliateLink.cpa
+          );
         }
         break;
       case SortBy.Date:
@@ -245,6 +250,17 @@ const AdminConversionBrowserContent = ({
         } else {
           filteredConversions.sort(
             (a, b) => a.dateOccurred.getTime() - b.dateOccurred.getTime()
+          );
+        }
+        break;
+      case SortBy.CustomerName:
+        if (sortDirection === SortDirection.Descending) {
+          filteredConversions.sort((a, b) =>
+            a.customer.fullName.localeCompare(b.customer.fullName)
+          );
+        } else {
+          filteredConversions.sort((a, b) =>
+            b.customer.fullName.localeCompare(a.customer.fullName)
           );
         }
         break;

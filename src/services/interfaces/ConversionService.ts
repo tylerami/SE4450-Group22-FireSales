@@ -49,4 +49,6 @@ export interface ConversionService {
     assignmentCode: string;
     userId: string;
   }): Promise<Conversion[]>;
+
+  isAssignmentCodeValid(code: string): Promise<boolean>;
 }

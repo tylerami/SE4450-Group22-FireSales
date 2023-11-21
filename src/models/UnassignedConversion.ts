@@ -1,6 +1,6 @@
 import { formatDateString } from "./utils/Date";
 import { AffiliateLink } from "./AffiliateLink";
-import { Conversion } from "./Conversion";
+import { Conversion, getConversionId } from "./Conversion";
 import { Customer } from "./Customer";
 import { Message } from "./Message";
 import { ConversionStatus } from "./enums/ConversionStatus";
@@ -175,12 +175,9 @@ export function assignConversionsToUser({
   unassignedConversions: UnassignedConversion[];
   userId: string;
 }) {
-  return unassignedConversions.map((conv) => {
-    return new Conversion({
-      userId,
-      ...conv,
-    });
-  });
+  return unassignedConversions.map((conv) =>
+    Conversion.fromUnassignedConversion(conv, userId)
+  );
 }
 
 export function getUnassignedConversionId({

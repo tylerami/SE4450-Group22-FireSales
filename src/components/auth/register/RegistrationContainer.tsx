@@ -19,8 +19,12 @@ import { FcGoogle } from "react-icons/fc";
 import { authService } from "services/implementations/AuthFirebaseService";
 import { useGlobalState } from "components/utils/GlobalState";
 import { ConversionService } from "services/interfaces/ConversionService";
-import { DependencyInjection } from "@models/utils/DependencyInjection";
+import { DependencyInjection } from "models/utils/DependencyInjection";
 import { UserContext } from "../UserProvider";
+import { User } from "@models/User";
+import { UserService } from "services/interfaces/UserService";
+
+const COMP_GROUP_ID_FOR_ASSIGNED_USERS = "newbies-A";
 
 const RegistrationContainer = ({ goToLogin = () => {} }) => {
   const navigate = useNavigate();
@@ -40,17 +44,26 @@ const RegistrationContainer = ({ goToLogin = () => {} }) => {
   const conversionService: ConversionService =
     DependencyInjection.conversionService();
 
+  const userService: UserService = DependencyInjection.userService();
+
   const { setActiveTabIndex } = useGlobalState();
 
   const { setCurrentUser } = useContext(UserContext);
 
   // implement auth service here
   const signInWithGoogle = async () => {
+    if (
+      registrationCode.trim() !== "" &&
+      !conversionService.isAssignmentCodeValid(registrationCode.trim())
+    ) {
+      setErrorMessage("Invalid registration code.");
+      return;
+    }
+
     setDisabled(true);
     let user;
     try {
       user = await authService.signInWithGoogle();
-      setCurrentUser(user);
     } catch (e: any) {
       setErrorMessage(e.message);
       setDisabled(false);
@@ -58,8 +71,12 @@ const RegistrationContainer = ({ goToLogin = () => {} }) => {
     }
 
     if (user) {
+      setCurrentUser(user);
       navigate("/");
       setActiveTabIndex(0);
+      if (registrationCode.trim() !== "") {
+        await handleRegistrationCodeUsed(user);
+      }
     } else {
       setErrorMessage("Error signing in with Google");
     }
@@ -110,6 +127,14 @@ const RegistrationContainer = ({ goToLogin = () => {} }) => {
   const register = async () => {
     if (!validateRegistration()) return;
 
+    if (
+      registrationCode.trim() !== "" &&
+      !conversionService.isAssignmentCodeValid(registrationCode.trim())
+    ) {
+      setErrorMessage("Invalid registration code.");
+      return;
+    }
+
     setDisabled(true);
     let user;
     try {
@@ -119,26 +144,34 @@ const RegistrationContainer = ({ goToLogin = () => {} }) => {
         firstName,
         lastName,
       });
-      setCurrentUser(user);
     } catch (e: any) {
       setErrorMessage(e.message);
       setDisabled(false);
       return;
     }
     if (user) {
+      setCurrentUser(user);
       navigate("/");
       setActiveTabIndex(0);
       if (registrationCode.trim() !== "") {
-        conversionService.assignConversionsWithCode({
-          assignmentCode: registrationCode,
-          userId: user.uid,
-        });
+        await handleRegistrationCodeUsed(user);
       }
     } else {
       setErrorMessage("Error occurred during registration.");
     }
 
     setDisabled(false);
+  };
+
+  const handleRegistrationCodeUsed = async (user: User) => {
+    await userService.update({
+      ...user,
+      compensationGroupId: COMP_GROUP_ID_FOR_ASSIGNED_USERS,
+    });
+    return await conversionService.assignConversionsWithCode({
+      assignmentCode: registrationCode.trim(),
+      userId: user.uid,
+    });
   };
 
   const handleShowPassword = () => {

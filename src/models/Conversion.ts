@@ -11,6 +11,7 @@ import {
   getIntervalStart,
 } from "./enums/Timeframe";
 import { Timestamp, DocumentData } from "firebase/firestore";
+import { UnassignedConversion } from "./UnassignedConversion";
 
 export type ConversionAttachmentGroup = {
   conversion: Conversion;
@@ -111,6 +112,22 @@ export class Conversion {
       amount,
       attachmentUrls,
       currency,
+    });
+  }
+
+  public static fromUnassignedConversion(
+    unassignedConversion: UnassignedConversion,
+    userId: string
+  ): Conversion {
+    return new Conversion({
+      ...unassignedConversion,
+      userId,
+      id: getConversionId({
+        dateOccurred: unassignedConversion.dateOccurred,
+        clientId: unassignedConversion.affiliateLink.clientId,
+        customerId: unassignedConversion.customer.id,
+        userId,
+      }),
     });
   }
 

@@ -9,6 +9,7 @@ import {
   Firestore,
   collection,
   doc,
+  getDoc,
   getDocs,
   query,
   setDoc,
@@ -169,6 +170,17 @@ export class ConversionFirebaseService implements ConversionService {
     const batch = writeBatch(this.db);
     const conversions: UnassignedConversion[] = [];
 
+    // establish assignment codes
+    const assignmentCodes: string[] = Array.from(
+      new Set(items.map((item) => item.conversion.assignmentCode))
+    );
+
+    for (const assignmentCode of assignmentCodes) {
+      await this.setAssignmentCodeStatus(assignmentCode, false);
+    }
+
+    // create unassigned conversions
+
     for (const { conversion, attachments } of items) {
       const docRef = doc(this.unassignedConversionsCollection(), conversion.id);
 
@@ -194,6 +206,13 @@ export class ConversionFirebaseService implements ConversionService {
     await batch.commit();
     return conversions;
   }
+
+  async isAssignmentCodeValid(code: string): Promise<boolean> {
+    const docRef = doc(this.assignmentCodesCollection(), code);
+    const docSnapshot = await getDoc(docRef);
+    const docData = docSnapshot.data();
+    return docData?.used === false;
+  }
   async assignConversionsWithCode({
     assignmentCode,
     userId,
@@ -205,6 +224,8 @@ export class ConversionFirebaseService implements ConversionService {
       this.unassignedConversionsCollection(),
       where("assignmentCode", "==", assignmentCode)
     );
+
+    await this.setAssignmentCodeStatus(assignmentCode, true);
 
     const querySnapshot = await getDocs(queryRef);
     const unassignedConversions: UnassignedConversion[] =
@@ -227,6 +248,18 @@ export class ConversionFirebaseService implements ConversionService {
     await batch.commit();
 
     return conversions;
+  }
+
+  private setAssignmentCodeStatus(
+    assignmentCode: string,
+    status: boolean
+  ): Promise<void> {
+    const docRef = doc(this.assignmentCodesCollection(), assignmentCode);
+    return setDoc(docRef, { id: assignmentCode, used: status });
+  }
+
+  private assignmentCodesCollection(): CollectionReference {
+    return collection(this.db, "conversionAssignmentCodes");
   }
 
   private conversionsCollection(): CollectionReference {

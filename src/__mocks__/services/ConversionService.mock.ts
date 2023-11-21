@@ -4,6 +4,9 @@ import { sampleConversions } from "__mocks__/models/Conversion.mock";
 import { ConversionService } from "services/interfaces/ConversionService";
 
 export class MockConversionService implements ConversionService {
+  isAssignmentCodeValid(code: string): Promise<boolean> {
+    throw new Error("Method not implemented.");
+  }
   async create(
     conversion: Conversion,
     { attachments }: { attachments?: File[] | undefined }
