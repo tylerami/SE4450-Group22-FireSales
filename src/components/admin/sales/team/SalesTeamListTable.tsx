@@ -49,18 +49,16 @@ import { formatMoney } from "utils/Money";
 import { ConversionStatus } from "models/enums/ConversionStatus";
 
 type Props = {
-  conversions: Conversion[];
+  filteredConversions: Conversion[];
   currentPageUsers: User[];
-  payouts: Payout[];
-  timeframeFilter: Timeframe;
+  filteredPayouts: Payout[];
   selectUser: (user: User) => void;
 };
 
 const SalesTeamListTable = ({
-  conversions,
+  filteredConversions,
   currentPageUsers,
-  payouts,
-  timeframeFilter,
+  filteredPayouts,
   selectUser,
 }: Props) => {
   const getUser = (uid: string): User => {
@@ -72,17 +70,10 @@ const SalesTeamListTable = ({
   };
 
   const getUserConversions = (uid: string): Conversion[] => {
-    return conversions.filter((conv) => conv.userId === uid);
+    return filteredConversions.filter((conv) => conv.userId === uid);
   };
 
   const getAccountBalance = (uid: string): number => {
-    const filteredPayouts: Payout[] = payouts.filter(
-      (payout) =>
-        payout.userId === uid &&
-        payout.dateOccurred.getTime() >
-          getIntervalStart(timeframeFilter).getTime()
-    );
-
     const totalPayout = filteredPayouts.reduce(
       (total, payout) => total + payout.amount,
       0

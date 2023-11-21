@@ -11,7 +11,7 @@ import {
   Spacer,
   Box,
 } from "@chakra-ui/react";
-import React from "react";
+import React, { useState } from "react";
 
 import { Button } from "@chakra-ui/react";
 import { Client } from "models/Client";
@@ -21,16 +21,40 @@ import { AffiliateDeal } from "@models/AffiliateDeal";
 import ImageComponent from "components/utils/ImageComponent";
 import { CompensationGroup } from "@models/CompensationGroup";
 import { AffiliateLink } from "@models/AffiliateLink";
+import { User } from "@models/User";
+import { Conversion } from "@models/Conversion";
+import { Timeframe, getTimeframeLabel } from "models/enums/Timeframe";
+import { FilterDefinition } from "@components/utils/Filter";
+import CompGroupAffiliateDealsTable from "./CompGroupAffiliateDealsTable";
 
 type Props = {
   compGroup: CompensationGroup;
   selectCompGroup: (compGroup: CompensationGroup) => void;
+  users: User[];
+  conversions: Conversion[];
 };
 
 const CompensationGroupDetailsTile = ({
   compGroup,
   selectCompGroup,
+  users,
+  conversions,
 }: Props) => {
+  const timeframes: Timeframe[] = Object.values(Timeframe).filter(
+    (value): value is Timeframe => typeof value === "number"
+  );
+
+  const [timeframe, setSelectedTimeframe] = useState<Timeframe>(
+    Timeframe.lastMonth
+  );
+
+  const timeframeFilter: FilterDefinition<Timeframe> = {
+    options: timeframes,
+    onChange: (value) => setSelectedTimeframe(value as Timeframe),
+    value: timeframe,
+    label: (value) => getTimeframeLabel(value as Timeframe),
+  };
+
   return (
     <Flex
       borderRadius={"12px"}
@@ -55,70 +79,10 @@ const CompensationGroupDetailsTile = ({
       </Flex>
       <Heading size="xs">Affiliate Links</Heading>
 
-      <AffiliateDealTable
+      <CompGroupAffiliateDealsTable
         affiliateLinks={Object.values(compGroup.affiliateLinks)}
       />
     </Flex>
-  );
-};
-
-const AffiliateDealTable = ({
-  affiliateLinks,
-}: {
-  affiliateLinks: AffiliateLink[];
-}) => {
-  const tableColumns: {
-    label: string;
-    getValue: (link: AffiliateLink) => string;
-  }[] = [
-    {
-      label: "Sportsbook / Type",
-      getValue: (link) =>
-        `${link.clientName} - ${getReferralLinkTypeLabel(link.type)}`,
-    },
-    {
-      label: "Commission",
-      getValue: (link) => formatMoney(link.commission),
-    },
-    {
-      label: "Min Bet Size",
-      getValue: (link) => formatMoney(link.minBetSize),
-    },
-    {
-      label: "CPA",
-      getValue: (link) => formatMoney(link.cpa),
-    },
-    {
-      label: "Enabled",
-      getValue: (link) => (link.enabled ? "Yes" : "No"),
-    },
-  ];
-
-  affiliateLinks.sort((a, b) => a.clientName.localeCompare(b.clientName));
-
-  return (
-    <Table size="sm" variant="simple" alignSelf={"center"} width={"100%"}>
-      <Thead>
-        <Tr>
-          {tableColumns.map((column, index) => (
-            <Th key={index} textAlign="center">
-              {column.label}
-            </Th>
-          ))}
-        </Tr>
-      </Thead>
-      <Tbody>
-        {affiliateLinks.map((link: AffiliateLink, i: number) => (
-          <Tr key={i}>
-            {tableColumns.map((column, i) => (
-              <Td key={i} textAlign={"center"}>
-                {column.getValue(link)}
-              </Td>
-            ))}
-          </Tr>
-        ))}
-      </Tbody>
-    </Table>
   );
 };
 

@@ -22,13 +22,18 @@ import {
   totalGrossProfit,
 } from "models/Conversion";
 import { Payout } from "models/Payout";
-import { Timeframe, getTimeframeLabel } from "models/enums/Timeframe";
+import {
+  Timeframe,
+  getIntervalStart,
+  getTimeframeLabel,
+} from "models/enums/Timeframe";
 import { Client } from "models/Client";
 import { ReferralLinkType } from "models/enums/ReferralLinkType";
 import { CompensationGroup } from "models/CompensationGroup";
 import Filter, { FilterDefinition } from "components/utils/Filter";
 import { ConversionStatus } from "models/enums/ConversionStatus";
 import SalesTeamListTable from "./SalesTeamListTable";
+import SalesTeamTotalsTable from "./SalesTeamTotalsTable";
 
 enum SortBy {
   Conversions = "Conversions",
@@ -188,6 +193,14 @@ const SalesTeamListWidget = ({
     }
 
     return filteredUsers;
+  };
+
+  const getFilteredPayouts = (): Payout[] => {
+    return payouts.filter(
+      (payout) =>
+        payout.dateOccurred.getTime() >
+        getIntervalStart(timeframeFilter).getTime()
+    );
   };
 
   const getUserConversions = (uid: string): Conversion[] => {
@@ -353,11 +366,26 @@ const SalesTeamListWidget = ({
       <Box h={10}></Box>
       <SalesTeamListTable
         currentPageUsers={currentPageUsers}
-        conversions={getFilteredConversions()}
+        filteredConversions={getFilteredConversions()}
         selectUser={setSelectedUser}
-        payouts={payouts}
-        timeframeFilter={timeframeFilter}
+        filteredPayouts={getFilteredPayouts()}
       />
+
+      {filteredUsers.length > 0 ? (
+        <React.Fragment>
+          <Heading mt={4} minW="30%" as="h1" size="sm" fontWeight={700}>
+            Totals
+          </Heading>
+          <SalesTeamTotalsTable
+            filteredConversions={getFilteredConversions()}
+            filteredPayouts={getFilteredPayouts()}
+          />
+        </React.Fragment>
+      ) : (
+        <Text my={10} alignSelf={"center"}>
+          No Users Found
+        </Text>
+      )}
     </Flex>
   );
 };
