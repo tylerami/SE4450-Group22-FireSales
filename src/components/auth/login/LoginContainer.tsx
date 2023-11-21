@@ -16,6 +16,7 @@ import {
 import { FiEye, FiEyeOff } from "react-icons/fi";
 
 import { FcGoogle } from "react-icons/fc";
+import { useGlobalState } from "components/utils/GlobalState";
 
 const LoginContainer = ({ goToRegister = () => {} }) => {
   const navigate = useNavigate();
@@ -24,6 +25,8 @@ const LoginContainer = ({ goToRegister = () => {} }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+
+  const { setActiveTabIndex } = useGlobalState();
 
   // implement auth service here
   const signInWithGoogle = () => {
@@ -34,6 +37,7 @@ const LoginContainer = ({ goToRegister = () => {} }) => {
         setDisabled(false);
         console.info("TODO: navigate to authenticated screen");
         navigate("/");
+        setActiveTabIndex(0);
       })
       .catch((error) => {
         setErrorMessage(error.code + ": " + error.message);

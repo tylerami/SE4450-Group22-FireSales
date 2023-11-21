@@ -25,7 +25,7 @@ import {
   totalCommission,
 } from "models/Conversion";
 import { ConversionService } from "services/interfaces/ConversionService";
-import { DependencyInjection } from "utils/DependencyInjection";
+import { DependencyInjection } from "models/utils/DependencyInjection";
 import { UserContext } from "components/auth/UserProvider";
 import { Client } from "models/Client";
 import { CompensationGroup } from "models/CompensationGroup";
@@ -34,7 +34,7 @@ import { CompensationGroupService } from "services/interfaces/CompensationGroupS
 import { AffiliateLink } from "models/AffiliateLink";
 import { getReferralLinkTypeLabel } from "models/enums/ReferralLinkType";
 import { generateSampleCompensationGroups } from "__mocks__/models/CompensationGroup.mock";
-import { formatMoney } from "utils/Money";
+import { formatMoney } from "models/utils/Money";
 import PerformanceWidgetMetric from "./PerformanceWidgetMetric";
 
 type Props = {};

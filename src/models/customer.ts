@@ -1,4 +1,4 @@
-import { generateUserID } from "utils/Identification";
+import { generateUserID } from "models/utils/Identification";
 import { Timestamp, DocumentData } from "firebase/firestore";
 
 // Deprecate function

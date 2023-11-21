@@ -1,4 +1,4 @@
-import { AffiliateLink } from "@models/AffiliateLink";
+import { AffiliateLink } from "models/AffiliateLink";
 import { generateAffiliateLinks } from "./AffiliateLink.mock";
 import { CompensationGroup } from "models/CompensationGroup";
 import { Currency } from "models/enums/Currency";

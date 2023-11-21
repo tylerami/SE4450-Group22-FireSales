@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Box,
@@ -17,6 +17,10 @@ import { FiEye, FiEyeOff } from "react-icons/fi";
 
 import { FcGoogle } from "react-icons/fc";
 import { authService } from "services/implementations/AuthFirebaseService";
+import { useGlobalState } from "components/utils/GlobalState";
+import { ConversionService } from "services/interfaces/ConversionService";
+import { DependencyInjection } from "@models/utils/DependencyInjection";
+import { UserContext } from "../UserProvider";
 
 const RegistrationContainer = ({ goToLogin = () => {} }) => {
   const navigate = useNavigate();
@@ -33,12 +37,20 @@ const RegistrationContainer = ({ goToLogin = () => {} }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
+  const conversionService: ConversionService =
+    DependencyInjection.conversionService();
+
+  const { setActiveTabIndex } = useGlobalState();
+
+  const { setCurrentUser } = useContext(UserContext);
+
   // implement auth service here
   const signInWithGoogle = async () => {
     setDisabled(true);
     let user;
     try {
       user = await authService.signInWithGoogle();
+      setCurrentUser(user);
     } catch (e: any) {
       setErrorMessage(e.message);
       setDisabled(false);
@@ -47,6 +59,7 @@ const RegistrationContainer = ({ goToLogin = () => {} }) => {
 
     if (user) {
       navigate("/");
+      setActiveTabIndex(0);
     } else {
       setErrorMessage("Error signing in with Google");
     }
@@ -106,6 +119,7 @@ const RegistrationContainer = ({ goToLogin = () => {} }) => {
         firstName,
         lastName,
       });
+      setCurrentUser(user);
     } catch (e: any) {
       setErrorMessage(e.message);
       setDisabled(false);
@@ -113,7 +127,12 @@ const RegistrationContainer = ({ goToLogin = () => {} }) => {
     }
     if (user) {
       navigate("/");
+      setActiveTabIndex(0);
       if (registrationCode.trim() !== "") {
+        conversionService.assignConversionsWithCode({
+          assignmentCode: registrationCode,
+          userId: user.uid,
+        });
       }
     } else {
       setErrorMessage("Error occurred during registration.");

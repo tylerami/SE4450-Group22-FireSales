@@ -53,10 +53,25 @@ export function findClosestMatch<T>(
   getOptionString: (T) => string,
   differenceThreshold: number = 0.3
 ): T | null {
+  for (const option of options) {
+    const optionString = getOptionString(option);
+    if (
+      optionString
+        .toLowerCase()
+        .replaceAll(" ", "")
+        .includes(keyword.toLowerCase().replaceAll(" ", ""))
+    ) {
+      return option;
+    }
+  }
+
   const optionsWithScores = options.map((option) => {
     return {
       option,
-      score: percentageDifference(keyword, getOptionString(option)),
+      score: percentageDifference(
+        keyword.toLowerCase().replaceAll(" ", ""),
+        getOptionString(option).toLowerCase().replaceAll(" ", "")
+      ),
     };
   });
 
@@ -69,6 +84,7 @@ export function findClosestMatch<T>(
   if (sortedOptions[0].score < differenceThreshold) {
     return sortedOptions[0].option;
   } else {
+    console.log("No match found", keyword, sortedOptions, differenceThreshold);
     return null;
   }
 }

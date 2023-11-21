@@ -18,10 +18,10 @@ import {
 } from "@chakra-ui/react";
 import { Conversion } from "models/Conversion";
 import { ChevronDownIcon } from "@chakra-ui/icons";
-import { formatDateString } from "utils/Date";
+import { formatDateString } from "models/utils/Date";
 import { Timeframe, getTimeframeLabel } from "models/enums/Timeframe";
-import { CompensationGroup } from "@models/CompensationGroup";
-import { Client } from "@models/Client";
+import { CompensationGroup } from "models/CompensationGroup";
+import { Client } from "models/Client";
 import {
   ReferralLinkType,
   getReferralLinkTypeLabel,

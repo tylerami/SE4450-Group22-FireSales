@@ -14,13 +14,13 @@ import {
   Tr,
 } from "@chakra-ui/react";
 import { Conversion } from "models/Conversion";
-import { formatDateString } from "utils/Date";
+import { formatDateString } from "models/utils/Date";
 import {
   CheckCircleIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
 } from "@chakra-ui/icons";
-import { formatMoney } from "utils/Money";
+import { formatMoney } from "models/utils/Money";
 import { getConversionStatusLabel } from "models/enums/ConversionStatus";
 
 type Props = {

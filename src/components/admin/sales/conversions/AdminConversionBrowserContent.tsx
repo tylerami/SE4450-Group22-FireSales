@@ -23,14 +23,14 @@ import {
 } from "models/enums/ReferralLinkType";
 import { CompensationGroup } from "models/CompensationGroup";
 import Filter, { FilterDefinition } from "components/utils/Filter";
-import { formatMoney } from "utils/Money";
+import { formatMoney } from "models/utils/Money";
 import {
   ConversionStatus,
   getConversionStatusLabel,
 } from "models/enums/ConversionStatus";
-import { formatDateString } from "utils/Date";
+import { formatDateString } from "models/utils/Date";
 import { CompensationGroupService } from "services/interfaces/CompensationGroupService";
-import { DependencyInjection } from "@utils/DependencyInjection";
+import { DependencyInjection } from "models/utils/DependencyInjection";
 
 type Props = {
   conversions: Conversion[];

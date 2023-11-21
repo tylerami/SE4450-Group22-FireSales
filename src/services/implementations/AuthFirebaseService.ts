@@ -11,7 +11,7 @@ import {
 } from "firebase/auth";
 import { UserService } from "services/interfaces/UserService";
 import { AuthService } from "services/interfaces/AuthService";
-import { DependencyInjection } from "utils/DependencyInjection";
+import { DependencyInjection } from "models/utils/DependencyInjection";
 
 export class AuthFirebaseService implements AuthService {
   userService: UserService;

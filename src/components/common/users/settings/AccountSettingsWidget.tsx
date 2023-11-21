@@ -11,7 +11,7 @@ import { User } from "models/User";
 import { UserContext } from "components/auth/UserProvider";
 import React, { useContext, useState } from "react";
 import { UserService } from "services/interfaces/UserService";
-import { DependencyInjection } from "utils/DependencyInjection";
+import { DependencyInjection } from "models/utils/DependencyInjection";
 import useSuccessNotification from "components/utils/SuccessNotification";
 
 type Props = {};

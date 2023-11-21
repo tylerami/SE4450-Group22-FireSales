@@ -2,13 +2,13 @@ import React, { useState, useEffect, useContext } from "react";
 import { Flex } from "@chakra-ui/react";
 import { Conversion } from "models/Conversion";
 import { ConversionService } from "services/interfaces/ConversionService";
-import { DependencyInjection } from "utils/DependencyInjection";
+import { DependencyInjection } from "models/utils/DependencyInjection";
 import { UserContext } from "components/auth/UserProvider";
 import { sampleConversions } from "__mocks__/models/Conversion.mock";
 import SelectedConversionContent from "./SelectedConversionContent";
 import ConversionBrowserContent from "./ConversionBrowserContent";
 import { CompensationGroupService } from "services/interfaces/CompensationGroupService";
-import { CompensationGroup } from "@models/CompensationGroup";
+import { CompensationGroup } from "models/CompensationGroup";
 import { ClientService } from "services/interfaces/ClientService";
 import { Client } from "models/Client";
 

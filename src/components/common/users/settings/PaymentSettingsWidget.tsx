@@ -12,11 +12,11 @@ import React, { useCallback, useContext, useState } from "react";
 import {
   PaymentMethod,
   getPaymentMethodLabel,
-} from "../../../models/enums/PaymentMethod";
+} from "../../../../models/enums/PaymentMethod";
 import UserPaymentHistory from "./UserPaymentHistory";
 import { UserContext } from "components/auth/UserProvider";
 import { UserService } from "services/interfaces/UserService";
-import { DependencyInjection } from "utils/DependencyInjection";
+import { DependencyInjection } from "models/utils/DependencyInjection";
 import useSuccessNotification from "components/utils/SuccessNotification";
 import { User } from "models/User";
 import { DayOfTheWeek } from "models/enums/Timeframe";

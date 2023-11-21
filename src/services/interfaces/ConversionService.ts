@@ -1,5 +1,5 @@
-import { Conversion } from "@models/Conversion";
-import { UnassignedConversion } from "@models/UnassignedConversion";
+import { Conversion } from "models/Conversion";
+import { UnassignedConversion } from "models/UnassignedConversion";
 
 export interface ConversionService {
   create(

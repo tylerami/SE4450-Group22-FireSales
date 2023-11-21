@@ -15,17 +15,17 @@ import {
   Tr,
 } from "@chakra-ui/react";
 import { Conversion } from "models/Conversion";
-import { formatDateString } from "utils/Date";
+import { formatDateString } from "models/utils/Date";
 import {
   CheckCircleIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
 } from "@chakra-ui/icons";
 import { Payout } from "models/Payout";
-import { formatMoney } from "utils/Money";
+import { formatMoney } from "models/utils/Money";
 import { UserContext } from "components/auth/UserProvider";
 import { PayoutService } from "services/interfaces/PayoutService";
-import { DependencyInjection } from "utils/DependencyInjection";
+import { DependencyInjection } from "models/utils/DependencyInjection";
 import { getPaymentMethodLabel } from "models/enums/PaymentMethod";
 import { ConversionService } from "services/interfaces/ConversionService";
 import { ConversionStatus } from "models/enums/ConversionStatus";

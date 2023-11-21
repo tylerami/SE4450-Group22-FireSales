@@ -1,4 +1,4 @@
-import { Client } from "@models/Client";
+import { Client } from "models/Client";
 import { generateSampleClients } from "__mocks__/models/Client.mock";
 import { ClientService } from "services/interfaces/ClientService";
 

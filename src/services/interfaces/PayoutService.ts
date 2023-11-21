@@ -1,4 +1,4 @@
-import { Payout } from "@models/Payout";
+import { Payout } from "models/Payout";
 
 export interface PayoutService {
   create(payout: Payout): Promise<Payout>;

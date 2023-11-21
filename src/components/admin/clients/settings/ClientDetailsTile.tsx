@@ -16,12 +16,12 @@ import React, { useEffect, useState } from "react";
 import { Button } from "@chakra-ui/react";
 import { Client } from "models/Client";
 import { getReferralLinkTypeLabel } from "models/enums/ReferralLinkType";
-import { formatMoney } from "utils/Money";
-import { AffiliateDeal } from "@models/AffiliateDeal";
+import { formatMoney } from "models/utils/Money";
+import { AffiliateDeal } from "models/AffiliateDeal";
 import ImageComponent from "components/utils/ImageComponent";
 import { ImageService } from "services/interfaces/ImageService";
 import { ClientService } from "services/interfaces/ClientService";
-import { DependencyInjection } from "utils/DependencyInjection";
+import { DependencyInjection } from "models/utils/DependencyInjection";
 
 type Props = {
   client: Client;

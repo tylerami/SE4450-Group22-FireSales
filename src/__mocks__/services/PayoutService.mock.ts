@@ -1,4 +1,4 @@
-import { Payout } from "@models/Payout";
+import { Payout } from "models/Payout";
 import { generateSamplePayouts } from "__mocks__/models/Payout.mock";
 import { PayoutService } from "services/interfaces/PayoutService";
 

@@ -25,7 +25,7 @@ import {
   totalRevenue,
 } from "models/Conversion";
 import { ConversionService } from "services/interfaces/ConversionService";
-import { DependencyInjection } from "utils/DependencyInjection";
+import { DependencyInjection } from "models/utils/DependencyInjection";
 import { Client, getAllAffiliateDeals } from "models/Client";
 import { CompensationGroup } from "models/CompensationGroup";
 import { ClientService } from "services/interfaces/ClientService";
@@ -34,7 +34,7 @@ import {
   ReferralLinkType,
   getReferralLinkTypeLabel,
 } from "models/enums/ReferralLinkType";
-import { formatMoney } from "utils/Money";
+import { formatMoney } from "models/utils/Money";
 import ClientsPerformanceChart from "./ClientsPerformanceChart";
 import { AffiliateDeal } from "models/AffiliateDeal";
 import PerformanceMetricBox from "../../common/PerformanceMetricBox";

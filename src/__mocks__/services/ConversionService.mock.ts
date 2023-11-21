@@ -1,5 +1,5 @@
-import { Conversion } from "@models/Conversion";
-import { UnassignedConversion } from "@models/UnassignedConversion";
+import { Conversion } from "models/Conversion";
+import { UnassignedConversion } from "models/UnassignedConversion";
 import { sampleConversions } from "__mocks__/models/Conversion.mock";
 import { ConversionService } from "services/interfaces/ConversionService";
 

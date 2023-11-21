@@ -1,6 +1,6 @@
 import { PayoutPreferrences } from "models/PayoutPreferrences";
 import { Role } from "models/enums/Role";
-import { generateUserID } from "utils/Identification";
+import { generateUserID } from "models/utils/Identification";
 import { User } from "models/User";
 
 export const sampleUser: User = User.create({

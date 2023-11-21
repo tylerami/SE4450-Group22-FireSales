@@ -1,13 +1,13 @@
 import { Button, Heading, Spinner } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 import { Flex } from "@chakra-ui/react";
-import { DependencyInjection } from "utils/DependencyInjection";
+import { DependencyInjection } from "models/utils/DependencyInjection";
 import CompensationGroupEditor from "./CompensationGroupEditor";
-import { CompensationGroup } from "@models/CompensationGroup";
+import { CompensationGroup } from "models/CompensationGroup";
 import { CompensationGroupService } from "services/interfaces/CompensationGroupService";
 import CompensationGroupDetailsTile from "./CompensationGroupDetailsTile";
-import { User } from "@models/User";
-import { Conversion } from "@models/Conversion";
+import { User } from "models/User";
+import { Conversion } from "models/Conversion";
 import { UserService } from "services/interfaces/UserService";
 import { ConversionService } from "services/interfaces/ConversionService";
 

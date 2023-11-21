@@ -2,13 +2,13 @@ import { Flex, Heading, Text, useBreakpointValue } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 
 import { Button } from "@chakra-ui/react";
-import ImageComponent from "../../../utils/ImageComponent";
-import { Client } from "@models/Client";
+import ImageComponent from "../../../../utils/ImageComponent";
+import { Client } from "models/Client";
 import { getReferralLinkTypeLabel } from "models/enums/ReferralLinkType";
 import { AffiliateLink } from "models/AffiliateLink";
-import { formatMoney } from "utils/Money";
+import { formatMoney } from "models/utils/Money";
 import { ClientService } from "services/interfaces/ClientService";
-import { DependencyInjection } from "utils/DependencyInjection";
+import { DependencyInjection } from "models/utils/DependencyInjection";
 
 const AffiliateLinksContainer = ({
   client,

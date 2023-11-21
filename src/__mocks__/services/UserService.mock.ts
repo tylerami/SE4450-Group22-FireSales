@@ -1,4 +1,4 @@
-import { User } from "@models/User";
+import { User } from "models/User";
 import { generateSampleUsers, sampleUser } from "__mocks__/models/User.mock";
 import { UserService } from "services/interfaces/UserService";
 

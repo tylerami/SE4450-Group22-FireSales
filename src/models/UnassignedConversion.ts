@@ -1,4 +1,4 @@
-import { formatDateString } from "../utils/Date";
+import { formatDateString } from "./utils/Date";
 import { AffiliateLink } from "./AffiliateLink";
 import { Conversion } from "./Conversion";
 import { Customer } from "./Customer";
@@ -18,11 +18,11 @@ export class UnassignedConversion {
   dateOccurred: Date;
   loggedAt: Date;
   status: ConversionStatus;
-  compensationGroupId?: string;
+  compensationGroupId: string | null;
   affiliateLink: AffiliateLink;
   customer: Customer;
   amount: number; // Bet size
-  attachmentUrls?: Array<string>;
+  attachmentUrls: Array<string>;
   currency: Currency;
   messages: Array<Message>;
 
@@ -32,11 +32,11 @@ export class UnassignedConversion {
     dateOccurred,
     loggedAt,
     status,
-    compensationGroupId,
+    compensationGroupId = null,
     affiliateLink,
     customer,
     amount,
-    attachmentUrls,
+    attachmentUrls = [],
     currency,
     messages = [],
   }: {
@@ -45,7 +45,7 @@ export class UnassignedConversion {
     loggedAt: Date;
     assignmentCode: string;
     status: ConversionStatus;
-    compensationGroupId?: string;
+    compensationGroupId?: string | null;
     affiliateLink: AffiliateLink;
     customer: Customer;
     amount: number;
@@ -68,7 +68,7 @@ export class UnassignedConversion {
   }
 
   static fromManualInput({
-    dateOccurred, // maybe modify this to accept a Date object instead
+    dateOccurred,
     assignmentCode,
     compensationGroupId,
     affiliateLink,
@@ -105,6 +105,19 @@ export class UnassignedConversion {
       amount,
       attachmentUrls,
       currency,
+    });
+  }
+
+  public withNewAssignmentCode(assignmentCode: string): UnassignedConversion {
+    return new UnassignedConversion({
+      ...this,
+      id: getUnassignedConversionId({
+        dateOccurred: this.dateOccurred,
+        clientId: this.affiliateLink.clientId,
+        assignmentCode,
+        customerId: this.customer.id,
+      }),
+      assignmentCode,
     });
   }
 

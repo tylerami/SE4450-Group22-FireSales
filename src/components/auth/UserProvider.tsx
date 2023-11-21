@@ -1,14 +1,16 @@
 // UserProvider.tsx
 import React, { createContext, useEffect, useState } from "react";
 import { authService } from "services/implementations/AuthFirebaseService";
-import { User } from "@models/User";
+import { User } from "models/User";
 
 interface UserContextProps {
   currentUser: User | null;
+  setCurrentUser: (user: User | null) => void;
 }
 
 export const UserContext = createContext<UserContextProps>({
   currentUser: null,
+  setCurrentUser: () => {},
 });
 
 export const UserProvider = ({ children }: { children: any }) => {
@@ -23,7 +25,7 @@ export const UserProvider = ({ children }: { children: any }) => {
   }, []);
 
   return (
-    <UserContext.Provider value={{ currentUser }}>
+    <UserContext.Provider value={{ currentUser, setCurrentUser }}>
       {children}
     </UserContext.Provider>
   );

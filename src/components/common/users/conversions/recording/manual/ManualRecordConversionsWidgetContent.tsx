@@ -5,10 +5,10 @@ import { AddIcon } from "@chakra-ui/icons";
 import {
   Conversion,
   ConversionAttachmentGroup,
-} from "../../../../../models/Conversion";
-import { CompensationGroup } from "@models/CompensationGroup";
+} from "../../../../../../models/Conversion";
+import { CompensationGroup } from "models/CompensationGroup";
 import { ConversionService } from "services/interfaces/ConversionService";
-import { DependencyInjection } from "utils/DependencyInjection";
+import { DependencyInjection } from "models/utils/DependencyInjection";
 import { RiSubtractLine } from "react-icons/ri";
 import useSuccessNotification from "components/utils/SuccessNotification";
 import { error } from "console";

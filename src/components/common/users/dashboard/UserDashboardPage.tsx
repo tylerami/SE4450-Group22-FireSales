@@ -1,11 +1,22 @@
-import { Box, Flex, Heading } from "@chakra-ui/react";
-import React from "react";
+import { Box, Center, Flex, Heading, Spinner } from "@chakra-ui/react";
+import React, { useContext } from "react";
 import UserPerformanceWidget from "./performance/UserPerformanceWidget";
 import AffiliateLinkWidget from "./referrals/AffiliateLinkWidget";
+import { UserContext } from "components/auth/UserProvider";
 
 type Props = {};
 
 const UserDashboardPage = (props: Props) => {
+  const { currentUser } = useContext(UserContext);
+
+  if (!currentUser) {
+    return (
+      <Center w="100%" h="20em">
+        <Spinner size="xl" />
+      </Center>
+    );
+  }
+
   return (
     <React.Fragment>
       <Flex alignSelf="start" px={8} py={2} pt={8}>
@@ -13,7 +24,7 @@ const UserDashboardPage = (props: Props) => {
           Welcome,
         </Heading>
         <Heading size="lg" fontWeight={400} color="#ED7D31">
-          Tyler
+          {currentUser?.firstName}
         </Heading>
       </Flex>
 

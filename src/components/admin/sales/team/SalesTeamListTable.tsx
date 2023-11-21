@@ -45,7 +45,7 @@ import { Client } from "models/Client";
 import { ReferralLinkType } from "models/enums/ReferralLinkType";
 import { CompensationGroup } from "models/CompensationGroup";
 import Filter, { FilterDefinition } from "components/utils/Filter";
-import { formatMoney } from "utils/Money";
+import { formatMoney } from "models/utils/Money";
 import { ConversionStatus } from "models/enums/ConversionStatus";
 
 type Props = {

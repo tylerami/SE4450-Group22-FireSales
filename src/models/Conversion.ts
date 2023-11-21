@@ -1,4 +1,4 @@
-import { formatDateString } from "../utils/Date";
+import { formatDateString } from "./utils/Date";
 import { AffiliateLink } from "./AffiliateLink";
 import { Customer } from "./Customer";
 import { Message } from "./Message";
@@ -23,11 +23,11 @@ export class Conversion {
   loggedAt: Date;
   userId: string;
   status: ConversionStatus;
-  compensationGroupId?: string;
+  compensationGroupId: string | null;
   affiliateLink: AffiliateLink;
   customer: Customer;
   amount: number; // Bet size
-  attachmentUrls?: Array<string>;
+  attachmentUrls: Array<string>;
   currency: Currency;
   messages: Array<Message>;
 
@@ -37,11 +37,11 @@ export class Conversion {
     loggedAt,
     userId,
     status,
-    compensationGroupId,
+    compensationGroupId = null,
     affiliateLink,
     customer,
     amount,
-    attachmentUrls,
+    attachmentUrls = [],
     currency,
     messages = [],
   }: {
@@ -50,7 +50,7 @@ export class Conversion {
     loggedAt: Date;
     userId: string;
     status: ConversionStatus;
-    compensationGroupId?: string;
+    compensationGroupId?: string | null;
     affiliateLink: AffiliateLink;
     customer: Customer;
     amount: number;

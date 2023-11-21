@@ -4,7 +4,7 @@ import { Flex } from "@chakra-ui/react";
 import ManualRecordConversionsWidgetContent from "./manual/ManualRecordConversionsWidgetContent";
 import BulkRecordConversionsWidgetContent from "./bulk/BulkRecordConversionsWidgetContent";
 import { CompensationGroupService } from "services/interfaces/CompensationGroupService";
-import { DependencyInjection } from "utils/DependencyInjection";
+import { DependencyInjection } from "models/utils/DependencyInjection";
 import { CompensationGroup } from "models/CompensationGroup";
 import { UserContext } from "components/auth/UserProvider";
 

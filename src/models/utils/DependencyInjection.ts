@@ -5,7 +5,6 @@ import { MockCustomerService } from "__mocks__/services/CustomerService.mock";
 import { MockPayoutService } from "__mocks__/services/PayoutService.mock";
 import { MockUserService } from "__mocks__/services/UserService.mock";
 import { firebase, firestore, storage } from "config/firebase";
-import "reflect-metadata";
 import { ClientFirebaseService } from "services/implementations/ClientFirebaseService";
 import { CompensationGroupFirebaseService } from "services/implementations/CompensationGroupFirebaseService";
 import { ConversionFirebaseService } from "services/implementations/ConversionFirebaseService";
@@ -24,14 +23,14 @@ import { UserService } from "services/interfaces/UserService";
 const USE_MOCKS = false;
 
 const mockDependencies: Record<string, any> = {
-  // ClientService: new MockClientService(),
-  // ConversionService: new MockConversionService(),
-  // UserService: new MockUserService(),
-  // CompensationGroupService: new MockCompensationGroupService(),
-  // CustomerService: new MockCustomerService(),
-  // PayoutService: new MockPayoutService(),
-  // // Firebase image service already implemented
-  // ImageService: new ImageFirebaseService(storage),
+  ClientService: new MockClientService(),
+  ConversionService: new MockConversionService(),
+  UserService: new MockUserService(),
+  CompensationGroupService: new MockCompensationGroupService(),
+  CustomerService: new MockCustomerService(),
+  PayoutService: new MockPayoutService(),
+  // Firebase image service already implemented
+  ImageService: new ImageFirebaseService(storage),
 };
 
 const dependencies: Record<string, any> = {

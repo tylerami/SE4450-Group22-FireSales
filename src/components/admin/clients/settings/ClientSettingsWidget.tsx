@@ -4,7 +4,7 @@ import { Flex } from "@chakra-ui/react";
 import { Client } from "models/Client";
 import ClientSettingsEditor from "./ClientSettingsEditor";
 import { ClientService } from "services/interfaces/ClientService";
-import { DependencyInjection } from "utils/DependencyInjection";
+import { DependencyInjection } from "models/utils/DependencyInjection";
 import ClientDetailsTile from "./ClientDetailsTile";
 
 type Props = {};

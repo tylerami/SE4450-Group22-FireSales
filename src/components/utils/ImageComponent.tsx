@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Box, Flex, Image, Spinner } from "@chakra-ui/react";
 import ImageFirebaseService from "services/implementations/ImageFirebaseService";
 import { ImageService } from "services/interfaces/ImageService";
-import { DependencyInjection } from "utils/DependencyInjection";
+import { DependencyInjection } from "models/utils/DependencyInjection";
 
 interface ImageComponentProps {
   imagePath?: string;

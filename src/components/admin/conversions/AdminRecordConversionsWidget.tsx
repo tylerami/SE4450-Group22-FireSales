@@ -1,20 +1,22 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, Heading, Input, InputGroup, Spinner } from "@chakra-ui/react";
 import { Box, Text, Flex } from "@chakra-ui/react";
-import { filterCsvHeaders, getCsvFileContent } from "utils/File";
+import { filterCsvHeaders, getCsvFileContent } from "models/utils/File";
 import { generateSampleClients } from "__mocks__/models/Client.mock";
-import { findClosestMatch } from "utils/String";
+import { findClosestMatch } from "models/utils/String";
 import { Client } from "models/Client";
 import { ReferralLinkType } from "models/enums/ReferralLinkType";
 import { AffiliateLink } from "models/AffiliateLink";
 import { Customer } from "models/Customer";
 import { ConversionService } from "services/interfaces/ConversionService";
-import { DependencyInjection } from "utils/DependencyInjection";
-import { parseDateString } from "utils/Date";
+import { DependencyInjection } from "models/utils/DependencyInjection";
+import { parseDateString } from "models/utils/Date";
 import AdminRecordConversionsProcessedTable from "./AdminRecordConversionsProcessedTable";
 import AdminRecordConversionsInstructions from "./AdminRecordConversionsInstructions";
 import { UnassignedConversion } from "models/UnassignedConversion";
-import { AffiliateDeal } from "@models/AffiliateDeal";
+import { AffiliateDeal } from "models/AffiliateDeal";
+import { ClientService } from "services/interfaces/ClientService";
+import useSuccessNotification from "components/utils/SuccessNotification";
 
 type Props = {};
 
@@ -22,9 +24,10 @@ const AdminRecordConversionsWidgetContent = (props: Props) => {
   // Services
   const conversionService: ConversionService =
     DependencyInjection.conversionService();
+  const clientClient: ClientService = DependencyInjection.clientService();
 
   // State
-  const [errorText, setErrorText] = useState(null);
+  const [errorText, setErrorText] = useState<string | null>(null);
   const [processing, setProcessing] = useState<boolean>(false);
   const [csvFile, setCsvFile] = useState<File | null>(null);
 
@@ -35,6 +38,18 @@ const AdminRecordConversionsWidgetContent = (props: Props) => {
   > | null>(null);
   const [assignmentCode, setAssignmentCode] = useState("");
 
+  const [clients, setClients] = useState<Client[]>([]);
+
+  // Get clients
+  useEffect(() => {
+    const fetchClients = async () => {
+      const clients = await clientClient.getAll();
+      setClients(clients);
+    };
+
+    fetchClients();
+  }, [clientClient]);
+
   // Process the CSV file into conversions
   const processCsvFile = async (
     csvFile: File
@@ -42,8 +57,13 @@ const AdminRecordConversionsWidgetContent = (props: Props) => {
     setProcessing(true);
     let csvContent = await getCsvFileContent(csvFile);
 
+    const columnCount = csvContent
+      .split("\n")[0]
+      .split(",")
+      .filter((item) => item.trim() !== "").length;
+
     const expectedHeaders = [
-      "number",
+      ...(columnCount > 6 ? ["number"] : []),
       "date",
       "sportsbook",
       "type",
@@ -61,13 +81,19 @@ const AdminRecordConversionsWidgetContent = (props: Props) => {
       csvRow: string
     ): UnassignedConversion | null => {
       const values: string[] = csvRow.split(",");
-      const clients: Client[] = generateSampleClients(5);
 
-      const dateString: string = values[1];
-      const dateOccurred: Date = parseDateString(dateString, "yyyy-mm-dd");
+      const dateString: string = values[columnCount - 6];
+      let dateOccurred: Date;
 
-      const sportsbookName: string = values[2];
-      const typeString: string = values[3]?.toLowerCase();
+      try {
+        dateOccurred = parseDateString(dateString, "yyyy-mm-dd");
+      } catch (e: any) {
+        console.log(e, dateString, csvRow);
+        return null;
+      }
+
+      const sportsbookName: string = values[columnCount - 5];
+      const typeString: string = values[columnCount - 4]?.toLowerCase();
       const referralType: ReferralLinkType = typeString.includes("sports")
         ? ReferralLinkType.sports
         : ReferralLinkType.casino;
@@ -82,15 +108,16 @@ const AdminRecordConversionsWidgetContent = (props: Props) => {
         return null;
       }
 
-      const betSize = Number(values[4]);
-      const commission = Number(values[5]);
-      const customerName = values[6];
+      const betSize = Number(values[columnCount - 3].replaceAll("$", ""));
+      const commission = Number(values[columnCount - 2].replaceAll("$", ""));
+      const customerName = values[columnCount - 1];
 
       const matchedAffiliateDeal: AffiliateDeal | undefined = Object.values(
         matchedClient.affiliateDeals
       ).find(
         (deal) =>
-          deal.clientId === matchedClient.id && deal.type === referralType
+          deal.clientId === matchedClient.id &&
+          (deal.type === referralType || deal.type === null)
       );
       if (matchedAffiliateDeal === undefined) {
         console.log("No affiliate deal match");
@@ -107,6 +134,8 @@ const AdminRecordConversionsWidgetContent = (props: Props) => {
         cpa: matchedAffiliateDeal.cpa,
       });
 
+      console.log("creating conversion with assignment code", assignmentCode);
+
       const conversion: UnassignedConversion =
         UnassignedConversion.fromManualInput({
           dateOccurred,
@@ -118,6 +147,7 @@ const AdminRecordConversionsWidgetContent = (props: Props) => {
           }),
         });
 
+      console.log("created conversion", conversion);
       return conversion;
     };
 
@@ -126,8 +156,12 @@ const AdminRecordConversionsWidgetContent = (props: Props) => {
 
     for (let i = 0; i < rows.length; i++) {
       const row = rows[i];
-      const convNumber = Number(row.split(",")[0]);
-
+      if (row.replaceAll(",", "").trim() === "") {
+        continue;
+      }
+      const convNumber = columnCount > 6 ? Number(row.split(",")[0]) : i + 1;
+      console.log(row.split(","));
+      console.log(convNumber);
       const conversion = mapCsvRowToConversion(row.replace("\r", ""));
       if (conversion !== null) {
         conversionsByNumber[convNumber] = conversion;
@@ -175,7 +209,9 @@ const AdminRecordConversionsWidgetContent = (props: Props) => {
 
     const conversionGroups: UnassignedConversionAttachmentGroup[] = [];
     for (const convNumber of Object.keys(conversionsByNumber)) {
-      const conversion: UnassignedConversion = conversionsByNumber[convNumber];
+      let conversion: UnassignedConversion = conversionsByNumber[convNumber];
+      conversion = conversion.withNewAssignmentCode(assignmentCode);
+
       const attachments = getAttachmentsForConversion(Number(convNumber));
       const conversionGroup: UnassignedConversionAttachmentGroup = {
         conversion,
@@ -187,8 +223,15 @@ const AdminRecordConversionsWidgetContent = (props: Props) => {
     return conversionGroups;
   };
 
+  const showSuccess = useSuccessNotification();
+
   // Record the conversions once ready
   async function recordConversions() {
+    if (assignmentCode.trim() === "") {
+      setErrorText("Please enter an assignment code");
+      return;
+    }
+
     let conversionGroups: UnassignedConversionAttachmentGroup[];
     try {
       conversionGroups = await createConversionGroups();
@@ -201,8 +244,14 @@ const AdminRecordConversionsWidgetContent = (props: Props) => {
     const result = await conversionService.createBulkUnassigned(
       conversionGroups
     );
+    console.log(result);
     if (result !== undefined && result !== null) {
       setErrorText(null);
+      handleCsvChange(null);
+      setAssignmentCode("");
+      showSuccess({
+        message: `Successfully recorded ${result.length} conversions`,
+      });
     } else {
       setErrorText(result);
     }
@@ -213,21 +262,21 @@ const AdminRecordConversionsWidgetContent = (props: Props) => {
   const triggerCsvUpload = () => {
     if (csvFile !== null) {
       console.log("Removing CSV file");
-      setCsvFile(null);
-      setConversionsByNumber(null);
+      handleCsvChange(null);
       return;
     }
+    console.log("Triggering CSV upload");
     const fileInput = document.getElementById("csv-upload");
     if (fileInput) {
       (fileInput as HTMLInputElement).click();
     }
   };
 
-  const handleCsvChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    console.log(event.target.files);
-    if (event.target.files && event.target.files.length > 0) {
-      setCsvFile(event.target.files[0]);
-      processCsvFile(event.target.files[0]);
+  const handleCsvChange = (files: FileList | null) => {
+    const csv = Array.from(files ?? [])[0];
+    if (csv) {
+      setCsvFile(csv);
+      processCsvFile(csv);
     } else {
       console.log("No file uploaded");
       setCsvFile(null);
@@ -237,7 +286,7 @@ const AdminRecordConversionsWidgetContent = (props: Props) => {
 
   const triggerAttachmentsUpload = () => {
     if (attachments.length > 0) {
-      setAttachments([]);
+      handleAttachementsChange(null);
       return;
     }
     const fileInput = document.getElementById("attachments-upload");
@@ -246,11 +295,9 @@ const AdminRecordConversionsWidgetContent = (props: Props) => {
     }
   };
 
-  const handleAttachementsChange = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    if (event.target.files) {
-      setAttachments(Array.from(event.target.files));
+  const handleAttachementsChange = (files: FileList | null) => {
+    if (files) {
+      setAttachments(Array.from(files));
     } else {
       setAttachments([]);
     }
@@ -319,8 +366,9 @@ const AdminRecordConversionsWidgetContent = (props: Props) => {
               type="file"
               accept=".csv"
               hidden
-              onChange={handleCsvChange}
+              onChange={(e) => handleCsvChange(e.target.files)}
               id="csv-upload"
+              name="csv-upload"
             />
             {csvUploaded ? "Remove " + csvFile.name : "Upload CSV"}
           </Button>
@@ -338,8 +386,9 @@ const AdminRecordConversionsWidgetContent = (props: Props) => {
               multiple
               accept="image/*"
               hidden
-              onChange={handleAttachementsChange}
+              onChange={(e) => handleAttachementsChange(e.target.files)}
               id="attachments-upload"
+              name="attachments-upload"
             />
             {attachmentsUploaded
               ? "Remove " + attachments.length + " attachments"

@@ -26,7 +26,7 @@ import {
 import { CloseIcon } from "@chakra-ui/icons";
 import { FaDollarSign, FaPlus, FaTrash } from "react-icons/fa";
 import { ClientService } from "services/interfaces/ClientService";
-import { DependencyInjection } from "utils/DependencyInjection";
+import { DependencyInjection } from "models/utils/DependencyInjection";
 import { Client } from "models/Client";
 import useSuccessNotification from "components/utils/SuccessNotification";
 import {

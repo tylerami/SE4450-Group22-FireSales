@@ -19,16 +19,16 @@ import { ChevronDownIcon, DeleteIcon } from "@chakra-ui/icons";
 import {
   Conversion,
   ConversionAttachmentGroup,
-} from "../../../../../models/Conversion";
+} from "../../../../../../models/Conversion";
 import { FaDollarSign } from "react-icons/fa";
 import { AffiliateLink } from "models/AffiliateLink";
 import { UserContext } from "components/auth/UserProvider";
 import { CompensationGroup } from "models/CompensationGroup";
 import { Customer } from "models/Customer";
 import { CustomerService } from "services/interfaces/CustomerService";
-import { DependencyInjection } from "utils/DependencyInjection";
-import { formatMoney } from "utils/Money";
-import { parseDateString } from "utils/Date";
+import { DependencyInjection } from "models/utils/DependencyInjection";
+import { formatMoney } from "models/utils/Money";
+import { parseDateString } from "models/utils/Date";
 
 type Props = {
   compensationGroup: CompensationGroup;

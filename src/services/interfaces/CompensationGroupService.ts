@@ -1,4 +1,4 @@
-import { CompensationGroup } from "@models/CompensationGroup";
+import { CompensationGroup } from "models/CompensationGroup";
 
 export interface CompensationGroupService {
   create(compensationGroup: CompensationGroup): Promise<CompensationGroup>;
