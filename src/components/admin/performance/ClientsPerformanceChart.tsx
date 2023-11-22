@@ -1,5 +1,5 @@
 import { Timeframe } from "models/enums/Timeframe";
-import BarChart, { BarChartSegment } from "components/utils/BarChart";
+import BarChart, { AxisSide, BarChartSegment } from "components/utils/BarChart";
 import React from "react";
 import {
   Conversion,
@@ -69,14 +69,17 @@ const ClientsPerformanceChart = ({
         {
           name: "Conversions",
           color: "#4D3FB5",
+          axis: AxisSide.left,
         },
         {
           name: "Revenue",
           color: "#07B0FF",
+          axis: AxisSide.right,
         },
         {
           name: "Earnings",
           color: "#3FB54D",
+          axis: AxisSide.right,
         },
       ]}
     />

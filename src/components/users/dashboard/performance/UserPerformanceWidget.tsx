@@ -45,7 +45,7 @@ type Props = {
   conversions: Conversion[];
 };
 
-const UserPerformanceWidget = ({ user, conversions }: Props) => {
+const UserPerformanceWidget = (props: Props) => {
   const conversionService: ConversionService =
     DependencyInjection.conversionService();
   const clientService: ClientService = DependencyInjection.clientService();
@@ -68,6 +68,7 @@ const UserPerformanceWidget = ({ user, conversions }: Props) => {
   const [selectedCompensationGroup, setSelectedCompensationGroup] =
     useState<CompensationGroup | null>(null);
 
+  const [conversions, setConversions] = useState<Conversion[]>([]);
   const [filteredConversions, setFilteredConversions] = useState<Conversion[]>(
     []
   );
@@ -179,11 +180,11 @@ const UserPerformanceWidget = ({ user, conversions }: Props) => {
     ),
   }));
 
-  affiliateDealGroups.sort((a, b) =>
-    a.deal.clientName.localeCompare(b.deal.clientName)
-  );
   affiliateDealGroups.sort(
     (a, b) => b.conversions.length - a.conversions.length
+  );
+  affiliateDealGroups.sort((a, b) =>
+    a.deal.clientName.localeCompare(b.deal.clientName)
   );
 
   // Define filters

@@ -20,6 +20,11 @@ ChartJS.register(
   Legend
 );
 
+export enum AxisSide {
+  left = "left",
+  right = "right",
+}
+
 export type BarChartSegment = {
   xAxisLabel: string;
   data: { series: string; value: number }[];
@@ -32,7 +37,7 @@ const BarChart = ({
   leftAxisLabel,
   rightAxisLabel,
 }: {
-  series: { name: string; color: string }[];
+  series: { name: string; color: string; axis: AxisSide }[];
   segments: BarChartSegment[];
   maxBarThickness?: number;
   leftAxisLabel?: {
@@ -46,6 +51,42 @@ const BarChart = ({
     end?: number;
   };
 }) => {
+  const roundTo2Digits = (num) => {
+    if (num < 100) {
+      // Handles numbers with less than 3 digits
+      return Math.round(num / 10) * 10;
+    }
+    const digits = Math.ceil(Math.log10(num + 1));
+    const scaleFactor = Math.pow(10, digits - 2);
+    return Math.round(num / scaleFactor) * scaleFactor;
+  };
+
+  const yLeftAxisMax: number | undefined = leftAxisLabel?.end
+    ? roundTo2Digits(leftAxisLabel?.end * 1.2)
+    : undefined;
+  const yRightAxisMax: number | undefined = rightAxisLabel?.end
+    ? roundTo2Digits(rightAxisLabel?.end * 1.2)
+    : undefined;
+
+  const yLeftAxisMin: number = leftAxisLabel?.start ? leftAxisLabel?.start : 0;
+  const yRightAxisMin: number = rightAxisLabel?.start
+    ? rightAxisLabel?.start
+    : 0;
+
+  const yLeftAxisRange = yLeftAxisMax ? yLeftAxisMax - yLeftAxisMin : undefined;
+  const yRightAxisRange = yRightAxisMax
+    ? yRightAxisMax - yRightAxisMin
+    : undefined;
+
+  const ticksSegments = 10;
+
+  const yLeftAxisStepSize = yLeftAxisRange
+    ? yLeftAxisRange / ticksSegments
+    : undefined;
+  const yRightAxisStepSize = yRightAxisRange
+    ? yRightAxisRange / ticksSegments
+    : undefined;
+
   const options = {
     plugins: {},
     responsive: true,
@@ -62,22 +103,39 @@ const BarChart = ({
           display: leftAxisLabel?.label ? true : false,
           text: leftAxisLabel?.label,
         },
+        ticks: {
+          major: {
+            enabled: true,
+          },
+          stepSize: yLeftAxisStepSize,
+          beginAtZero: true,
+        },
         type: "linear" as const,
         display: true,
         position: "left" as const,
-        suggestedMin: leftAxisLabel?.start,
-        suggestedMax: leftAxisLabel?.end,
+        suggestedMin: yLeftAxisMin,
+        suggestedMax: yLeftAxisMax,
       },
       y1: {
         title: {
           display: rightAxisLabel?.label ? true : false,
           text: rightAxisLabel?.label,
         },
+        grid: {
+          display: true,
+        },
+        ticks: {
+          major: {
+            enabled: true,
+          },
+          stepSize: yRightAxisStepSize,
+          beginAtZero: true,
+        },
         type: "linear" as const,
         display: rightAxisLabel !== undefined,
         position: "right" as const,
-        suggestedMin: rightAxisLabel?.start,
-        suggestedMax: rightAxisLabel?.end,
+        suggestedMin: yRightAxisMin,
+        suggestedMax: yRightAxisMax,
       },
     },
   };
@@ -100,6 +158,11 @@ const BarChart = ({
         label: series.name,
         data: getSeriesDataSet(series.name),
         backgroundColor: series.color,
+        yAxisID: series.axis === AxisSide.left ? "y" : "y1",
+        parsing: {
+          yAxisID: "y", //series.axis === AxisSide.left ? "y" : "y1",
+        },
+
         stack: `Stack ${index}`,
         maxBarThickness,
       })),

@@ -1,13 +1,16 @@
 import { Box, Center, Flex, Heading, Spinner } from "@chakra-ui/react";
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import UserPerformanceWidget from "./performance/UserPerformanceWidget";
 import AffiliateLinkWidget from "./referrals/AffiliateLinkWidget";
 import { UserContext } from "components/auth/UserProvider";
+import { Conversion } from "@models/Conversion";
 
 type Props = {};
 
 const UserDashboardPage = (props: Props) => {
   const { currentUser } = useContext(UserContext);
+
+  const [conversions, setConversions] = useState<Conversion[]>([]);
 
   if (!currentUser) {
     return (
@@ -32,7 +35,7 @@ const UserDashboardPage = (props: Props) => {
       <Flex width={"100%"} direction="column" gap={6} alignItems={"center"}>
         <Box></Box>
         <AffiliateLinkWidget></AffiliateLinkWidget>
-        <UserPerformanceWidget />
+        <UserPerformanceWidget user={currentUser} conversions={[]} />
 
         <Box h={20}></Box>
       </Flex>

@@ -47,19 +47,18 @@ export function divideTimeframeIntoSegments(
       break;
 
     case Timeframe.lastMonth:
+      const daysInLastMonth = new Date(
+        today.getFullYear(),
+        today.getMonth(),
+        0
+      ).getDate();
       for (let i = 0; i < 4; i++) {
-        const start = new Date(
-          today.getFullYear(),
-          today.getMonth() - 1,
-          i * 7 + 1
-        );
-        let end = new Date(
-          start.getFullYear(),
-          start.getMonth(),
-          start.getDate() + 6
-        );
+        const start = new Date(today);
+        start.setDate(today.getDate() - 7 * (3 - i));
+        let end = new Date(start);
+        end.setDate(start.getDate() + 6);
         if (end.getMonth() !== start.getMonth()) {
-          end = new Date(start.getFullYear(), start.getMonth() + 1, 0);
+          end = new Date(today);
         }
         segments.push({
           label: `${start.toLocaleDateString("en-US", {
@@ -77,11 +76,9 @@ export function divideTimeframeIntoSegments(
 
     case Timeframe.last3Months:
       for (let i = 0; i < 6; i++) {
-        const start = new Date(
-          today.getFullYear(),
-          today.getMonth() - 2 + Math.floor(i / 2),
-          i % 2 === 0 ? 1 : 16
-        );
+        const start = new Date(today);
+        start.setMonth(today.getMonth() - 2 + Math.floor(i / 2));
+        start.setDate(i % 2 === 0 ? 1 : 16);
         const end = new Date(
           start.getFullYear(),
           start.getMonth(),
@@ -89,6 +86,9 @@ export function divideTimeframeIntoSegments(
             ? 15
             : new Date(start.getFullYear(), start.getMonth() + 1, 0).getDate()
         );
+        if (end > today) {
+          end.setDate(today.getDate());
+        }
         segments.push({
           label: `${start.toLocaleString("en-US", {
             month: "short",
@@ -102,7 +102,10 @@ export function divideTimeframeIntoSegments(
     case Timeframe.last6Months:
       for (let i = 5; i >= 0; i--) {
         const start = new Date(today.getFullYear(), today.getMonth() - i, 1);
-        const end = new Date(start.getFullYear(), start.getMonth() + 1, 0);
+        let end = new Date(start.getFullYear(), start.getMonth() + 1, 0);
+        if (end > today) {
+          end = new Date(today);
+        }
         segments.push({
           label: start.toLocaleDateString("en-US", { month: "long" }),
           start: start,
@@ -114,7 +117,10 @@ export function divideTimeframeIntoSegments(
     case Timeframe.lastYear:
       for (let i = 0; i < 4; i++) {
         const start = new Date(today.getFullYear() - 1, i * 3, 1);
-        const end = new Date(start.getFullYear(), start.getMonth() + 3, 0);
+        let end = new Date(start.getFullYear(), start.getMonth() + 3, 0);
+        if (end > today) {
+          end = new Date(today);
+        }
         segments.push({
           label: `${start.toLocaleDateString("en-US", {
             month: "short",

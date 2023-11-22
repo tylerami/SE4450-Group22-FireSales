@@ -1,10 +1,12 @@
 import { Timeframe } from "models/enums/Timeframe";
-import BarChart, { BarChartSegment } from "components/utils/BarChart";
+import BarChart, { AxisSide, BarChartSegment } from "components/utils/BarChart";
 import React from "react";
 import {
   Conversion,
   ConversionSegment,
   segmentConversionsByTimeframe,
+  totalCommission,
+  totalGrossProfit,
 } from "models/Conversion";
 
 const UserPerformanceChart = ({
@@ -30,23 +32,19 @@ const UserPerformanceChart = ({
           value: convSegment.conversions.length,
         },
         {
-          series: "Earnings",
-          value: convSegment.conversions.reduce(
-            (acc, curr) => acc + curr.affiliateLink.commission,
-            0
-          ),
+          series: "Commission",
+          value: totalCommission(convSegment.conversions),
+        },
+        {
+          series: "Profit Generated",
+          value: totalGrossProfit(convSegment.conversions),
         },
       ],
     };
   };
 
-  const maxSegmentEarnings = Math.max(
-    ...conversionSegments.map((seg) =>
-      seg.conversions.reduce(
-        (acc, curr) => acc + curr.affiliateLink.commission,
-        0
-      )
-    )
+  const maxSegmentProfit = Math.max(
+    ...conversionSegments.map((seg) => totalGrossProfit(seg.conversions))
   );
 
   const maxSegmentConversions = Math.max(
@@ -64,18 +62,25 @@ const UserPerformanceChart = ({
         end: maxSegmentConversions,
       }}
       rightAxisLabel={{
-        label: "Earnings (CAD)",
+        label: "$CAD",
         start: 0,
-        end: maxSegmentEarnings,
+        end: maxSegmentProfit,
       }}
       series={[
         {
           name: "Conversions",
-          color: "#076AFF",
+          color: "#B53F8A",
+          axis: AxisSide.left,
         },
         {
-          name: "Earnings",
-          color: "#3FB54D",
+          name: "Commission",
+          color: "#9807FF",
+          axis: AxisSide.right,
+        },
+        {
+          name: "Profit Generated",
+          color: "#3FB59B",
+          axis: AxisSide.right,
         },
       ]}
     />

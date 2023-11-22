@@ -1,6 +1,6 @@
 import { Timeframe } from "models/enums/Timeframe";
-import BarChart, { BarChartSegment } from "components/utils/BarChart";
-import React from "react";
+import BarChart, { AxisSide, BarChartSegment } from "components/utils/BarChart";
+import React, { useCallback } from "react";
 import {
   Conversion,
   ConversionSegment,
@@ -16,10 +16,9 @@ const UserPerformanceChart = ({
   conversions: Conversion[];
   timeframe: Timeframe;
 }) => {
-  const conversionSegments: ConversionSegment[] = segmentConversionsByTimeframe(
-    conversions,
-    timeframe
-  );
+  const conversionSegments: () => ConversionSegment[] = useCallback(() => {
+    return segmentConversionsByTimeframe(conversions, timeframe);
+  }, [conversions, timeframe]);
 
   const generateBarChartSegment = (
     convSegment: ConversionSegment
@@ -44,16 +43,16 @@ const UserPerformanceChart = ({
   };
 
   const maxSegmentProfit = Math.max(
-    ...conversionSegments.map((seg) => totalGrossProfit(seg.conversions))
+    ...conversionSegments().map((seg) => totalGrossProfit(seg.conversions))
   );
 
   const maxSegmentConversions = Math.max(
-    ...conversionSegments.map((seg) => seg.conversions.length)
+    ...conversionSegments().map((seg) => seg.conversions.length)
   );
 
   return (
     <BarChart
-      segments={conversionSegments.map((convSegment) =>
+      segments={conversionSegments().map((convSegment) =>
         generateBarChartSegment(convSegment)
       )}
       leftAxisLabel={{
@@ -70,14 +69,17 @@ const UserPerformanceChart = ({
         {
           name: "Conversions",
           color: "#B53F8A",
+          axis: AxisSide.left,
         },
         {
           name: "Commission",
           color: "#9807FF",
+          axis: AxisSide.right,
         },
         {
           name: "Profit Generated",
           color: "#3FB59B",
+          axis: AxisSide.right,
         },
       ]}
     />

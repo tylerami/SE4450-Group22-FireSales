@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import { auth, Providers } from "../../../config/firebase";
@@ -17,6 +17,9 @@ import { FiEye, FiEyeOff } from "react-icons/fi";
 
 import { FcGoogle } from "react-icons/fc";
 import { useGlobalState } from "components/utils/GlobalState";
+import { UserContext } from "../UserProvider";
+import { DependencyInjection } from "@models/utils/DependencyInjection";
+import { authService } from "services/implementations/AuthFirebaseService";
 
 const LoginContainer = ({ goToRegister = () => {} }) => {
   const navigate = useNavigate();
@@ -28,35 +31,53 @@ const LoginContainer = ({ goToRegister = () => {} }) => {
 
   const { setActiveTabIndex } = useGlobalState();
 
+  const { setCurrentUser } = useContext(UserContext);
+
   // implement auth service here
-  const signInWithGoogle = () => {
+  const signInWithGoogle = async () => {
     setDisabled(true);
-    signInWithPopup(auth, Providers.google)
-      .then(() => {
-        console.log("logged in");
-        setDisabled(false);
-        console.info("TODO: navigate to authenticated screen");
-        navigate("/");
-        setActiveTabIndex(0);
-      })
-      .catch((error) => {
-        setErrorMessage(error.code + ": " + error.message);
-        setDisabled(false);
-      });
+
+    let user;
+    try {
+      user = await authService.signInWithGoogle();
+    } catch (error: any) {
+      setErrorMessage(error.message);
+      setDisabled(false);
+      return;
+    }
+
+    if (user) {
+      setCurrentUser(user);
+      navigate("/");
+      setActiveTabIndex(0);
+    } else {
+      setErrorMessage("Invalid email or password");
+    }
+
+    setDisabled(false);
   };
 
-  const signInManually = () => {
+  const signInManually = async () => {
     setDisabled(true);
-    signInWithEmailAndPassword(auth, email, password)
-      .then(() => {
-        setDisabled(false);
-        console.info("TODO: navigate to authenticated screen");
-        navigate("/");
-      })
-      .catch((error) => {
-        setErrorMessage(error.code + ": " + error.message);
-        setDisabled(false);
-      });
+
+    let user;
+    try {
+      user = await authService.signInWithEmailAndPassword(email, password);
+    } catch (error: any) {
+      setErrorMessage(error.message);
+      setDisabled(false);
+      return;
+    }
+
+    if (user) {
+      setCurrentUser(user);
+      navigate("/");
+      setActiveTabIndex(0);
+    } else {
+      setErrorMessage("Invalid email or password");
+    }
+
+    setDisabled(false);
   };
 
   return (
@@ -154,8 +175,15 @@ const LoginContainer = ({ goToRegister = () => {} }) => {
       >
         Sign in
       </Button>
+      <Box h={2} />
 
-      <Box h={4} />
+      {errorMessage && (
+        <Text color="red" fontSize="0.8em">
+          {errorMessage}
+        </Text>
+      )}
+
+      <Box h={2} />
 
       <Flex w="100%" alignItems={"center"} justifyContent={"space-between"}>
         <Box w="45%" h="1px" background="black" opacity={0.2} />

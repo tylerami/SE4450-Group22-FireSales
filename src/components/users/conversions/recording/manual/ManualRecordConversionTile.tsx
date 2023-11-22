@@ -19,7 +19,7 @@ import { ChevronDownIcon, DeleteIcon } from "@chakra-ui/icons";
 import {
   Conversion,
   ConversionAttachmentGroup,
-} from "../../../../../../models/Conversion";
+} from "../../../../../models/Conversion";
 import { FaDollarSign } from "react-icons/fa";
 import { AffiliateLink } from "models/AffiliateLink";
 import { UserContext } from "components/auth/UserProvider";

@@ -61,11 +61,10 @@ const AdminSalesTeamPage = (props: Props) => {
     fetchPayouts();
   }, [compGroupService, conversionService, payoutService, userService]);
 
-  const selectedUserConversions: Conversion[] = conversions.filter(
-    (conversion) => {
+  const getUserConversions = (): Conversion[] =>
+    conversions.filter((conversion) => {
       return conversion.userId === selectedUser?.uid;
-    }
-  );
+    });
 
   const [displayPerformanceWidget, setDisplayPerformanceWidget] =
     useState<boolean>(true);
@@ -128,13 +127,13 @@ const AdminSalesTeamPage = (props: Props) => {
           </Flex>
 
           <AdminConversionHistoryWidget
-            conversions={selectedUserConversions}
+            conversions={getUserConversions()}
             togglePerformanceWidget={toggleDisplayPerformanceWidget}
           />
           {displayPerformanceWidget && (
             <UserPerformanceWidget
               user={selectedUser}
-              conversions={selectedUserConversions}
+              conversions={getUserConversions()}
             />
           )}
         </Flex>

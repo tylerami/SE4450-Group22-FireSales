@@ -5,7 +5,7 @@ import { AddIcon } from "@chakra-ui/icons";
 import {
   Conversion,
   ConversionAttachmentGroup,
-} from "../../../../../../models/Conversion";
+} from "../../../../../models/Conversion";
 import { CompensationGroup } from "models/CompensationGroup";
 import { ConversionService } from "services/interfaces/ConversionService";
 import { DependencyInjection } from "models/utils/DependencyInjection";

@@ -1,7 +1,7 @@
 import AdminDashboard from "../components/admin/AdminDashboard";
 import AuthPage from "../components/auth/AuthPage";
-import ConversionsPage from "../components/common/users/conversions/ConversionsPage";
-import UserDashboard from "../components/common/users/UserDashboard";
+import ConversionsPage from "../components/users/conversions/ConversionsPage";
+import UserDashboard from "../components/users/UserDashboard";
 
 const routes = [
   {
