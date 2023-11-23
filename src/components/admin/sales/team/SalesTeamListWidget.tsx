@@ -78,6 +78,11 @@ const SalesTeamListWidget = ({
     setShowUnassignedUsers((prev) => !prev);
   };
 
+  const [showAdmins, setShowAdmins] = useState<boolean>(false);
+  const toggleShowAdmins = () => {
+    setShowAdmins((prev) => !prev);
+  };
+
   // Sorting
   const [sortBy, setSortBy] = useState<SortBy>(SortBy.UnverifiedConversions);
   const [sortDirection, setSortDirection] = useState<SortDirection>(
@@ -325,7 +330,6 @@ const SalesTeamListWidget = ({
             />
           </React.Fragment>
         </Flex>
-
         <Flex
           gap={4}
           alignItems={"left"}
@@ -339,13 +343,6 @@ const SalesTeamListWidget = ({
             {filterDropdowns.map((filter, i) => (
               <Filter key={i} filter={filter} />
             ))}
-            <Heading minW="4em" size="xs" fontWeight={400}>
-              Unassigned Users:
-            </Heading>
-            <Switch
-              isChecked={showUnassignedUsers}
-              onChange={toggleUnassignedUsers}
-            />
           </Flex>
           <Flex
             gap={4}
@@ -360,6 +357,20 @@ const SalesTeamListWidget = ({
               <Filter key={i} filter={filter} />
             ))}
           </Flex>
+        </Flex>
+        <Flex alignItems={"center"} gap={2}>
+          <Heading minW="4em" size="xs" fontWeight={400}>
+            Unassigned Users:
+          </Heading>
+          <Switch
+            isChecked={showUnassignedUsers}
+            onChange={toggleUnassignedUsers}
+          />
+          <Box w={4} />
+          <Heading minW="4em" size="xs" fontWeight={400}>
+            Show Admins:
+          </Heading>
+          <Switch isChecked={showAdmins} onChange={toggleShowAdmins} />
         </Flex>
       </Flex>
 

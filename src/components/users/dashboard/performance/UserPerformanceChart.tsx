@@ -35,10 +35,6 @@ const UserPerformanceChart = ({
           series: "Commission",
           value: totalCommission(convSegment.conversions),
         },
-        {
-          series: "Profit Generated",
-          value: totalGrossProfit(convSegment.conversions),
-        },
       ],
     };
   };
@@ -69,17 +65,12 @@ const UserPerformanceChart = ({
       series={[
         {
           name: "Conversions",
-          color: "#B53F8A",
+          color: "#3F6EB5",
           axis: AxisSide.left,
         },
         {
           name: "Commission",
-          color: "#9807FF",
-          axis: AxisSide.right,
-        },
-        {
-          name: "Profit Generated",
-          color: "#3FB59B",
+          color: "#07FF7F",
           axis: AxisSide.right,
         },
       ]}

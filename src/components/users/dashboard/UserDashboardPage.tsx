@@ -22,7 +22,7 @@ const UserDashboardPage = (props: Props) => {
 
   return (
     <React.Fragment>
-      <Flex alignSelf="start" px={8} py={2} pt={8}>
+      <Flex alignSelf="start" px={8} py={6}>
         <Heading size="lg" mr={2} fontWeight={400}>
           Welcome,
         </Heading>
@@ -33,7 +33,6 @@ const UserDashboardPage = (props: Props) => {
 
       {/* Column: Performance chart and table */}
       <Flex width={"100%"} direction="column" gap={6} alignItems={"center"}>
-        <Box></Box>
         <AffiliateLinkWidget></AffiliateLinkWidget>
         <UserPerformanceWidget user={currentUser} conversions={[]} />
 

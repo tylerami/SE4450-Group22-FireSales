@@ -36,7 +36,7 @@ const AdminSalesTeamPage = (props: Props) => {
 
   useEffect(() => {
     const fetchUsers = async () => {
-      const users = await userService.getAll();
+      const users = await userService.getAll({ includeAdmins: true });
       setUsers(users);
     };
 

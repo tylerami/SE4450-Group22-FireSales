@@ -10,10 +10,8 @@ import {
   Th,
   Spacer,
 } from "@chakra-ui/react";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 
-import { Menu, MenuButton, MenuList, MenuItem, Button } from "@chakra-ui/react";
-import { ChevronDownIcon } from "@chakra-ui/icons";
 import { Timeframe, getTimeframeLabel } from "models/enums/Timeframe";
 import {
   Conversion,
@@ -66,11 +64,8 @@ const ClientsPerformanceWidget = (props: Props) => {
     useState<CompensationGroup | null>(null);
 
   const [conversions, setConversions] = useState<Conversion[]>([]);
-  const [filteredConversions, setFilteredConversions] = useState<Conversion[]>(
-    []
-  );
 
-  const filterConversions = () => {
+  const filteredConversions: Conversion[] = useMemo(() => {
     let tempConversions = conversions;
     if (selectedClient) {
       tempConversions = tempConversions.filter(
@@ -87,14 +82,22 @@ const ClientsPerformanceWidget = (props: Props) => {
         (conv) => conv.compensationGroupId === selectedCompensationGroup.id
       );
     }
-    if (timeframe) {
+
+    if (timeframe !== null) {
       tempConversions = filterConversionsByTimeframe(
         tempConversions,
         timeframe
       );
     }
-    setFilteredConversions(tempConversions);
-  };
+
+    return tempConversions;
+  }, [
+    conversions,
+    selectedClient,
+    selectedCompensationGroup,
+    selectedReferralLinkType,
+    timeframe,
+  ]);
 
   useEffect(() => {
     const fetchConversions = async () => {
@@ -119,42 +122,32 @@ const ClientsPerformanceWidget = (props: Props) => {
 
   const tableColumns: {
     label: string;
-    getValue: (conversions: Conversion[]) => string;
-  }[] = [
-    {
-      label: "Conversions",
-      getValue: (conversions: Conversion[]) => conversions.length.toString(),
-    },
-    {
-      label: "Revenue",
-      getValue: (conversions: Conversion[]) =>
-        formatMoney(totalRevenue(conversions)),
-    },
-    {
-      label: "Profit",
-      getValue: (conversions: Conversion[]) =>
-        formatMoney(totalGrossProfit(conversions)),
-    },
-    {
-      label: "Avg. Bet Size",
-      getValue: (conversions: Conversion[]) =>
-        formatMoney(averageBetSize(conversions)),
-    },
-    {
-      label: "Avg. Commission",
-      getValue: (conversions: Conversion[]) =>
-        formatMoney(averageCommission(conversions)),
-    },
-  ];
-
-  const performanceMetrics = [
-    ...tableColumns,
-    {
-      label: "Avg. CPA",
-      getValue: (conversions: Conversion[]) =>
-        formatMoney(averageCpa(conversions)),
-    },
-  ];
+    getValue: (conv: Conversion[]) => string;
+  }[] = useMemo(
+    () => [
+      {
+        label: "Conversions",
+        getValue: (conv: Conversion[]) => conv.length.toString(),
+      },
+      {
+        label: "Revenue",
+        getValue: (conv: Conversion[]) => formatMoney(totalRevenue(conv)),
+      },
+      {
+        label: "Profit",
+        getValue: (conv: Conversion[]) => formatMoney(totalGrossProfit(conv)),
+      },
+      {
+        label: "Avg. Commission",
+        getValue: (conv: Conversion[]) => formatMoney(averageCommission(conv)),
+      },
+      {
+        label: "Avg. Bet Size",
+        getValue: (conv: Conversion[]) => formatMoney(averageBetSize(conv)),
+      },
+    ],
+    []
+  );
 
   const timeframes: Timeframe[] = Object.values(Timeframe).filter(
     (value): value is Timeframe => typeof value === "number"
@@ -169,22 +162,36 @@ const ClientsPerformanceWidget = (props: Props) => {
     conversion.affiliateLink.clientId === deal.clientId &&
     conversion.affiliateLink.type === deal.type;
 
-  const affiliateDealGroups: {
-    deal: AffiliateDeal;
-    conversions: Conversion[];
-  }[] = getAllAffiliateDeals(clients).map((deal, i) => ({
-    deal,
-    conversions: filteredConversions.filter((conv) =>
-      sameAffiliateDeal(conv, deal)
-    ),
-  }));
+  const getAffiliateDealGroups = useCallback(() => {
+    let relevantConversions = filterConversionsByTimeframe(
+      conversions,
+      timeframe
+    );
 
-  affiliateDealGroups.sort(
-    (a, b) => b.conversions.length - a.conversions.length
-  );
-  affiliateDealGroups.sort((a, b) =>
-    a.deal.clientName.localeCompare(b.deal.clientName)
-  );
+    let revelantConversions = relevantConversions.filter(
+      (conv) =>
+        selectedCompensationGroup === null ||
+        conv.compensationGroupId === selectedCompensationGroup?.id
+    );
+
+    const affiliateDealGroups: {
+      deal: AffiliateDeal;
+      conversions: Conversion[];
+    }[] = getAllAffiliateDeals(clients).map((deal, i) => ({
+      deal,
+      conversions: revelantConversions.filter((conv) =>
+        sameAffiliateDeal(conv, deal)
+      ),
+    }));
+
+    affiliateDealGroups.sort(
+      (a, b) => b.conversions.length - a.conversions.length
+    );
+    affiliateDealGroups.sort((a, b) =>
+      a.deal.clientName.localeCompare(b.deal.clientName)
+    );
+    return affiliateDealGroups;
+  }, [clients, conversions, selectedCompensationGroup, timeframe]);
 
   // Define filters
 
@@ -195,7 +202,6 @@ const ClientsPerformanceWidget = (props: Props) => {
       options: [null, ...clients],
       onChange: (value) => setSelectedClient(value as Client),
       value: selectedClient,
-      refresh: filterConversions,
       label: (value) => {
         if (value == null) return "All Clients";
         return (value as Client).name;
@@ -206,7 +212,7 @@ const ClientsPerformanceWidget = (props: Props) => {
       onChange: (value) =>
         setSelectedReferralLinkType(value as ReferralLinkType),
       value: selectedReferralLinkType,
-      refresh: filterConversions,
+
       label: (value) => getReferralLinkTypeLabel(value as ReferralLinkType),
     },
     {
@@ -214,7 +220,6 @@ const ClientsPerformanceWidget = (props: Props) => {
       onChange: (value) =>
         setSelectedCompensationGroup(value as CompensationGroup),
       value: selectedCompensationGroup,
-      refresh: filterConversions,
       label: (value) => {
         if (value == null) return "All Comp. Groups";
         return (value as CompensationGroup).id;
@@ -224,10 +229,27 @@ const ClientsPerformanceWidget = (props: Props) => {
       options: timeframes,
       onChange: (value) => setSelectedTimeframe(value as Timeframe),
       value: timeframe,
-      refresh: filterConversions,
       label: (value) => getTimeframeLabel(value as Timeframe),
     },
   ];
+
+  const performanceMetricsContent = useMemo(() => {
+    const performanceMetrics: {
+      label: string;
+      getValue: (conv: Conversion[]) => string;
+    }[] = [
+      ...tableColumns,
+      {
+        label: "Avg. CPA",
+        getValue: (conv: Conversion[]) => formatMoney(averageCpa(conv)),
+      },
+    ];
+
+    return performanceMetrics.map((metric) => ({
+      title: metric.label,
+      value: metric.getValue(filteredConversions),
+    }));
+  }, [tableColumns, filteredConversions]);
 
   return (
     <Flex
@@ -252,12 +274,8 @@ const ClientsPerformanceWidget = (props: Props) => {
       <Box h={4}></Box>
 
       <Flex my={4} justifyContent={"space-evenly"}>
-        {performanceMetrics.map((metric, i) => (
-          <PerformanceMetricBox
-            key={i}
-            title={metric.label}
-            value={metric.getValue(filteredConversions).toString()}
-          />
+        {performanceMetricsContent.map(({ title, value }, i) => (
+          <PerformanceMetricBox key={i} title={title} value={value} />
         ))}
       </Flex>
 
@@ -289,7 +307,7 @@ const ClientsPerformanceWidget = (props: Props) => {
           </Tr>
         </Thead>
         <Tbody>
-          {affiliateDealGroups.map(
+          {getAffiliateDealGroups().map(
             ({ deal, conversions: groupConversions }, i) => (
               <Tr key={i}>
                 <Td textAlign={"center"}>

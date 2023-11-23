@@ -89,6 +89,7 @@ export class User {
       lastName: this.lastName,
       email: this.email,
       roles: this.roles,
+      phone: this.phone,
       registeredAt: this.registeredAt
         ? Timestamp.fromDate(this.registeredAt)
         : null,
@@ -105,6 +106,7 @@ export class User {
       lastName: doc.lastName,
       email: doc.email,
       roles: doc.roles,
+      phone: doc.phone,
       registeredAt: doc.registeredAt ? doc.registeredAt.toDate() : new Date(),
       compensationGroupId: doc.compensationGroupId,
       payoutPreferrences: doc.payoutPreferrences

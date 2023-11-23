@@ -157,7 +157,6 @@ const SalesTeamListTable = ({
         {currentPageUsers.map((user, index) => (
           <Tr
             _hover={{ background: "rgba(237, 125, 49, 0.26)" }}
-            textAlign={"center"}
             key={index}
             transition={"all 0.2s ease-in-out"}
             cursor={"pointer"}
@@ -165,7 +164,7 @@ const SalesTeamListTable = ({
             height={"5em"}
           >
             <Td maxWidth={"10em"} textAlign="center">
-              <Flex justifyContent={"center"}>
+              <Flex justifyContent={"left"}>
                 {user.profilePictureSrc ? (
                   <Image
                     borderRadius="full"

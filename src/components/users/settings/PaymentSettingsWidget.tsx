@@ -25,7 +25,7 @@ import { PayoutPreferrences } from "models/PayoutPreferrences";
 type Props = {};
 
 const PaymentSettingsWidget = (props: Props) => {
-  const { currentUser } = useContext(UserContext);
+  const { currentUser, setCurrentUser } = useContext(UserContext);
 
   const [payoutDay, setPayoutDay] = useState<DayOfTheWeek | null>(
     currentUser?.payoutPreferrences?.preferredPayoutDay || null
@@ -56,14 +56,15 @@ const PaymentSettingsWidget = (props: Props) => {
   const saveChanges = async () => {
     if (!currentUser) return;
 
-    const updatedUser: Partial<User> = {
-      uid: currentUser.uid,
+    const updatedUser: User = new User({
+      ...currentUser,
       payoutPreferrences: generatePayoutPreferences(),
-    };
+    });
 
     const result = await userService.update(updatedUser);
     if (result) {
       showSuccess({ message: "Changes saved successfully!" });
+      setCurrentUser(updatedUser);
     }
   };
 

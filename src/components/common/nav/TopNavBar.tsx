@@ -44,23 +44,26 @@ const TopNavBar: React.FC<TopNavBarProps> = ({ pageName }) => {
         </Heading>
       </Box>
 
-      <Button
-        onClick={() => {
-          setActiveTabIndex(0);
-          navigate("/admin");
-        }}
-      >
-        Admin Dashboard
-      </Button>
-      <Button
-        onClick={() => {
-          setActiveTabIndex(0);
-          navigate("/");
-        }}
-      >
-        User Dashboard
-      </Button>
-
+      {currentUser?.isAdmin() && (
+        <React.Fragment>
+          <Button
+            onClick={() => {
+              setActiveTabIndex(0);
+              navigate("/admin");
+            }}
+          >
+            Admin Dashboard
+          </Button>
+          <Button
+            onClick={() => {
+              setActiveTabIndex(0);
+              navigate("/");
+            }}
+          >
+            User Dashboard
+          </Button>
+        </React.Fragment>
+      )}
       {/* Right-aligned Profile section */}
       <Flex mx={8}>
         <Box mx={4} textAlign="right">

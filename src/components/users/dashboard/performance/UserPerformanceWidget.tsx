@@ -123,39 +123,24 @@ const UserPerformanceWidget = (props: Props) => {
       getValue: (conversions: Conversion[]) => conversions.length.toString(),
     },
     {
-      label: "Commission",
+      label: "Total Commission",
       getValue: (conversions: Conversion[]) =>
         formatMoney(totalCommission(conversions)),
     },
     {
-      label: "Profit",
+      label: "Avg. Bet Size",
       getValue: (conversions: Conversion[]) =>
-        formatMoney(totalGrossProfit(conversions)),
+        formatMoney(averageBetSize(conversions)),
     },
-    ...(useBreakpointValue({ base: false, lg: true })
-      ? [
-          {
-            label: "Avg. Bet Size",
-            getValue: (conversions: Conversion[]) =>
-              formatMoney(averageBetSize(conversions)),
-          },
-          {
-            label: "Avg. Commission",
-            getValue: (conversions: Conversion[]) =>
-              formatMoney(averageCommission(conversions)),
-          },
-        ]
-      : []),
+
+    {
+      label: "Avg. Commission",
+      getValue: (conversions: Conversion[]) =>
+        formatMoney(averageCommission(conversions)),
+    },
   ];
 
-  const performanceMetrics = [
-    ...tableColumns,
-    {
-      label: "Avg. CPA",
-      getValue: (conversions: Conversion[]) =>
-        formatMoney(averageCpa(conversions)),
-    },
-  ];
+  const performanceMetrics = [...tableColumns];
 
   const timeframes: Timeframe[] = Object.values(Timeframe).filter(
     (value): value is Timeframe => typeof value === "number"
@@ -210,17 +195,7 @@ const UserPerformanceWidget = (props: Props) => {
       refresh: filterConversions,
       label: (value) => getReferralLinkTypeLabel(value as ReferralLinkType),
     },
-    {
-      options: [null, ...compensationGroups],
-      onChange: (value) =>
-        setSelectedCompensationGroup(value as CompensationGroup),
-      value: selectedCompensationGroup,
-      refresh: filterConversions,
-      label: (value) => {
-        if (value == null) return "All Comp. Groups";
-        return (value as CompensationGroup).id;
-      },
-    },
+
     {
       options: timeframes,
       onChange: (value) => setSelectedTimeframe(value as Timeframe),
@@ -234,7 +209,7 @@ const UserPerformanceWidget = (props: Props) => {
     <Flex
       p={26}
       borderRadius={"20px"}
-      width={"100%"}
+      width={"95%"}
       flexDirection={"column"}
       boxShadow={"3px 4px 12px rgba(0, 0, 0, 0.2)"}
     >

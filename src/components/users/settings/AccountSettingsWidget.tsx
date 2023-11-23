@@ -17,38 +17,9 @@ import useSuccessNotification from "components/utils/SuccessNotification";
 type Props = {};
 
 const AccountSettingsWidget = (props: Props) => {
-  const { currentUser } = useContext(UserContext);
+  const { currentUser, setCurrentUser } = useContext(UserContext);
 
   const userService: UserService = DependencyInjection.userService();
-
-  const showSuccess = useSuccessNotification();
-
-  const saveChanges = async () => {
-    if (!currentUser) return;
-
-    const updatedUser: Partial<User> = {
-      uid: currentUser.uid,
-      phone: phoneNumber,
-      email: primaryEmail,
-      firstName: fullName.split(" ")[0],
-      lastName: fullName.split(" ")[1],
-    };
-
-    const result = await userService.update(updatedUser);
-    if (result) {
-      showSuccess({ message: "Changes saved successfully!" });
-    }
-  };
-
-  const changesMade = () => {
-    if (!currentUser) return false;
-
-    return (
-      fullName !== currentUser.getFullName() ||
-      primaryEmail !== currentUser.email ||
-      phoneNumber !== (currentUser.phone ?? "")
-    );
-  };
 
   const [fullName, setFullName] = useState<string>(
     currentUser?.getFullName() || ""
@@ -61,6 +32,36 @@ const AccountSettingsWidget = (props: Props) => {
   const [phoneNumber, setPhoneNumber] = useState<string>(
     currentUser?.phone || ""
   );
+
+  const showSuccess = useSuccessNotification();
+
+  const saveChanges = async () => {
+    if (!currentUser) return;
+
+    const updatedUser: User = new User({
+      ...currentUser,
+      phone: phoneNumber,
+      email: primaryEmail,
+      firstName: fullName.split(" ")[0],
+      lastName: fullName.split(" ")[1],
+    });
+
+    const result = await userService.update(updatedUser);
+    if (result) {
+      showSuccess({ message: "Changes saved successfully!" });
+      setCurrentUser(updatedUser);
+    }
+  };
+
+  const changesMade = () => {
+    if (!currentUser) return false;
+
+    return (
+      fullName !== currentUser.getFullName() ||
+      primaryEmail !== currentUser.email ||
+      phoneNumber !== (currentUser.phone ?? "")
+    );
+  };
 
   return (
     <Flex

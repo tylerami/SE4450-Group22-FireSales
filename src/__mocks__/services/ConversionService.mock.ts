@@ -4,6 +4,9 @@ import { sampleConversions } from "__mocks__/models/Conversion.mock";
 import { ConversionService } from "services/interfaces/ConversionService";
 
 export class MockConversionService implements ConversionService {
+  updateBulk(conversions: Conversion[]): Promise<Conversion[]> {
+    throw new Error("Method not implemented.");
+  }
   isAssignmentCodeValid(code: string): Promise<boolean> {
     throw new Error("Method not implemented.");
   }

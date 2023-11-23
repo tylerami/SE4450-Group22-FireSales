@@ -6,6 +6,7 @@ export interface ConversionService {
     conversion: Conversion,
     { attachments }: { attachments?: File[] }
   ): Promise<Conversion>;
+  updateBulk(conversions: Conversion[]): Promise<Conversion[]>;
   createBulk(
     items: Array<{ conversion: Conversion; attachments?: File[] }>
   ): Promise<Conversion[]>;

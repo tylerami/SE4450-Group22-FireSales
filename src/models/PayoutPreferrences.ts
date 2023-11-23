@@ -5,16 +5,16 @@ import { Timestamp, DocumentData } from "firebase/firestore";
 export class PayoutPreferrences {
   addressByMethod: { [key in PaymentMethod]?: string };
   preferredMethod: PaymentMethod;
-  preferredPayoutDay?: DayOfTheWeek;
+  preferredPayoutDay: DayOfTheWeek | null;
 
   constructor({
     addressByMethod = {},
     preferredMethod = PaymentMethod.etransfer,
-    preferredPayoutDay,
+    preferredPayoutDay = null,
   }: {
     addressByMethod?: { [key in PaymentMethod]?: string };
-    preferredMethod: PaymentMethod;
-    preferredPayoutDay?: DayOfTheWeek;
+    preferredMethod?: PaymentMethod;
+    preferredPayoutDay?: DayOfTheWeek | null;
   }) {
     this.addressByMethod = addressByMethod;
     this.preferredMethod = preferredMethod;

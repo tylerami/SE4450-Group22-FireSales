@@ -53,6 +53,25 @@ export class ConversionFirebaseService implements ConversionService {
     return conversion;
   }
 
+  async updateBulk(conversions: Conversion[]): Promise<Conversion[]> {
+    const batch = writeBatch(this.db);
+
+    for (const conversion of conversions) {
+      const docRef = doc(this.conversionsCollection(), conversion.id);
+      try {
+        batch.update(docRef, conversion.toFirestoreDoc());
+      } catch (e) {
+        console.log(e);
+      }
+    }
+    try {
+      await batch.commit();
+    } catch (e) {
+      console.log(e);
+    }
+    return conversions;
+  }
+
   async createBulk(
     items: { conversion: Conversion; attachments?: File[] | undefined }[]
   ): Promise<Conversion[]> {

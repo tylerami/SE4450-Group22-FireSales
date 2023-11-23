@@ -5,6 +5,7 @@ import {
   Conversion,
   ConversionSegment,
   segmentConversionsByTimeframe,
+  totalCostOfConversions,
   totalGrossProfit,
   totalRevenue,
 } from "models/Conversion";
@@ -32,7 +33,16 @@ const ClientsPerformanceChart = ({
           value: convSegment.conversions.length,
         },
         {
-          series: "Earnings",
+          series: "Revenue",
+          value: totalRevenue(convSegment.conversions),
+        },
+        {
+          series: "COGS",
+          value: totalCostOfConversions(convSegment.conversions),
+        },
+
+        {
+          series: "Profit",
           value: convSegment.conversions.reduce(
             (acc, curr) => acc + curr.affiliateLink.commission,
             0
@@ -47,7 +57,7 @@ const ClientsPerformanceChart = ({
   );
 
   const maxSegmentConversions = Math.max(
-    ...conversionSegments.map((seg) => seg.conversions.length)
+    ...conversionSegments.map((seg) => Math.max(10, seg.conversions.length))
   );
 
   return (
@@ -77,7 +87,13 @@ const ClientsPerformanceChart = ({
           axis: AxisSide.right,
         },
         {
-          name: "Earnings",
+          name: "COGS",
+          color: "#FF0000",
+          axis: AxisSide.right,
+        },
+
+        {
+          name: "Profit",
           color: "#3FB54D",
           axis: AxisSide.right,
         },

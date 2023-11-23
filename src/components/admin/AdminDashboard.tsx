@@ -6,7 +6,7 @@ import { useGlobalState } from "../utils/GlobalState";
 import { MdMonetizationOn } from "react-icons/md";
 import { BiAnalyse } from "react-icons/bi";
 import { IoMdPeople } from "react-icons/io";
-import { FaReceipt, FaRegHandshake } from "react-icons/fa";
+import { FaMoneyBillWave, FaReceipt, FaRegHandshake } from "react-icons/fa";
 import { RiLogoutBoxRLine } from "react-icons/ri";
 import { signOut } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
@@ -17,6 +17,7 @@ import AdminClientsPage from "./clients/AdminClientsPage";
 import CompensationGroupsPage from "./compensation_groups/CompensationGroupsPage";
 import { Tab } from "components/common/nav/Tab";
 import AdminRecordConversionsPage from "./conversions/AdminRecordConversionsPage";
+import PayoutsPage from "./payouts/PayoutsPage";
 
 const AdminDashboard = (props) => {
   // Assuming the SideNavBar has a fixed width for simplicity
@@ -58,6 +59,12 @@ const AdminDashboard = (props) => {
       icon: FaReceipt,
       content: <AdminRecordConversionsPage />,
       onClick: () => setActiveTabIndex(4),
+    },
+    {
+      name: "Payouts",
+      icon: FaMoneyBillWave,
+      content: <PayoutsPage />,
+      onClick: () => setActiveTabIndex(5),
     },
     {
       name: "Sign Out",

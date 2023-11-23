@@ -288,10 +288,6 @@ export function segmentConversionsByTimeframe(
   const timeframeSegments: TimeframeSegment[] =
     divideTimeframeIntoSegments(timeframe);
 
-  for (const segment of timeframeSegments) {
-    console.log(segment.label, segment.start, segment.end);
-  }
-
   const conversionSegments: ConversionSegment[] = timeframeSegments.map(
     (segment) => ({
       segmentLabel: segment.label,
@@ -321,9 +317,23 @@ export function filterConversionsByTimeframe(
   conversions: Array<Conversion>,
   timeframe: Timeframe
 ): Array<Conversion> {
-  const intervalStart = getIntervalStart(timeframe);
+  const intervalStart: Date = getIntervalStart(timeframe);
+
   return conversions.filter(
-    (conversion) => conversion.dateOccurred >= intervalStart
+    (conversion) => conversion.dateOccurred.getTime() >= intervalStart.getTime()
+  );
+}
+
+export function setConversionStatus(
+  conversions: Array<Conversion>,
+  status: ConversionStatus
+): Array<Conversion> {
+  return conversions.map(
+    (conversion: Conversion) =>
+      new Conversion({
+        ...conversion,
+        status,
+      })
   );
 }
 

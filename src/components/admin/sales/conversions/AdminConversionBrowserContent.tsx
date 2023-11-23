@@ -137,7 +137,7 @@ const AdminConversionBrowserContent = ({
       onChange: (value) => setClientFilter(value as Client | null),
       value: clientFilter,
       label: (value) => {
-        if (value === null) return "All Comp. Groups";
+        if (value === null) return "All Clients";
         return (value as Client).name;
       },
     },
@@ -363,19 +363,32 @@ const AdminConversionBrowserContent = ({
           </Tr>
         </Thead>
         <Tbody>
-          {currentPageConversions.map((sale, i) => (
+          {currentPageConversions.map((conv, i) => (
             <Tr
               key={i}
               cursor={"pointer"}
               onClick={() => {
-                selectConversion(sale);
+                selectConversion(conv);
               }}
-              _hover={{ background: "rgba(237, 125, 49, 0.26)" }}
+              _hover={{ background: "#FFF08D" }}
             >
               {tableColumns.map((property, i) => {
                 return (
-                  <Td key={i} textAlign={"center"}>
-                    {property.getValue(sale)}
+                  <Td
+                    color={
+                      i === tableColumns.length - 1
+                        ? conv.status === ConversionStatus.pending
+                          ? "#FA9D45"
+                          : conv.status === ConversionStatus.rejected
+                          ? "#F71010"
+                          : "#4BF84B"
+                        : undefined
+                    }
+                    fontWeight={i === tableColumns.length - 1 ? 700 : undefined}
+                    key={i}
+                    textAlign={"center"}
+                  >
+                    {property.getValue(conv)}
                   </Td>
                 );
               })}

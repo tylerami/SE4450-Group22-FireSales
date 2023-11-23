@@ -32,8 +32,10 @@ import {
   averageBetSize,
   averageCommission,
   filterConversionsByTimeframe,
+  totalBets,
   totalCommission,
   totalGrossProfit,
+  totalRevenue,
 } from "models/Conversion";
 import { Payout } from "models/Payout";
 import {
