@@ -15,11 +15,9 @@
     "@types/node": "^12.20.55",
     "@types/react": "^18.2.34",
     "@types/react-dom": "^18.2.14",
-    "customize-cra": "^1.0.0",
     "firebase": "^10.5.2",
     "framer-motion": "^6.5.1",
     "react": "^18.2.0",
-    "react-app-rewired": "^2.2.1",
     "react-chartjs-2": "^5.2.0",
     "react-dom": "^18.2.0",
     "react-icons": "^3.11.0",
@@ -31,7 +29,9 @@
   },
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.16.7",
-    "babel-plugin-module-resolver": "^5.0.0"
+    "babel-plugin-module-resolver": "^5.0.0",
+    "customize-cra": "^1.0.0",
+    "react-app-rewired": "^2.2.1"
   },
   "scripts": {
     "start": "react-app-rewired start",
