@@ -10,14 +10,29 @@ type Props = {};
 const ConversionsPage = (props: Props) => {
   const { currentUser } = useContext(UserContext);
 
+  const [isConversionSelected, setIsConversionSelected] =
+    useState<boolean>(false);
+
+  const [minimizeRecordConversion, setMinimizeRecordConversions] =
+    useState<boolean>(false);
+
   return (
     <Flex w="100%" alignItems={"center"} direction={"column"} px={6}>
       <Box minH={8}></Box>
       {currentUser?.compensationGroupId ? (
         <React.Fragment>
-          <RecordConversionsWidget />
-          <Box minH={8}></Box>
-          <ConversionHistoryWidget />
+          {!isConversionSelected && (
+            <React.Fragment>
+              <RecordConversionsWidget
+                minimizeRecordConversion={minimizeRecordConversion}
+                setMinimizeRecordConversions={setMinimizeRecordConversions}
+              />
+              <Box minH={8}></Box>
+            </React.Fragment>
+          )}
+          <ConversionHistoryWidget
+            setIsConversionSelected={setIsConversionSelected}
+          />
         </React.Fragment>
       ) : (
         <React.Fragment>

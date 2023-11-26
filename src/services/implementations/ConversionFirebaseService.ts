@@ -26,27 +26,17 @@ export class ConversionFirebaseService implements ConversionService {
     this.db = db;
     this.imageService = imageService;
   }
-
   async create(
     conversion: Conversion,
-    { attachments }: { attachments?: File[] | undefined }
+    attachments: File[] = []
   ): Promise<Conversion> {
     const docRef = doc(this.conversionsCollection(), conversion.id);
 
     if (attachments) {
-      const userId = conversion.userId;
-      const path = `/conversions/${userId}/${conversion.id}`;
-
-      const attachmentUrls: string[] = [];
-      for (const attachment of attachments) {
-        const attachmentUrl = await this.imageService.uploadImage(
-          path,
-          attachment
-        );
-        attachmentUrls.push(attachmentUrl);
-      }
-
-      conversion.attachmentUrls = attachmentUrls;
+      conversion = await this.imageService.uploadConversionAttachments(
+        conversion,
+        attachments
+      );
     }
 
     await setDoc(docRef, conversion.toFirestoreDoc());
@@ -72,29 +62,37 @@ export class ConversionFirebaseService implements ConversionService {
     return conversions;
   }
 
+  async update(
+    conversion: Conversion,
+    newAttachments: File[] = []
+  ): Promise<Conversion> {
+    const docRef = doc(this.conversionsCollection(), conversion.id);
+
+    if (newAttachments) {
+      conversion = await this.imageService.uploadConversionAttachments(
+        conversion,
+        newAttachments
+      );
+    }
+
+    await setDoc(docRef, conversion.toFirestoreDoc());
+    return conversion;
+  }
+
   async createBulk(
     items: { conversion: Conversion; attachments?: File[] | undefined }[]
   ): Promise<Conversion[]> {
     const batch = writeBatch(this.db);
     const conversions: Conversion[] = [];
 
-    for (const { conversion, attachments } of items) {
+    for (let { conversion, attachments } of items) {
       const docRef = doc(this.conversionsCollection(), conversion.id);
 
       if (attachments) {
-        const userId = conversion.userId;
-        const path = `/conversions/${userId}/${conversion.id}`;
-
-        const attachmentUrls: string[] = [];
-        for (const attachment of attachments) {
-          const attachmentUrl = await this.imageService.uploadImage(
-            path,
-            attachment
-          );
-          attachmentUrls.push(attachmentUrl);
-        }
-
-        conversion.attachmentUrls = attachmentUrls;
+        conversion = await this.imageService.uploadConversionAttachments(
+          conversion,
+          attachments
+        );
       }
 
       batch.set(docRef, conversion.toFirestoreDoc());
@@ -200,26 +198,22 @@ export class ConversionFirebaseService implements ConversionService {
 
     // create unassigned conversions
 
-    for (const { conversion, attachments } of items) {
-      const docRef = doc(this.unassignedConversionsCollection(), conversion.id);
+    for (let { conversion: unassignedConv, attachments } of items) {
+      const docRef = doc(
+        this.unassignedConversionsCollection(),
+        unassignedConv.id
+      );
 
       if (attachments) {
-        const path = `/conversions/unassigned/${conversion.assignmentCode}/${conversion.id}`;
-
-        const attachmentUrls: string[] = [];
-        for (const attachment of attachments) {
-          const attachmentUrl = await this.imageService.uploadImage(
-            path,
-            attachment
+        unassignedConv =
+          await this.imageService.uploadUnassignedConversionAttachments(
+            unassignedConv,
+            attachments
           );
-          attachmentUrls.push(attachmentUrl);
-        }
-
-        conversion.attachmentUrls = attachmentUrls;
       }
 
-      batch.set(docRef, conversion.toFirestoreDoc());
-      conversions.push(conversion);
+      batch.set(docRef, unassignedConv.toFirestoreDoc());
+      conversions.push(unassignedConv);
     }
 
     await batch.commit();

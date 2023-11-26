@@ -1,41 +1,23 @@
 import React, { useState, useEffect, useContext } from "react";
-import {
-  Button,
-  Flex,
-  Heading,
-  IconButton,
-  Table,
-  Tbody,
-  Td,
-  Th,
-  Thead,
-  Tr,
-} from "@chakra-ui/react";
+import { Flex } from "@chakra-ui/react";
 import { Conversion } from "models/Conversion";
-import { ConversionService } from "services/interfaces/ConversionService";
 import { DependencyInjection } from "models/utils/DependencyInjection";
 import { UserContext } from "components/auth/UserProvider";
-import { CloseIcon } from "@chakra-ui/icons";
-import ImageComponent from "components/utils/ImageComponent";
-import ConversionMessageWidget from "components/common/conversions/ConversionMessagesWidget";
-import { formatDateString } from "models/utils/Date";
-import { sampleConversions } from "__mocks__/models/Conversion.mock";
 import SelectedConversionContent from "./AdminSelectedConversionContent";
 import AdminConversionBrowserContent from "./AdminConversionBrowserContent";
 import { CompensationGroupService } from "services/interfaces/CompensationGroupService";
 import { CompensationGroup } from "models/CompensationGroup";
 import { ClientService } from "services/interfaces/ClientService";
 import { Client } from "models/Client";
-import { UserService } from "services/interfaces/UserService";
 
 type Props = {
   conversions: Conversion[];
-  togglePerformanceWidget: () => void;
+  setConversionIsSelected: (isBooled: boolean) => void;
 };
 
 const AdminConversionHistoryWidget = ({
   conversions,
-  togglePerformanceWidget,
+  setConversionIsSelected,
 }: Props) => {
   const compGroupService: CompensationGroupService =
     DependencyInjection.compensationGroupService();
@@ -72,12 +54,12 @@ const AdminConversionHistoryWidget = ({
 
   const exit = () => {
     setSelectedConversion(null);
-    togglePerformanceWidget();
+    setConversionIsSelected(false);
   };
 
   const selectConversion = (conversion: Conversion) => {
     setSelectedConversion(conversion);
-    togglePerformanceWidget();
+    setConversionIsSelected(true);
   };
 
   return (

@@ -14,6 +14,9 @@ import { CompensationGroupService } from "services/interfaces/CompensationGroupS
 import UserPerformanceWidget from "./performance/UserPerformanceWidget";
 import AdminConversionHistoryWidget from "./conversions/AdminConversionHistoryWidget";
 import Filter, { FilterDefinition } from "components/utils/Filter";
+import { DayOfTheWeek } from "@models/enums/Timeframe";
+import { PayoutPreferrences } from "models/PayoutPreferrences";
+import useSuccessNotification from "components/utils/SuccessNotification";
 
 type Props = {};
 
@@ -66,10 +69,27 @@ const AdminSalesTeamPage = (props: Props) => {
       return conversion.userId === selectedUser?.uid;
     });
 
-  const [displayPerformanceWidget, setDisplayPerformanceWidget] =
-    useState<boolean>(true);
-  const toggleDisplayPerformanceWidget = () => {
-    setDisplayPerformanceWidget(!displayPerformanceWidget);
+  const [isConversionSelected, setIsConversionSelected] =
+    useState<boolean>(false);
+
+  const displayPerformanceWidget =
+    !isConversionSelected && selectedUser !== null;
+
+  const [paymentDay, setPaymentDay] = useState<DayOfTheWeek | null>(null);
+
+  const showSuccess = useSuccessNotification();
+
+  const setPayoutDay = async (user: User, day: DayOfTheWeek | undefined) => {
+    const updatedUser: User = new User({
+      ...user,
+      payoutPreferrences: new PayoutPreferrences({
+        ...user.payoutPreferrences,
+        preferredPayoutDay: day ?? null,
+      }),
+    });
+    await userService.update(updatedUser);
+    console.log("asdsd ", updatedUser);
+    showSuccess({ message: `Payout day updated to ${day}.` });
   };
 
   const [selectedCompGroup, setSelectedCompGroup] =
@@ -81,6 +101,11 @@ const AdminSalesTeamPage = (props: Props) => {
     setSelectedCompGroup(compGroup);
     selectedUser.compensationGroupId = compGroup?.id ?? null;
     await userService.update(selectedUser);
+    showSuccess({
+      message: `Compensation group updated to ${
+        compGroup?.id ?? "UNASSIGNED"
+      }.`,
+    });
   };
 
   const selectUser = (user: User | null) => {
@@ -90,6 +115,7 @@ const AdminSalesTeamPage = (props: Props) => {
       (compGroup) => compGroup.id === user.compensationGroupId
     );
 
+    setPaymentDay(user.payoutPreferrences?.preferredPayoutDay ?? null);
     setSelectedCompGroup(compGroup ?? null);
   };
 
@@ -128,7 +154,7 @@ const AdminSalesTeamPage = (props: Props) => {
 
           <AdminConversionHistoryWidget
             conversions={getUserConversions()}
-            togglePerformanceWidget={toggleDisplayPerformanceWidget}
+            setConversionIsSelected={setIsConversionSelected}
           />
           {displayPerformanceWidget && (
             <UserPerformanceWidget

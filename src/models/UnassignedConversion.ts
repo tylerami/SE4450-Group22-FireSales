@@ -108,6 +108,17 @@ export class UnassignedConversion {
     });
   }
 
+  public addConversionAttachmentUrls = (
+    newAttachmentUrls: string[]
+  ): UnassignedConversion => {
+    const combinedUrls = [...this.attachmentUrls, ...newAttachmentUrls];
+
+    return new UnassignedConversion({
+      ...this,
+      attachmentUrls: combinedUrls,
+    });
+  };
+
   public withNewAssignmentCode(assignmentCode: string): UnassignedConversion {
     return new UnassignedConversion({
       ...this,

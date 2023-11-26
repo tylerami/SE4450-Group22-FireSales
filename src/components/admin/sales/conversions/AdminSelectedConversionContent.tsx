@@ -1,9 +1,13 @@
-import React from "react";
+import React, { useState } from "react";
 import { Button, Flex, Heading, IconButton, Spacer } from "@chakra-ui/react";
 import { Conversion } from "models/Conversion";
 import { CloseIcon } from "@chakra-ui/icons";
 import ImageComponent from "components/utils/ImageComponent";
 import ConversionMessageWidget from "components/common/conversions/ConversionMessagesWidget";
+import { ConversionService } from "services/interfaces/ConversionService";
+import { DependencyInjection } from "models/utils/DependencyInjection";
+import { ConversionStatus } from "models/enums/ConversionStatus";
+import useSuccessNotification from "components/utils/SuccessNotification";
 
 type Props = {
   selectedConversion: Conversion;
@@ -11,6 +15,45 @@ type Props = {
 };
 
 const SelectedConversionContent = ({ selectedConversion, exit }: Props) => {
+  const conversionService: ConversionService =
+    DependencyInjection.conversionService();
+
+  const [conversion, setConversion] = useState<Conversion>(selectedConversion);
+
+  const showSuccess = useSuccessNotification();
+
+  const handleApproveButton = async () => {
+    const newStatus: ConversionStatus = conversion.isApproved()
+      ? conversion.isPaid()
+        ? ConversionStatus.approvedUnpaid
+        : ConversionStatus.approvedPaid
+      : ConversionStatus.approvedUnpaid;
+
+    const updatedConversion: Conversion = conversion.changeStatus(newStatus);
+
+    const result = await conversionService.update(updatedConversion);
+    if (result) {
+      setConversion(updatedConversion);
+
+      showSuccess({ message: "Conversion updated successfully" });
+    }
+  };
+
+  const handleRejectButton = async () => {
+    const newStatus: ConversionStatus = !conversion.isPending()
+      ? ConversionStatus.pending
+      : ConversionStatus.rejected;
+
+    const updatedConversion: Conversion = conversion.changeStatus(newStatus);
+
+    const result = await conversionService.update(updatedConversion);
+    if (result) {
+      setConversion(updatedConversion);
+
+      showSuccess({ message: "Conversion updated successfully" });
+    }
+  };
+
   return (
     <React.Fragment>
       <Flex justifyContent={"start"} alignItems={"center"} gap={6}>
@@ -22,17 +65,35 @@ const SelectedConversionContent = ({ selectedConversion, exit }: Props) => {
           aria-label={""}
         />
         <Heading as="h1" fontSize={"1.2em"} fontWeight={700}>
-          {selectedConversion.description()}
+          {conversion.description()}
         </Heading>
 
         <Spacer />
 
-        <Button cursor={"default"} _hover={{}} disabled>
-          Not Verified
+        <Button
+          cursor={"default"}
+          _hover={{}}
+          colorScheme={
+            conversion.isPending()
+              ? undefined
+              : conversion.isApproved()
+              ? "green"
+              : "red"
+          }
+          size={"sm"}
+          disabled
+        >
+          {conversion.isPending()
+            ? "Unverified"
+            : conversion.isApproved()
+            ? conversion.isPaid()
+              ? "Approved (Paid)"
+              : "Approved (Unpaid)"
+            : "Rejected"}
         </Button>
       </Flex>
 
-      {selectedConversion && (
+      {conversion.attachmentUrls.length > 0 ? (
         <Flex
           maxH={"40em"}
           gap={10}
@@ -40,26 +101,48 @@ const SelectedConversionContent = ({ selectedConversion, exit }: Props) => {
           alignItems={"center"}
           w="100%"
         >
-          {Array.from({ length: 3 }, (_, index) => (
-            <ImageComponent
-              imagePath={`/conversions/1/${selectedConversion.id}_${
-                index + 1
-              }.png`}
-            />
+          {conversion.attachmentUrls.map((url, index) => (
+            <ImageComponent key={index} imageUrl={url} />
           ))}
+        </Flex>
+      ) : (
+        <Flex justifyContent={"center"} alignItems={"center"} w="100%" h="100%">
+          <Heading as="h1" fontSize={"2em"} fontWeight={400}>
+            No Attachments
+          </Heading>
         </Flex>
       )}
 
       <Flex gap={8}>
-        <Button size="lg" colorScheme="green" w="full">
-          Approve
+        <Button
+          onClick={handleApproveButton}
+          size="lg"
+          colorScheme="green"
+          w="full"
+        >
+          {conversion.isApproved()
+            ? conversion.isPaid()
+              ? "Mark as unpaid"
+              : "Mark as paid"
+            : "Approve"}
         </Button>
-        <Button size="lg" colorScheme="red" w="full">
-          Deny
+        <Button
+          onClick={handleRejectButton}
+          size="lg"
+          colorScheme="red"
+          w="full"
+        >
+          {conversion.isApproved()
+            ? "Remove Approval"
+            : conversion.isRejected()
+            ? "Remove Rejection"
+            : "Reject"}
         </Button>
       </Flex>
 
-      {selectedConversion && <ConversionMessageWidget />}
+      {conversion && (
+        <ConversionMessageWidget selectedConversion={conversion} />
+      )}
     </React.Fragment>
   );
 };

@@ -34,6 +34,10 @@ export class CompensationGroup {
     this.currency = currency;
   }
 
+  public clientIds(): string[] {
+    return this.affiliateLinks.map((link) => link.clientId);
+  }
+
   public toFirestoreDoc(): DocumentData {
     const affiliateLinksForFirestore = this.affiliateLinks.map((link) =>
       link.toFirestoreDoc()

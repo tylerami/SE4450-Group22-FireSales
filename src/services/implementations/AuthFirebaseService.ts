@@ -39,7 +39,7 @@ export class AuthFirebaseService implements AuthService {
     if (!user) {
       user = await this.handleHotTakesUserRegistration(firebaseUser);
     }
-    return null;
+    return user;
   }
 
   public async signInWithGoogle(): Promise<User | null> {

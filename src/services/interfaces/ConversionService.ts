@@ -2,14 +2,13 @@ import { Conversion } from "models/Conversion";
 import { UnassignedConversion } from "models/UnassignedConversion";
 
 export interface ConversionService {
-  create(
-    conversion: Conversion,
-    { attachments }: { attachments?: File[] }
-  ): Promise<Conversion>;
-  updateBulk(conversions: Conversion[]): Promise<Conversion[]>;
+  create(conversion: Conversion, attachments?: File[]): Promise<Conversion>;
   createBulk(
     items: Array<{ conversion: Conversion; attachments?: File[] }>
   ): Promise<Conversion[]>;
+  update(conversion: Conversion, attachments?: File[]): Promise<Conversion>;
+  updateBulk(conversions: Conversion[]): Promise<Conversion[]>;
+
   query({
     userId,
     clientId,

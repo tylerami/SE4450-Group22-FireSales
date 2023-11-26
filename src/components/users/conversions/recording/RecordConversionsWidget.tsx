@@ -1,5 +1,12 @@
 import React, { useState, useContext, useEffect } from "react";
-import { Heading, Spacer, Spinner, Switch, Text } from "@chakra-ui/react";
+import {
+  Button,
+  Heading,
+  Spacer,
+  Spinner,
+  Switch,
+  Text,
+} from "@chakra-ui/react";
 import { Flex } from "@chakra-ui/react";
 import ManualRecordConversionsWidgetContent from "./manual/ManualRecordConversionsWidgetContent";
 import BulkRecordConversionsWidgetContent from "./bulk/BulkRecordConversionsWidgetContent";
@@ -7,17 +14,24 @@ import { CompensationGroupService } from "services/interfaces/CompensationGroupS
 import { DependencyInjection } from "models/utils/DependencyInjection";
 import { CompensationGroup } from "models/CompensationGroup";
 import { UserContext } from "components/auth/UserProvider";
+import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
 
 const ENABLE_BULK_MODE = false;
 
-type Props = {};
+type Props = {
+  minimizeRecordConversion: boolean;
+  setMinimizeRecordConversions: (minimizeRecordConversion: boolean) => void;
+};
 
 enum RecordMode {
   manual,
   bulk,
 }
 
-const RecordConversionsWidget = (props: Props) => {
+const RecordConversionsWidget = ({
+  minimizeRecordConversion,
+  setMinimizeRecordConversions,
+}: Props) => {
   const compGroupService: CompensationGroupService =
     DependencyInjection.compensationGroupService();
 
@@ -70,22 +84,43 @@ const RecordConversionsWidget = (props: Props) => {
             <Text>Bulk mode</Text>{" "}
           </React.Fragment>
         )}
-      </Flex>
 
-      {compensationGroup ? (
-        recordMode === RecordMode.manual ? (
-          <ManualRecordConversionsWidgetContent
-            compensationGroup={compensationGroup}
-          />
-        ) : (
-          <BulkRecordConversionsWidgetContent
-            compensationGroup={compensationGroup}
-          />
-        )
-      ) : (
-        <Flex w="100%" h="10em" justifyContent={"center"} alignItems={"center"}>
-          <Spinner size="lg" />
-        </Flex>
+        {/* button to minimize / maximize the widget, with chevron icons  */}
+        <Button
+          width={"10em"}
+          onClick={() =>
+            setMinimizeRecordConversions(!minimizeRecordConversion)
+          }
+          leftIcon={
+            minimizeRecordConversion ? <ChevronDownIcon /> : <ChevronUpIcon />
+          }
+        >
+          {minimizeRecordConversion ? "Expand" : "Collapse"}
+        </Button>
+      </Flex>
+      {!minimizeRecordConversion && (
+        <React.Fragment>
+          {compensationGroup ? (
+            recordMode === RecordMode.manual ? (
+              <ManualRecordConversionsWidgetContent
+                compensationGroup={compensationGroup}
+              />
+            ) : (
+              <BulkRecordConversionsWidgetContent
+                compensationGroup={compensationGroup}
+              />
+            )
+          ) : (
+            <Flex
+              w="100%"
+              h="10em"
+              justifyContent={"center"}
+              alignItems={"center"}
+            >
+              <Spinner size="lg" />
+            </Flex>
+          )}
+        </React.Fragment>
       )}
     </Flex>
   );

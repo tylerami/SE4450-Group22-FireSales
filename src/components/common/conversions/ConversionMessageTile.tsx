@@ -28,7 +28,7 @@ type Props = {
 };
 
 const ConversionMessageTile = (props: Props) => {
-  const color = props.fromSelf ? "#ED7D31" : "gray.200";
+  const color = props.fromSelf ? "#F4C3A2C7" : "gray.200";
 
   return (
     <Flex

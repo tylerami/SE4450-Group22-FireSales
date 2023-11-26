@@ -155,8 +155,8 @@ const RecordConversionTile = ({
     const validateConversion = () =>
       attachmentsValid && dateValid && customerValid && affiliateLinkValid;
     const isValid = validateConversion();
-    console.log("isValid", isValid);
     setIsValid(isValid);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [affiliateLinkValid, attachmentsValid, customerValid, dateValid]);
 
   return (

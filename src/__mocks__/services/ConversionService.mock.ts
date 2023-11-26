@@ -4,18 +4,26 @@ import { sampleConversions } from "__mocks__/models/Conversion.mock";
 import { ConversionService } from "services/interfaces/ConversionService";
 
 export class MockConversionService implements ConversionService {
+  create(
+    conversion: Conversion,
+    attachments?: File[] | undefined
+  ): Promise<Conversion> {
+    throw new Error("Method not implemented.");
+  }
+  update(
+    conversion: Conversion,
+    attachments?: File[] | undefined
+  ): Promise<Conversion> {
+    throw new Error("Method not implemented.");
+  }
+
   updateBulk(conversions: Conversion[]): Promise<Conversion[]> {
     throw new Error("Method not implemented.");
   }
   isAssignmentCodeValid(code: string): Promise<boolean> {
     throw new Error("Method not implemented.");
   }
-  async create(
-    conversion: Conversion,
-    { attachments }: { attachments?: File[] | undefined }
-  ): Promise<Conversion> {
-    return conversion;
-  }
+
   async createBulk(
     items: { conversion: Conversion; attachments?: File[] | undefined }[]
   ): Promise<Conversion[]> {

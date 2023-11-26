@@ -12,6 +12,7 @@ import {
 } from "./enums/Timeframe";
 import { Timestamp, DocumentData } from "firebase/firestore";
 import { UnassignedConversion } from "./UnassignedConversion";
+import { sampleMessages } from "__mocks__/models/Message.mock";
 
 export type ConversionAttachmentGroup = {
   conversion: Conversion;
@@ -28,7 +29,7 @@ export class Conversion {
   affiliateLink: AffiliateLink;
   customer: Customer;
   amount: number; // Bet size
-  attachmentUrls: Array<string>;
+  attachmentUrls: string[];
   currency: Currency;
   messages: Array<Message>;
 
@@ -42,7 +43,7 @@ export class Conversion {
     affiliateLink,
     customer,
     amount,
-    attachmentUrls = [],
+    attachmentUrls,
     currency,
     messages = [],
   }: {
@@ -55,7 +56,7 @@ export class Conversion {
     affiliateLink: AffiliateLink;
     customer: Customer;
     amount: number;
-    attachmentUrls?: Array<string>;
+    attachmentUrls?: string[];
     currency: Currency;
     messages?: Array<Message>;
   }) {
@@ -68,13 +69,13 @@ export class Conversion {
     this.affiliateLink = affiliateLink;
     this.customer = customer;
     this.amount = amount;
-    this.attachmentUrls = attachmentUrls;
+    this.attachmentUrls = attachmentUrls ?? [];
     this.currency = currency;
     this.messages = messages;
   }
 
   static fromManualInput({
-    dateOccurred, // maybe modify this to accept a Date object instead
+    dateOccurred,
     userId,
     compensationGroupId,
     affiliateLink,
@@ -130,6 +131,54 @@ export class Conversion {
       }),
     });
   }
+
+  public addMessage = (message: Message): Conversion => {
+    return new Conversion({
+      ...this,
+      messages: [...this.messages, message],
+    });
+  };
+
+  public addConversionAttachmentUrls = (
+    newAttachmentUrls: string[]
+  ): Conversion => {
+    const combinedUrls = [...this.attachmentUrls, ...newAttachmentUrls];
+
+    return new Conversion({
+      ...this,
+      attachmentUrls: combinedUrls,
+    });
+  };
+
+  public changeStatus = (status: ConversionStatus): Conversion => {
+    return new Conversion({
+      ...this,
+      status,
+    });
+  };
+
+  public isApproved = (): boolean => {
+    return (
+      this.status === ConversionStatus.approvedPaid ||
+      this.status === ConversionStatus.approvedUnpaid
+    );
+  };
+
+  public isApprovedNotPaid = (): boolean => {
+    return this.status === ConversionStatus.approvedUnpaid;
+  };
+
+  public isPending = (): boolean => {
+    return this.status === ConversionStatus.pending;
+  };
+
+  public isRejected = (): boolean => {
+    return this.status === ConversionStatus.rejected;
+  };
+
+  public isPaid = (): boolean => {
+    return this.status === ConversionStatus.approvedPaid;
+  };
 
   public description(): string {
     return `${formatDateString(this.dateOccurred)} / ${
@@ -318,7 +367,6 @@ export function filterConversionsByTimeframe(
   timeframe: Timeframe
 ): Array<Conversion> {
   const intervalStart: Date = getIntervalStart(timeframe);
-
   return conversions.filter(
     (conversion) => conversion.dateOccurred.getTime() >= intervalStart.getTime()
   );

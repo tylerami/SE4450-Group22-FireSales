@@ -4,7 +4,6 @@ import { Conversion } from "models/Conversion";
 import { ConversionService } from "services/interfaces/ConversionService";
 import { DependencyInjection } from "models/utils/DependencyInjection";
 import { UserContext } from "components/auth/UserProvider";
-import { sampleConversions } from "__mocks__/models/Conversion.mock";
 import SelectedConversionContent from "./SelectedConversionContent";
 import ConversionBrowserContent from "./ConversionBrowserContent";
 import { CompensationGroupService } from "services/interfaces/CompensationGroupService";
@@ -12,9 +11,11 @@ import { CompensationGroup } from "models/CompensationGroup";
 import { ClientService } from "services/interfaces/ClientService";
 import { Client } from "models/Client";
 
-type Props = {};
+type Props = {
+  setIsConversionSelected: (isConversionSelected: boolean) => void;
+};
 
-const ConversionHistoryWidget = (props: Props) => {
+const ConversionHistoryWidget = ({ setIsConversionSelected }: Props) => {
   const conversionService: ConversionService =
     DependencyInjection.conversionService();
 
@@ -28,6 +29,8 @@ const ConversionHistoryWidget = (props: Props) => {
     useState<Conversion | null>(null);
   const [compGroup, setCompGroup] = useState<CompensationGroup | null>(null);
   const [clients, setClients] = useState<Client[]>([]);
+  const [updateTrigger, setUpdateTrigger] = useState<boolean>(false);
+  const refresh = () => setUpdateTrigger(!updateTrigger);
 
   const { currentUser } = useContext(UserContext);
 
@@ -51,17 +54,37 @@ const ConversionHistoryWidget = (props: Props) => {
     const fetchConversions = async () => {
       if (!currentUser) return;
 
-      // const conversions = await conversionService.query({
-      //   userId: currentUser.uid,
-      // });
-      const conversions = sampleConversions;
+      const conversions = await conversionService.query({
+        userId: currentUser.uid,
+      });
       setConversions(conversions);
     };
 
     fetchConversions();
     fetchCompGroup();
     fetchClients();
-  }, [clientService, compGroupService, conversionService, currentUser]);
+  }, [
+    clientService,
+    compGroupService,
+    conversionService,
+    currentUser,
+    updateTrigger,
+  ]);
+
+  const selectConversion = (conversion: Conversion) => {
+    setSelectedConversion(conversion);
+    setIsConversionSelected(true);
+  };
+
+  const exit = () => {
+    refresh();
+    setSelectedConversion(null);
+    setIsConversionSelected(false);
+  };
+
+  const relevantClients = clients.filter((client) =>
+    compGroup?.clientIds().includes(client.id)
+  );
 
   return (
     <Flex
@@ -75,15 +98,15 @@ const ConversionHistoryWidget = (props: Props) => {
     >
       {selectedConversion ? (
         <SelectedConversionContent
-          exit={() => setSelectedConversion(null)}
+          exit={exit}
           selectedConversion={selectedConversion}
         />
       ) : (
         <ConversionBrowserContent
-          clients={clients}
+          clients={relevantClients}
           compGroup={compGroup}
           conversions={conversions}
-          selectConversion={setSelectedConversion}
+          selectConversion={selectConversion}
         />
       )}
     </Flex>

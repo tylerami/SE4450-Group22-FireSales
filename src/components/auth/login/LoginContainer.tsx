@@ -20,6 +20,7 @@ import { useGlobalState } from "components/utils/GlobalState";
 import { UserContext } from "../UserProvider";
 import { DependencyInjection } from "@models/utils/DependencyInjection";
 import { authService } from "services/implementations/AuthFirebaseService";
+import { User } from "models/User";
 
 const LoginContainer = ({ goToRegister = () => {} }) => {
   const navigate = useNavigate();
@@ -37,10 +38,12 @@ const LoginContainer = ({ goToRegister = () => {} }) => {
   const signInWithGoogle = async () => {
     setDisabled(true);
 
-    let user;
+    let user: User | null;
     try {
       user = await authService.signInWithGoogle();
+      console.log(user);
     } catch (error: any) {
+      console.log(error);
       setErrorMessage(error.message);
       setDisabled(false);
       return;
@@ -60,14 +63,17 @@ const LoginContainer = ({ goToRegister = () => {} }) => {
   const signInManually = async () => {
     setDisabled(true);
 
-    let user;
+    let user: User | null;
     try {
+      console.log(email, password);
       user = await authService.signInWithEmailAndPassword(email, password);
     } catch (error: any) {
+      console.log(error);
       setErrorMessage(error.message);
       setDisabled(false);
       return;
     }
+    console.log(user);
 
     if (user) {
       setCurrentUser(user);
@@ -118,6 +124,8 @@ const LoginContainer = ({ goToRegister = () => {} }) => {
             focusBorderColor="#ED7D31"
             variant={"outline"}
             placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
           ></Input>
         </InputGroup>
       </Flex>

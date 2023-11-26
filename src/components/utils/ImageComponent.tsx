@@ -19,8 +19,8 @@ interface ImageComponentProps {
 const ImageComponent: React.FC<ImageComponentProps> = ({
   imagePath,
   imageUrl,
-  height = "100%",
-  width = "100%",
+  height,
+  width,
   maxWidth = "100%",
   maxHeight = "100%",
   margin = "auto",
