@@ -1,14 +1,15 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 const { override, useBabelRc, addWebpackAlias } = require("customize-cra");
+const path = require("path");
 
 module.exports = override(
   addWebpackAlias({
-    models: "src/models",
-    components: "src/components",
-    services: "src/services",
-    assets: "src/assets",
-    __mocks__: "src/__mocks__",
-    app: "src/app",
-    index: "src/index",
+    models: path.resolve(__dirname, "src/models"),
+    components: path.resolve(__dirname, "src/components"),
+    services: path.resolve(__dirname, "src/services"),
+    assets: path.resolve(__dirname, "src/assets"),
+    __mocks__: path.resolve(__dirname, "src/__mocks__"),
+    app: path.resolve(__dirname, "src/app"),
+    index: path.resolve(__dirname, "src/index"),
   })
 );
