@@ -34,7 +34,6 @@ export class CompensationGroupFirebaseService
   }
 
   async set(compensationGroup: CompensationGroup): Promise<CompensationGroup> {
-    console.log("compensationGroup", compensationGroup);
     const docRef = doc(
       this.compensationGroupsCollection(),
       compensationGroup.id

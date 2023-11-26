@@ -1,9 +1,11 @@
 import { Box, Center, Flex, Heading, Spinner } from "@chakra-ui/react";
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import UserPerformanceWidget from "./performance/UserPerformanceWidget";
 import AffiliateLinkWidget from "./referrals/AffiliateLinkWidget";
 import { UserContext } from "components/auth/UserProvider";
 import { Conversion } from "@models/Conversion";
+import { ConversionService } from "services/interfaces/ConversionService";
+import { DependencyInjection } from "models/utils/DependencyInjection";
 
 type Props = {};
 
@@ -11,6 +13,22 @@ const UserDashboardPage = (props: Props) => {
   const { currentUser } = useContext(UserContext);
 
   const [conversions, setConversions] = useState<Conversion[]>([]);
+
+  const conversionService: ConversionService =
+    DependencyInjection.conversionService();
+
+  useEffect(() => {
+    const fetchConversions = async () => {
+      if (!currentUser?.uid) {
+        return;
+      }
+      const fetchedConversions = await conversionService.query({
+        userId: currentUser?.uid,
+      });
+      setConversions(fetchedConversions ?? []);
+    };
+    fetchConversions();
+  }, [conversionService, currentUser?.uid]);
 
   if (!currentUser) {
     return (
@@ -34,7 +52,7 @@ const UserDashboardPage = (props: Props) => {
       {/* Column: Performance chart and table */}
       <Flex width={"100%"} direction="column" gap={6} alignItems={"center"}>
         <AffiliateLinkWidget></AffiliateLinkWidget>
-        <UserPerformanceWidget user={currentUser} conversions={[]} />
+        <UserPerformanceWidget conversions={conversions} />
 
         <Box h={20}></Box>
       </Flex>

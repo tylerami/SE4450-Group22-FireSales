@@ -1,6 +1,6 @@
 import { formatDateString } from "./utils/Date";
 import { AffiliateLink } from "./AffiliateLink";
-import { Conversion, getConversionId } from "./Conversion";
+import { Conversion } from "./Conversion";
 import { Customer } from "./Customer";
 import { Message } from "./Message";
 import { ConversionStatus } from "./enums/ConversionStatus";

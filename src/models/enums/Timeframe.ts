@@ -1,6 +1,3 @@
-import { assert } from "console";
-import { get } from "http";
-
 export enum Timeframe {
   lastWeek,
   lastMonth,
@@ -225,7 +222,6 @@ export function getIntervalStart(timeframe: Timeframe): Date {
         today.getDate() - 6
       );
     case Timeframe.lastMonth:
-      console.log("Last month");
       return new Date(
         today.getFullYear(),
         today.getMonth() - 1,

@@ -11,7 +11,7 @@ import {
   Spacer,
   useBreakpointValue,
 } from "@chakra-ui/react";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Timeframe, getTimeframeLabel } from "models/enums/Timeframe";
 import {
   Conversion,
@@ -38,14 +38,12 @@ import { AffiliateDeal } from "models/AffiliateDeal";
 import Filter, { FilterDefinition } from "components/utils/Filter";
 import PerformanceMetricBox from "components/common/PerformanceMetricBox";
 import UserPerformanceChart from "./UserPerformanceChart";
-import { User } from "models/User";
 
 type Props = {
-  user: User;
   conversions: Conversion[];
 };
 
-const UserPerformanceWidget = (props: Props) => {
+const UserPerformanceWidget = ({ conversions }: Props) => {
   const conversionService: ConversionService =
     DependencyInjection.conversionService();
   const clientService: ClientService = DependencyInjection.clientService();
@@ -62,18 +60,7 @@ const UserPerformanceWidget = (props: Props) => {
   const [selectedReferralLinkType, setSelectedReferralLinkType] =
     useState<ReferralLinkType | null>(null);
 
-  const [compensationGroups, setCompensationGroups] = useState<
-    CompensationGroup[]
-  >([]);
-  const [selectedCompensationGroup, setSelectedCompensationGroup] =
-    useState<CompensationGroup | null>(null);
-
-  const [conversions, setConversions] = useState<Conversion[]>([]);
-  const [filteredConversions, setFilteredConversions] = useState<Conversion[]>(
-    []
-  );
-
-  const filterConversions = () => {
+  const getFilteredConversions = () => {
     let tempConversions = conversions;
     if (selectedClient) {
       tempConversions = tempConversions.filter(
@@ -85,32 +72,22 @@ const UserPerformanceWidget = (props: Props) => {
         (conv) => conv.affiliateLink.type === selectedReferralLinkType
       );
     }
-    if (selectedCompensationGroup) {
-      tempConversions = tempConversions.filter(
-        (conv) => conv.compensationGroupId === selectedCompensationGroup.id
-      );
-    }
-    if (timeframe) {
+
+    if (timeframe !== null) {
       tempConversions = filterConversionsByTimeframe(
         tempConversions,
         timeframe
       );
     }
-    setFilteredConversions(tempConversions);
+    return tempConversions;
   };
 
   useEffect(() => {
-    const fetchCompensationGroups = async () => {
-      const compensationGroups = await compGroupService.getAll();
-      setCompensationGroups(compensationGroups);
-    };
-
     const fetchClients = async () => {
       const clients = await clientService.getAll();
       setClients(clients);
     };
 
-    fetchCompensationGroups();
     fetchClients();
   }, [conversionService, compGroupService, clientService]);
 
@@ -158,12 +135,14 @@ const UserPerformanceWidget = (props: Props) => {
   const affiliateDealGroups: {
     deal: AffiliateDeal;
     conversions: Conversion[];
-  }[] = getAllAffiliateDeals(clients).map((deal, i) => ({
-    deal,
-    conversions: filteredConversions.filter((conv) =>
-      sameAffiliateDeal(conv, deal)
-    ),
-  }));
+  }[] = getAllAffiliateDeals(clients)
+    .map((deal, i) => ({
+      deal,
+      conversions: getFilteredConversions().filter((conv) =>
+        sameAffiliateDeal(conv, deal)
+      ),
+    }))
+    .filter((group) => group.conversions.length > 0);
 
   affiliateDealGroups.sort(
     (a, b) => b.conversions.length - a.conversions.length
@@ -181,18 +160,18 @@ const UserPerformanceWidget = (props: Props) => {
       options: [null, ...clients],
       onChange: (value) => setSelectedClient(value as Client),
       value: selectedClient,
-      refresh: filterConversions,
+
       label: (value) => {
         if (value == null) return "All Clients";
         return (value as Client).name;
       },
     },
     {
-      options: referralLinkTypes,
+      options: [null, ...referralLinkTypes],
       onChange: (value) =>
         setSelectedReferralLinkType(value as ReferralLinkType),
       value: selectedReferralLinkType,
-      refresh: filterConversions,
+
       label: (value) => getReferralLinkTypeLabel(value as ReferralLinkType),
     },
 
@@ -200,7 +179,7 @@ const UserPerformanceWidget = (props: Props) => {
       options: timeframes,
       onChange: (value) => setSelectedTimeframe(value as Timeframe),
       value: timeframe,
-      refresh: filterConversions,
+
       label: (value) => getTimeframeLabel(value as Timeframe),
     },
   ];
@@ -232,7 +211,7 @@ const UserPerformanceWidget = (props: Props) => {
           <PerformanceMetricBox
             key={i}
             title={metric.label}
-            value={metric.getValue(filteredConversions).toString()}
+            value={metric.getValue(getFilteredConversions()).toString()}
           />
         ))}
       </Flex>
@@ -247,7 +226,7 @@ const UserPerformanceWidget = (props: Props) => {
       >
         <UserPerformanceChart
           timeframe={timeframe}
-          conversions={filteredConversions}
+          conversions={getFilteredConversions()}
         />
       </Flex>
 

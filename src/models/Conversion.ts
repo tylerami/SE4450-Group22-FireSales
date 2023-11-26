@@ -12,7 +12,6 @@ import {
 } from "./enums/Timeframe";
 import { Timestamp, DocumentData } from "firebase/firestore";
 import { UnassignedConversion } from "./UnassignedConversion";
-import { sampleMessages } from "__mocks__/models/Message.mock";
 
 export type ConversionAttachmentGroup = {
   conversion: Conversion;

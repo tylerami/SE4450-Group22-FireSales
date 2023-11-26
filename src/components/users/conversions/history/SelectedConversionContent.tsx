@@ -3,7 +3,6 @@ import {
   Button,
   Flex,
   Heading,
-  Icon,
   IconButton,
   Image,
   Input,
@@ -24,7 +23,6 @@ import ConversionMessageWidget from "components/common/conversions/ConversionMes
 import { ConversionService } from "services/interfaces/ConversionService";
 import { DependencyInjection } from "models/utils/DependencyInjection";
 import useSuccessNotification from "components/utils/SuccessNotification";
-import useErrorNotification from "components/utils/ErrorNotification";
 import { FaTrash } from "react-icons/fa";
 import useConfirmationModal from "components/utils/ConfirmationModal";
 
@@ -42,7 +40,6 @@ const SelectedConversionContent = ({ selectedConversion, exit }: Props) => {
   const [attachments, setAttachments] = useState<File[]>([]);
 
   const showSuccess = useSuccessNotification();
-  const showError = useErrorNotification();
 
   const { openModal, ConfirmationModal } = useConfirmationModal();
 

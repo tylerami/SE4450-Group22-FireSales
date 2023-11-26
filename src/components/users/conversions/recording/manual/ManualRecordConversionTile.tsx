@@ -7,7 +7,6 @@ import {
   MenuList,
   MenuItem,
   Button,
-  IconButton,
   InputGroup,
   Text,
   Heading,
@@ -15,7 +14,7 @@ import {
   Icon,
   Box,
 } from "@chakra-ui/react";
-import { ChevronDownIcon, DeleteIcon } from "@chakra-ui/icons";
+import { ChevronDownIcon } from "@chakra-ui/icons";
 import {
   Conversion,
   ConversionAttachmentGroup,

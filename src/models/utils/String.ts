@@ -79,8 +79,6 @@ export function findClosestMatch<T>(
     return a.score - b.score;
   });
 
-  console.log(sortedOptions);
-
   if (sortedOptions[0].score < differenceThreshold) {
     return sortedOptions[0].option;
   } else {
