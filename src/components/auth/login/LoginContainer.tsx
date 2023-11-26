@@ -1,7 +1,5 @@
 import React, { useContext, useState } from "react";
-import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
-import { auth, Providers } from "../../../config/firebase";
 import {
   Box,
   Button,
@@ -18,7 +16,6 @@ import { FiEye, FiEyeOff } from "react-icons/fi";
 import { FcGoogle } from "react-icons/fc";
 import { useGlobalState } from "components/utils/GlobalState";
 import { UserContext } from "../UserProvider";
-import { DependencyInjection } from "@models/utils/DependencyInjection";
 import { authService } from "services/implementations/AuthFirebaseService";
 import { User } from "models/User";
 import Logo from "components/common/Logo";

@@ -1,10 +1,8 @@
-import React, { useState } from "react";
+import React from "react";
 import { useSearchParams } from "react-router-dom";
-import Center from "../utils/Center";
 import LoginContainer from "./login/LoginContainer";
 import RegistrationContainer from "./register/RegistrationContainer";
 import { Box, Flex } from "@chakra-ui/react";
-import Logo from "../common/Logo";
 import CollageBG from "assets/ht_collage.png";
 
 const AuthPage = (props) => {
