@@ -1,11 +1,5 @@
 import React from "react";
-import {
-  Box,
-  Button,
-  Flex,
-  Heading,
-  useColorModeValue,
-} from "@chakra-ui/react";
+import { Box, Button, Heading } from "@chakra-ui/react";
 import { IconType } from "react-icons";
 
 interface SideNavBarButtonProps {

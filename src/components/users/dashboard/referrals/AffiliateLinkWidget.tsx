@@ -1,13 +1,11 @@
 import React, { useContext, useEffect, useState, useMemo } from "react";
 import {
-  Box,
   Flex,
   Heading,
   Text,
   useBreakpointValue,
   Spinner,
   Alert,
-  Icon,
   IconButton,
   Spacer,
 } from "@chakra-ui/react";

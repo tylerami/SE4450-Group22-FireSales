@@ -1,6 +1,6 @@
 import { PaymentMethod } from "./enums/PaymentMethod";
 import { DayOfTheWeek } from "./enums/Timeframe";
-import { Timestamp, DocumentData } from "firebase/firestore";
+import { DocumentData } from "firebase/firestore";
 
 export class PayoutPreferrences {
   addressByMethod: { [key in PaymentMethod]?: string };

@@ -257,7 +257,7 @@ const BulkRecordConversionsWidgetContent = ({ compensationGroup }: Props) => {
   const areAttachmentsValid = (): boolean => {
     if (conversionsByNumber == null) return false;
 
-    for (let [convNumber, _] of Object.entries(conversionsByNumber)) {
+    for (let [convNumber] of Object.keys(conversionsByNumber)) {
       const attachmentsForConv = attachments.filter(
         (attachment) => getAttachmentNumber(attachment) === Number(convNumber)
       );

@@ -1,60 +1,19 @@
-import {
-  Flex,
-  Heading,
-  Table,
-  Thead,
-  Tr,
-  Tbody,
-  Text,
-  Td,
-  Th,
-  Spacer,
-  Box,
-} from "@chakra-ui/react";
-import React, { useState } from "react";
+import { Flex, Heading, Text, Spacer } from "@chakra-ui/react";
+import React from "react";
 
 import { Button } from "@chakra-ui/react";
-import { Client } from "models/Client";
-import { getReferralLinkTypeLabel } from "models/enums/ReferralLinkType";
-import { formatMoney } from "models/utils/Money";
-import { AffiliateDeal } from "models/AffiliateDeal";
-import ImageComponent from "components/utils/ImageComponent";
 import { CompensationGroup } from "models/CompensationGroup";
-import { AffiliateLink } from "models/AffiliateLink";
-import { User } from "models/User";
-import { Conversion } from "models/Conversion";
-import { Timeframe, getTimeframeLabel } from "models/enums/Timeframe";
-import { FilterDefinition } from "@components/utils/Filter";
 import CompGroupAffiliateDealsTable from "./CompGroupAffiliateDealsTable";
 
 type Props = {
   compGroup: CompensationGroup;
   selectCompGroup: (compGroup: CompensationGroup) => void;
-  users: User[];
-  conversions: Conversion[];
 };
 
 const CompensationGroupDetailsTile = ({
   compGroup,
   selectCompGroup,
-  users,
-  conversions,
 }: Props) => {
-  const timeframes: Timeframe[] = Object.values(Timeframe).filter(
-    (value): value is Timeframe => typeof value === "number"
-  );
-
-  const [timeframe, setSelectedTimeframe] = useState<Timeframe>(
-    Timeframe.lastMonth
-  );
-
-  const timeframeFilter: FilterDefinition<Timeframe> = {
-    options: timeframes,
-    onChange: (value) => setSelectedTimeframe(value as Timeframe),
-    value: timeframe,
-    label: (value) => getTimeframeLabel(value as Timeframe),
-  };
-
   return (
     <Flex
       borderRadius={"12px"}

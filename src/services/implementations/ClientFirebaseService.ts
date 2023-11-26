@@ -8,7 +8,6 @@ import {
   getDoc,
   getDocs,
   setDoc,
-  updateDoc,
 } from "firebase/firestore";
 import { ImageService } from "services/interfaces/ImageService";
 

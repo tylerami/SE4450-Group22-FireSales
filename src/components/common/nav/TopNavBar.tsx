@@ -2,12 +2,10 @@ import React, { useContext } from "react";
 import {
   Flex,
   Box,
-  Avatar,
   Text,
   Icon,
   Heading,
   Circle,
-  Image,
   Button,
   Spinner,
 } from "@chakra-ui/react";
@@ -15,8 +13,6 @@ import { FiUser } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "components/auth/UserProvider";
 import { useGlobalState } from "components/utils/GlobalState";
-
-const profilePictureSrc = null;
 
 interface TopNavBarProps {
   pageName: string;
@@ -27,7 +23,7 @@ const TopNavBar: React.FC<TopNavBarProps> = ({ pageName }) => {
 
   const { currentUser } = useContext(UserContext);
 
-  const { activeTabIndex, setActiveTabIndex } = useGlobalState();
+  const { setActiveTabIndex } = useGlobalState();
 
   return (
     <Flex

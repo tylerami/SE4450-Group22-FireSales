@@ -6,8 +6,6 @@ import CompensationGroupEditor from "./CompensationGroupEditor";
 import { CompensationGroup } from "models/CompensationGroup";
 import { CompensationGroupService } from "services/interfaces/CompensationGroupService";
 import CompensationGroupDetailsTile from "./CompensationGroupDetailsTile";
-import { User } from "models/User";
-import { Conversion } from "models/Conversion";
 import { UserService } from "services/interfaces/UserService";
 import { ConversionService } from "services/interfaces/ConversionService";
 
@@ -21,9 +19,6 @@ const CompensationGroupWidget = (props: Props) => {
 
   const [updateTrigger, setUpdateTrigger] = useState<number>(0);
   const [compGroups, setCompGroups] = useState<CompensationGroup[]>([]);
-
-  const [users, setUsers] = useState<User[]>([]);
-  const [conversions, setConversions] = useState<Conversion[]>([]);
 
   const compGroupService: CompensationGroupService =
     DependencyInjection.compensationGroupService();
@@ -39,39 +34,13 @@ const CompensationGroupWidget = (props: Props) => {
       setCompGroups(compGroups);
     };
 
-    const fetchUsers = async () => {
-      const users = await userService.getAll();
-      setUsers(users);
-    };
-
-    const fetchConversions = async () => {
-      const conversions = await conversionService.query({
-        includeUnasigned: true,
-      });
-      setConversions(conversions);
-    };
-
     fetchCompGroups();
-    fetchUsers();
-    fetchConversions();
   }, [compGroupService, conversionService, updateTrigger, userService]);
 
   const exit = () => {
     setCreateMode(false);
     setEditingGroup(null);
     setUpdateTrigger(updateTrigger + 1);
-  };
-
-  const getCompGroupUsers = (compGroup: CompensationGroup): User[] => {
-    return users.filter((user) => user.compensationGroupId === compGroup.id);
-  };
-
-  const getCompGroupConversions = (
-    compGroup: CompensationGroup
-  ): Conversion[] => {
-    return conversions.filter(
-      (conversion) => conversion.compensationGroupId === compGroup.id
-    );
   };
 
   return (
@@ -100,8 +69,6 @@ const CompensationGroupWidget = (props: Props) => {
               <CompensationGroupDetailsTile
                 key={i}
                 compGroup={compGroup}
-                users={getCompGroupUsers(compGroup)}
-                conversions={getCompGroupConversions(compGroup)}
                 selectCompGroup={setEditingGroup}
               />
             ))

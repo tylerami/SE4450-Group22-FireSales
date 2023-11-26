@@ -13,7 +13,6 @@ import {
   Thead,
   Tr,
 } from "@chakra-ui/react";
-import { Conversion } from "models/Conversion";
 import { formatDateString } from "models/utils/Date";
 import {
   CheckCircleIcon,
@@ -21,7 +20,6 @@ import {
   ChevronRightIcon,
 } from "@chakra-ui/icons";
 import { formatMoney } from "models/utils/Money";
-import { getConversionStatusLabel } from "models/enums/ConversionStatus";
 import { UnassignedConversion } from "models/UnassignedConversion";
 
 type Props = {

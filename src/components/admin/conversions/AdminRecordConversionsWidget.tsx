@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { Button, Heading, Input, InputGroup, Spinner } from "@chakra-ui/react";
 import { Box, Text, Flex } from "@chakra-ui/react";
 import { filterCsvHeaders, getCsvFileContent } from "models/utils/File";
-import { generateSampleClients } from "__mocks__/models/Client.mock";
 import { findClosestMatch } from "models/utils/String";
 import { Client } from "models/Client";
 import { ReferralLinkType } from "models/enums/ReferralLinkType";
@@ -301,12 +300,6 @@ const AdminRecordConversionsWidgetContent = (props: Props) => {
     } else {
       setAttachments([]);
     }
-  };
-
-  const getAttachmentNumber = (attachment: File): number => {
-    const numString = attachment.name.split("_")[0].replace("conv", "");
-    const num = Number.parseInt(numString);
-    return num;
   };
 
   const csvUploaded = csvFile !== null;

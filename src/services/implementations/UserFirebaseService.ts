@@ -3,7 +3,6 @@ import { UserService } from "services/interfaces/UserService";
 
 import {
   CollectionReference,
-  DocumentData,
   Firestore,
   collection,
   doc,
@@ -12,7 +11,6 @@ import {
   query,
   setDoc,
   updateDoc,
-  where,
 } from "firebase/firestore";
 
 export class UserFirebaseService implements UserService {

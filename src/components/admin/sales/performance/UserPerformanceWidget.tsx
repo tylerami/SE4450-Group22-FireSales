@@ -21,7 +21,6 @@ import {
   filterConversionsByTimeframe,
   totalCommission,
   totalGrossProfit,
-  totalRevenue,
 } from "models/Conversion";
 import { ConversionService } from "services/interfaces/ConversionService";
 import { DependencyInjection } from "models/utils/DependencyInjection";
@@ -62,12 +61,6 @@ const UserPerformanceWidget = ({ user, conversions }: Props) => {
   const [selectedReferralLinkType, setSelectedReferralLinkType] =
     useState<ReferralLinkType | null>(null);
 
-  const [compensationGroups, setCompensationGroups] = useState<
-    CompensationGroup[]
-  >([]);
-  const [selectedCompensationGroup, setSelectedCompensationGroup] =
-    useState<CompensationGroup | null>(null);
-
   const getFilteredConversions = useCallback(() => {
     let tempConversions = conversions;
     if (selectedClient) {
@@ -80,11 +73,6 @@ const UserPerformanceWidget = ({ user, conversions }: Props) => {
         (conv) => conv.affiliateLink.type === selectedReferralLinkType
       );
     }
-    if (selectedCompensationGroup) {
-      tempConversions = tempConversions.filter(
-        (conv) => conv.compensationGroupId === selectedCompensationGroup.id
-      );
-    }
     if (timeframe) {
       tempConversions = filterConversionsByTimeframe(
         tempConversions,
@@ -92,26 +80,14 @@ const UserPerformanceWidget = ({ user, conversions }: Props) => {
       );
     }
     return tempConversions;
-  }, [
-    conversions,
-    selectedClient,
-    selectedReferralLinkType,
-    selectedCompensationGroup,
-    timeframe,
-  ]);
+  }, [conversions, selectedClient, selectedReferralLinkType, timeframe]);
 
   useEffect(() => {
-    const fetchCompensationGroups = async () => {
-      const compensationGroups = await compGroupService.getAll();
-      setCompensationGroups(compensationGroups);
-    };
-
     const fetchClients = async () => {
       const clients = await clientService.getAll();
       setClients(clients);
     };
 
-    fetchCompensationGroups();
     fetchClients();
   }, [conversionService, compGroupService, clientService]);
 

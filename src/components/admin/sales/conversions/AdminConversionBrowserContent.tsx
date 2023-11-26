@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   Table,
   Thead,
@@ -29,8 +29,6 @@ import {
   getConversionStatusLabel,
 } from "models/enums/ConversionStatus";
 import { formatDateString } from "models/utils/Date";
-import { CompensationGroupService } from "services/interfaces/CompensationGroupService";
-import { DependencyInjection } from "models/utils/DependencyInjection";
 
 type Props = {
   conversions: Conversion[];

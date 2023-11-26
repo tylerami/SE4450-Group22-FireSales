@@ -16,14 +16,13 @@ import {
   Tr,
   Th,
   Td,
-  Image,
   Box,
   Text,
   Icon,
   Flex,
 } from "@chakra-ui/react";
 import { CloseIcon } from "@chakra-ui/icons";
-import { FaDollarSign, FaTrash } from "react-icons/fa";
+import { FaDollarSign } from "react-icons/fa";
 import { ClientService } from "services/interfaces/ClientService";
 import { DependencyInjection } from "models/utils/DependencyInjection";
 import { Client, getAllAffiliateDeals } from "models/Client";
@@ -36,7 +35,6 @@ import { CompensationGroup } from "models/CompensationGroup";
 import { AffiliateLink } from "models/AffiliateLink";
 import { CompensationGroupService } from "services/interfaces/CompensationGroupService";
 import { AffiliateDeal } from "models/AffiliateDeal";
-import { error } from "console";
 
 type Props = {
   exisitingGroup?: CompensationGroup | null;

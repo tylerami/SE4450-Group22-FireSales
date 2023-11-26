@@ -7,10 +7,8 @@ import {
   doc,
   getDoc,
   getDocs,
-  query,
   setDoc,
   updateDoc,
-  where,
 } from "firebase/firestore";
 
 export class CompensationGroupFirebaseService

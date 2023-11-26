@@ -9,7 +9,6 @@ import {
   Td,
   Th,
   Spacer,
-  Box,
 } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 
@@ -19,7 +18,6 @@ import { getReferralLinkTypeLabel } from "models/enums/ReferralLinkType";
 import { formatMoney } from "models/utils/Money";
 import { AffiliateDeal } from "models/AffiliateDeal";
 import ImageComponent from "components/utils/ImageComponent";
-import { ImageService } from "services/interfaces/ImageService";
 import { ClientService } from "services/interfaces/ClientService";
 import { DependencyInjection } from "models/utils/DependencyInjection";
 

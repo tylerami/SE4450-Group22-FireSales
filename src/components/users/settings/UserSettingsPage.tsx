@@ -1,4 +1,4 @@
-import { Box, Flex, Input } from "@chakra-ui/react";
+import { Box, Flex } from "@chakra-ui/react";
 import React from "react";
 import AccountSettingsWidget from "./AccountSettingsWidget";
 import PaymentSettingsWidget from "./PaymentSettingsWidget";

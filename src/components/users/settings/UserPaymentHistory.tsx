@@ -3,9 +3,6 @@ import {
   Box,
   Flex,
   Heading,
-  Icon,
-  IconButton,
-  Spacer,
   Table,
   Tbody,
   Td,
@@ -16,11 +13,6 @@ import {
 } from "@chakra-ui/react";
 import { Conversion } from "models/Conversion";
 import { formatDateString } from "models/utils/Date";
-import {
-  CheckCircleIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
-} from "@chakra-ui/icons";
 import { Payout } from "models/Payout";
 import { formatMoney } from "models/utils/Money";
 import { UserContext } from "components/auth/UserProvider";

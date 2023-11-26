@@ -6,7 +6,6 @@ import {
   ConversionSegment,
   segmentConversionsByTimeframe,
   totalCostOfConversions,
-  totalGrossProfit,
   totalRevenue,
 } from "models/Conversion";
 

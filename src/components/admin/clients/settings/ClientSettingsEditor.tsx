@@ -34,7 +34,6 @@ import {
   getReferralLinkTypeLabel,
 } from "models/enums/ReferralLinkType";
 import { AffiliateDeal } from "models/AffiliateDeal";
-import { ImageService } from "services/interfaces/ImageService";
 
 type Props = {
   existingClient?: Client | null;

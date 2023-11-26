@@ -1,5 +1,5 @@
 import { generateUserID } from "models/utils/Identification";
-import { Timestamp, DocumentData } from "firebase/firestore";
+import { DocumentData } from "firebase/firestore";
 
 // Deprecate function
 export function customerIdFromName(fullName: string) {

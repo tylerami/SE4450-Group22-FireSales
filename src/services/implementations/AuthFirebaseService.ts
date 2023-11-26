@@ -1,6 +1,5 @@
 // AuthService.ts
 import { User } from "models/User";
-import { MockUserService } from "__mocks__/services/UserService.mock";
 import { Providers, auth } from "config/firebase";
 import {
   User as FirebaseUser,

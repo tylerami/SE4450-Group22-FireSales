@@ -1,10 +1,4 @@
-// I want to see:
-// - my performance this week / month / year
-// - my commission rate
-
-// - area to upload new sales
-// - my conversion history
-import { Box, Flex, Heading, Text } from "@chakra-ui/react";
+import { Flex, Heading, Text } from "@chakra-ui/react";
 import React from "react";
 
 const PerformanceMetricBox = ({

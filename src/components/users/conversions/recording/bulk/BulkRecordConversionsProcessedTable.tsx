@@ -21,7 +21,6 @@ import {
   ChevronRightIcon,
 } from "@chakra-ui/icons";
 import { formatMoney } from "models/utils/Money";
-import { getConversionStatusLabel } from "models/enums/ConversionStatus";
 
 type Props = {
   conversionsByNumber: Record<number, Conversion> | null;

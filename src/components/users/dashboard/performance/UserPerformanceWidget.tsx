@@ -9,19 +9,15 @@ import {
   Td,
   Th,
   Spacer,
-  useBreakpointValue,
 } from "@chakra-ui/react";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Timeframe, getTimeframeLabel } from "models/enums/Timeframe";
 import {
   Conversion,
   averageBetSize,
   averageCommission,
-  averageCpa,
   filterConversionsByTimeframe,
   totalCommission,
-  totalGrossProfit,
-  totalRevenue,
 } from "models/Conversion";
 import { ConversionService } from "services/interfaces/ConversionService";
 import { DependencyInjection } from "models/utils/DependencyInjection";

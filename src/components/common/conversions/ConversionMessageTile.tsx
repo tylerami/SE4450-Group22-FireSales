@@ -1,25 +1,6 @@
-import {
-  Box,
-  Button,
-  Circle,
-  Flex,
-  Heading,
-  Icon,
-  IconButton,
-  InputGroup,
-  InputRightElement,
-  Table,
-  Tbody,
-  Td,
-  Text,
-  Textarea,
-  Th,
-  Thead,
-  Tr,
-} from "@chakra-ui/react";
-import React, { useState } from "react";
+import { Box, Circle, Flex, Icon, Text } from "@chakra-ui/react";
+import React from "react";
 
-import { ArrowForwardIcon, ArrowUpIcon, CloseIcon } from "@chakra-ui/icons";
 import { FiUser } from "react-icons/fi";
 
 type Props = {

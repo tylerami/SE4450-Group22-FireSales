@@ -4,7 +4,7 @@ import { MockConversionService } from "__mocks__/services/ConversionService.mock
 import { MockCustomerService } from "__mocks__/services/CustomerService.mock";
 import { MockPayoutService } from "__mocks__/services/PayoutService.mock";
 import { MockUserService } from "__mocks__/services/UserService.mock";
-import { firebase, firestore, storage } from "config/firebase";
+import { firestore, storage } from "config/firebase";
 import { ClientFirebaseService } from "services/implementations/ClientFirebaseService";
 import { CompensationGroupFirebaseService } from "services/implementations/CompensationGroupFirebaseService";
 import { ConversionFirebaseService } from "services/implementations/ConversionFirebaseService";

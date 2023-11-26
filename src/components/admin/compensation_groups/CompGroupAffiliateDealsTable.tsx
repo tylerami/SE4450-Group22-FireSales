@@ -1,32 +1,9 @@
-import {
-  Flex,
-  Heading,
-  Table,
-  Thead,
-  Tr,
-  Tbody,
-  Text,
-  Td,
-  Th,
-  Spacer,
-  Box,
-} from "@chakra-ui/react";
-import React, { useState } from "react";
+import { Table, Thead, Tr, Tbody, Td, Th } from "@chakra-ui/react";
+import React from "react";
 
-import { Button } from "@chakra-ui/react";
-import { Client } from "models/Client";
 import { getReferralLinkTypeLabel } from "models/enums/ReferralLinkType";
 import { formatMoney } from "models/utils/Money";
-import { AffiliateDeal } from "models/AffiliateDeal";
-import ImageComponent from "components/utils/ImageComponent";
-import { CompensationGroup } from "models/CompensationGroup";
 import { AffiliateLink } from "models/AffiliateLink";
-import { User } from "models/User";
-import { Conversion } from "models/Conversion";
-import { Timeframe, getTimeframeLabel } from "models/enums/Timeframe";
-import { FilterDefinition } from "@components/utils/Filter";
-
-type Props = {};
 
 const CompGroupAffiliateDealsTable = ({
   affiliateLinks,
