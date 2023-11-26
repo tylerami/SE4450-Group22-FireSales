@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-const { override, useBabelRc, addWebpackAlias } = require("customize-cra");
+const { override, addWebpackAlias } = require("customize-cra");
 const path = require("path");
 
 module.exports = override(
@@ -11,5 +11,6 @@ module.exports = override(
     __mocks__: path.resolve(__dirname, "src/__mocks__"),
     app: path.resolve(__dirname, "src/app"),
     index: path.resolve(__dirname, "src/index"),
+    config: path.resolve(__dirname, "src/config"),
   })
 );
