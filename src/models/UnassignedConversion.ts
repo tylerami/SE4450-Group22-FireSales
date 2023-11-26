@@ -1,6 +1,6 @@
 import { formatDateString } from "./utils/Date";
 import { AffiliateLink } from "./AffiliateLink";
-import { Conversion } from "./Conversion";
+import { Conversion, getConversionId } from "./Conversion";
 import { Customer } from "./Customer";
 import { Message } from "./Message";
 import { ConversionStatus } from "./enums/ConversionStatus";
@@ -65,6 +65,26 @@ export class UnassignedConversion {
     this.attachmentUrls = attachmentUrls;
     this.currency = currency;
     this.messages = messages;
+  }
+
+  public asConversionWithoutAssignment(): Conversion {
+    return new Conversion({
+      ...this,
+      userId: "UNASSIGNED",
+    });
+  }
+
+  public assignToUser(userId: string): Conversion {
+    return new Conversion({
+      ...this,
+      userId,
+      id: getConversionId({
+        dateOccurred: this.dateOccurred,
+        clientId: this.affiliateLink.clientId,
+        customerId: this.customer.id,
+        userId,
+      }),
+    });
   }
 
   static fromManualInput({
@@ -177,18 +197,6 @@ export class UnassignedConversion {
       ),
     });
   }
-}
-
-export function assignConversionsToUser({
-  unassignedConversions,
-  userId,
-}: {
-  unassignedConversions: UnassignedConversion[];
-  userId: string;
-}) {
-  return unassignedConversions.map((conv) =>
-    Conversion.fromUnassignedConversion(conv, userId)
-  );
 }
 
 export function getUnassignedConversionId({

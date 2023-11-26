@@ -79,7 +79,9 @@ const PayoutsWidget = (props: Props) => {
     };
 
     const fetchConversions = async () => {
-      const conversions: Conversion[] = await conversionService.query({});
+      const conversions: Conversion[] = await conversionService.query({
+        includeUnasigned: true,
+      });
       setConversions(conversions);
     };
 

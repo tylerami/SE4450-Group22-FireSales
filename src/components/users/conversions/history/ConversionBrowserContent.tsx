@@ -132,7 +132,7 @@ const ConversionBrowserContent = ({
       label: (value) => getTimeframeLabel(value as Timeframe),
     },
     {
-      options: clients,
+      options: [null, ...clients],
       onChange: (value) => setClientFilter(value as Client | null),
       value: clientFilter,
       label: (value: any) => value?.name ?? "All Clients",

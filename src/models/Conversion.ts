@@ -49,7 +49,7 @@ export class Conversion {
     id: string;
     dateOccurred: Date;
     loggedAt: Date;
-    userId: string;
+    userId?: string;
     status: ConversionStatus;
     compensationGroupId?: string | null;
     affiliateLink: AffiliateLink;
@@ -62,7 +62,7 @@ export class Conversion {
     this.id = id;
     this.dateOccurred = dateOccurred;
     this.loggedAt = loggedAt;
-    this.userId = userId;
+    this.userId = userId ?? "UNASSIGNED";
     this.status = status;
     this.compensationGroupId = compensationGroupId;
     this.affiliateLink = affiliateLink;
@@ -112,22 +112,6 @@ export class Conversion {
       amount,
       attachmentUrls,
       currency,
-    });
-  }
-
-  public static fromUnassignedConversion(
-    unassignedConversion: UnassignedConversion,
-    userId: string
-  ): Conversion {
-    return new Conversion({
-      ...unassignedConversion,
-      userId,
-      id: getConversionId({
-        dateOccurred: unassignedConversion.dateOccurred,
-        clientId: unassignedConversion.affiliateLink.clientId,
-        customerId: unassignedConversion.customer.id,
-        userId,
-      }),
     });
   }
 

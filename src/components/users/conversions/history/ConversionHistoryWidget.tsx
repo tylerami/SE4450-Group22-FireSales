@@ -82,8 +82,12 @@ const ConversionHistoryWidget = ({ setIsConversionSelected }: Props) => {
     setIsConversionSelected(false);
   };
 
-  const relevantClients = clients.filter((client) =>
-    compGroup?.clientIds().includes(client.id)
+  const relevantClientIds: Set<string> = new Set<string>(
+    conversions.map((conversion) => conversion.affiliateLink.clientId)
+  );
+
+  const relevantClients: Client[] = clients.filter((client) =>
+    relevantClientIds.has(client.id)
   );
 
   return (

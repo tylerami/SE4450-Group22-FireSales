@@ -1,6 +1,5 @@
 import React, { useContext, useState } from "react";
 import { Box, Flex, Heading, Text } from "@chakra-ui/react";
-import BulkRecordConversionsWidgetContent from "./recording/bulk/BulkRecordConversionsWidgetContent";
 import RecordConversionsWidget from "./recording/RecordConversionsWidget";
 import ConversionHistoryWidget from "./history/ConversionHistoryWidget";
 import { UserContext } from "components/auth/UserProvider";

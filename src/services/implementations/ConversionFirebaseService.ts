@@ -1,8 +1,5 @@
 import { Conversion } from "models/Conversion";
-import {
-  UnassignedConversion,
-  assignConversionsToUser,
-} from "models/UnassignedConversion";
+import { UnassignedConversion } from "models/UnassignedConversion";
 import { ConversionService } from "services/interfaces/ConversionService";
 import {
   CollectionReference,
@@ -113,6 +110,7 @@ export class ConversionFirebaseService implements ConversionService {
     maxCommission,
     compensationGroupId,
     referralLinkType,
+    includeUnasigned = false,
   }: {
     userId?: string | undefined;
     clientId?: string | undefined;
@@ -124,6 +122,7 @@ export class ConversionFirebaseService implements ConversionService {
     maxCommission?: number | undefined;
     compensationGroupId?: string | undefined;
     referralLinkType?: string | undefined;
+    includeUnasigned: boolean;
   }): Promise<Conversion[]> {
     let queryRef = query(this.conversionsCollection());
 
@@ -174,9 +173,21 @@ export class ConversionFirebaseService implements ConversionService {
     }
 
     const querySnapshot = await getDocs(queryRef);
-    return querySnapshot.docs.map((doc) =>
+    const assignedConversions = querySnapshot.docs.map((doc) =>
       Conversion.fromFirestoreDoc(doc.data())
     );
+
+    let unassignedConversions: UnassignedConversion[] = [];
+    if (includeUnasigned) {
+      unassignedConversions = await this.queryUnassigned({});
+    }
+
+    return [
+      ...unassignedConversions.map((unassignedConv) =>
+        unassignedConv.asConversionWithoutAssignment()
+      ),
+      ...assignedConversions,
+    ];
   }
   async createBulkUnassigned(
     items: {
@@ -226,6 +237,18 @@ export class ConversionFirebaseService implements ConversionService {
     const docData = docSnapshot.data();
     return docData?.used === false;
   }
+  async queryUnassigned({ assignmentCode }: { assignmentCode?: string }) {
+    let queryRef = query(this.unassignedConversionsCollection());
+    if (assignmentCode) {
+      queryRef = query(queryRef, where("assignmentCode", "==", assignmentCode));
+    }
+
+    const querySnapshot = await getDocs(queryRef);
+    return querySnapshot.docs.map((doc) =>
+      UnassignedConversion.fromFirestoreDoc(doc.data())
+    );
+  }
+
   async assignConversionsWithCode({
     assignmentCode,
     userId,
@@ -233,25 +256,16 @@ export class ConversionFirebaseService implements ConversionService {
     assignmentCode: string;
     userId: string;
   }): Promise<Conversion[]> {
-    const queryRef = query(
-      this.unassignedConversionsCollection(),
-      where("assignmentCode", "==", assignmentCode)
-    );
+    const unassignedConversions: UnassignedConversion[] =
+      await this.queryUnassigned({ assignmentCode });
 
     await this.setAssignmentCodeStatus(assignmentCode, true);
 
-    const querySnapshot = await getDocs(queryRef);
-    const unassignedConversions: UnassignedConversion[] =
-      querySnapshot.docs.map((doc) =>
-        UnassignedConversion.fromFirestoreDoc(doc.data())
-      );
-
     const batch = writeBatch(this.db);
 
-    const conversions: Conversion[] = assignConversionsToUser({
-      unassignedConversions,
-      userId,
-    });
+    const conversions: Conversion[] = unassignedConversions.map(
+      (unassignedConv) => unassignedConv.assignToUser(userId)
+    );
 
     for (const conversion of conversions) {
       const docRef = doc(this.conversionsCollection(), conversion.id);

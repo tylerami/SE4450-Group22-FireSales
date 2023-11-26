@@ -101,7 +101,9 @@ const ClientsPerformanceWidget = (props: Props) => {
 
   useEffect(() => {
     const fetchConversions = async () => {
-      const conversions = await conversionService.query({});
+      const conversions = await conversionService.query({
+        includeUnasigned: true,
+      });
       setConversions(conversions);
     };
 

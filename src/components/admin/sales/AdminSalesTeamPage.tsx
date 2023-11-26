@@ -44,7 +44,9 @@ const AdminSalesTeamPage = (props: Props) => {
     };
 
     const fetchConversions = async () => {
-      const conversions = await conversionService.query({});
+      const conversions = await conversionService.query({
+        includeUnasigned: true,
+      });
       setConversions(conversions);
     };
 

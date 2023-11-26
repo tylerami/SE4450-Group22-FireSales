@@ -20,6 +20,7 @@ export interface ConversionService {
     maxCommission,
     compensationGroupId,
     referralLinkType,
+    includeUnasigned,
   }: {
     userId?: string;
     clientId?: string;
@@ -31,6 +32,7 @@ export interface ConversionService {
     maxCommission?: number;
     compensationGroupId?: string;
     referralLinkType?: string;
+    includeUnasigned?: boolean;
   }): Promise<Conversion[]>;
   // this should save the unassigned conversions to a collection called 'unassigned-conversions'
   createBulkUnassigned(
