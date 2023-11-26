@@ -1,17 +1,13 @@
 import React, { useState, useCallback } from "react";
-import { Box, Button, Flex, Text } from "@chakra-ui/react";
+import { Box, Button, Flex } from "@chakra-ui/react";
 import RecordConversionTile from "./ManualRecordConversionTile";
 import { AddIcon } from "@chakra-ui/icons";
-import {
-  Conversion,
-  ConversionAttachmentGroup,
-} from "../../../../../models/Conversion";
+import { ConversionAttachmentGroup } from "models/Conversion";
 import { CompensationGroup } from "models/CompensationGroup";
 import { ConversionService } from "services/interfaces/ConversionService";
 import { DependencyInjection } from "models/utils/DependencyInjection";
 import { RiSubtractLine } from "react-icons/ri";
 import useSuccessNotification from "components/utils/SuccessNotification";
-import { error } from "console";
 
 // Since the Props type is empty, we can omit it and also the props parameter
 const ManualRecordConversionsWidgetContent = ({

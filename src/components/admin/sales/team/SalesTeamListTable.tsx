@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   Table,
   Thead,
@@ -7,44 +7,22 @@ import {
   Th,
   Td,
   Image,
-  Box,
   Text,
   Circle,
   Flex,
-  Heading,
-  InputGroup,
-  InputLeftElement,
-  Input,
-  Spacer,
   useBreakpointValue,
-  MenuList,
-  MenuItem,
-  Menu,
-  MenuButton,
-  Button,
 } from "@chakra-ui/react";
-import { FiSearch, FiUser } from "react-icons/fi";
-import { Icon, IconButton } from "@chakra-ui/react";
-import { ChevronLeftIcon, ChevronRightIcon } from "@chakra-ui/icons";
-import { User } from "../../../../models/User";
+import { FiUser } from "react-icons/fi";
+import { Icon } from "@chakra-ui/react";
+import { User } from "models/User";
 import {
   Conversion,
   averageBetSize,
   averageCommission,
-  filterConversionsByTimeframe,
   totalCommission,
   totalGrossProfit,
 } from "models/Conversion";
 import { Payout } from "models/Payout";
-import {
-  Timeframe,
-  getIntervalStart,
-  getTimeframeLabel,
-} from "models/enums/Timeframe";
-import { Client } from "models/Client";
-import { ReferralLinkType } from "models/enums/ReferralLinkType";
-import { CompensationGroup } from "models/CompensationGroup";
-import Filter, { FilterDefinition } from "components/utils/Filter";
 import { formatMoney } from "models/utils/Money";
 import { ConversionStatus } from "models/enums/ConversionStatus";
 

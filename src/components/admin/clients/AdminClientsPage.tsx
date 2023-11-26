@@ -1,5 +1,4 @@
 import React from "react";
-import ClientsPerformanceWidget from "../performance/ClientsPerformanceWidget";
 import { Box, Flex } from "@chakra-ui/react";
 import ClientsSettingsWidget from "./settings/ClientSettingsWidget";
 

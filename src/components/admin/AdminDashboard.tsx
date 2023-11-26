@@ -1,8 +1,8 @@
 import React from "react";
 import { Box, Flex } from "@chakra-ui/react";
-import SideNavBar from "../common/nav/SideNavBar";
-import TopNavBar from "../common/nav/TopNavBar";
-import { useGlobalState } from "../utils/GlobalState";
+import SideNavBar from "components/common/nav/SideNavBar";
+import TopNavBar from "components/common/nav/TopNavBar";
+import { useGlobalState } from "components/utils/GlobalState";
 import { MdMonetizationOn } from "react-icons/md";
 import { BiAnalyse } from "react-icons/bi";
 import { IoMdPeople } from "react-icons/io";

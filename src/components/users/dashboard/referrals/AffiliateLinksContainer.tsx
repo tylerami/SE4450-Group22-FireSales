@@ -2,7 +2,7 @@ import { Flex, Heading, Text, useBreakpointValue } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 
 import { Button } from "@chakra-ui/react";
-import ImageComponent from "../../../utils/ImageComponent";
+import ImageComponent from "components/utils/ImageComponent";
 import { Client } from "models/Client";
 import { getReferralLinkTypeLabel } from "models/enums/ReferralLinkType";
 import { AffiliateLink } from "models/AffiliateLink";

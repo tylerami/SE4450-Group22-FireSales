@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import SalesTeamListWidget from "./team/SalesTeamListWidget";
 import { Box, Flex, Heading, IconButton, Spacer } from "@chakra-ui/react";
-import { User } from "../../../models/User";
+import { User } from "models//User";
 import { ChevronLeftIcon } from "@chakra-ui/icons";
 import { Conversion } from "models/Conversion";
 import { UserService } from "services/interfaces/UserService";

@@ -13,7 +13,7 @@ import {
 import { FiSearch } from "react-icons/fi";
 import { Icon, IconButton } from "@chakra-ui/react";
 import { ChevronLeftIcon, ChevronRightIcon } from "@chakra-ui/icons";
-import { User } from "../../../../models/User";
+import { User } from "models/User";
 import {
   Conversion,
   averageCommission,

@@ -15,10 +15,10 @@ import { FiEye, FiEyeOff } from "react-icons/fi";
 
 import { FcGoogle } from "react-icons/fc";
 import { useGlobalState } from "components/utils/GlobalState";
-import { UserContext } from "../UserProvider";
 import { authService } from "services/implementations/AuthFirebaseService";
 import { User } from "models/User";
 import Logo from "components/common/Logo";
+import { UserContext } from "components/auth/UserProvider";
 
 const LoginContainer = ({ goToRegister = () => {} }) => {
   const navigate = useNavigate();

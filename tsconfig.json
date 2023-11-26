@@ -21,7 +21,9 @@
     "paths": {
       "@models/*": ["models/*"],
       "@components/*": ["components/*"],
-      "@utils/*": ["utils/*"]
+      "@assets/*": ["assets/*"],
+      "@services/*": ["services/*"],
+      "@config/*": ["config/*"]
     }
   },
   "include": ["src/**/*", "src/__mocks__"],

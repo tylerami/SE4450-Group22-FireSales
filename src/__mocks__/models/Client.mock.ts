@@ -1,5 +1,5 @@
 import { ReferralLinkType } from "models/enums/ReferralLinkType";
-import { Client } from "../../models/Client";
+import { Client } from "models/Client";
 import { generateAffiliateDeal } from "./AffiliateDeal.mock";
 
 const names = ["PointsBet", "Betano", "Proline", "Bet99"];

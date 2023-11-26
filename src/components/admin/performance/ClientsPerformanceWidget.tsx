@@ -35,7 +35,7 @@ import {
 import { formatMoney } from "models/utils/Money";
 import ClientsPerformanceChart from "./ClientsPerformanceChart";
 import { AffiliateDeal } from "models/AffiliateDeal";
-import PerformanceMetricBox from "../../common/PerformanceMetricBox";
+import PerformanceMetricBox from "components/common/PerformanceMetricBox";
 import Filter, { FilterDefinition } from "components/utils/Filter";
 
 type Props = {};

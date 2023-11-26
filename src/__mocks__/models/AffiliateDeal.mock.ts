@@ -1,6 +1,6 @@
-import { AffiliateDeal } from "../../models/AffiliateDeal";
-import { Currency } from "../../models/enums/Currency";
-import { ReferralLinkType } from "../../models/enums/ReferralLinkType";
+import { AffiliateDeal } from "models/AffiliateDeal";
+import { Currency } from "models/enums/Currency";
+import { ReferralLinkType } from "models/enums/ReferralLinkType";
 
 export const casinoAffiliateDeal1 = new AffiliateDeal({
   clientId: "client1",

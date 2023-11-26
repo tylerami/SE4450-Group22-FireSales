@@ -1,16 +1,7 @@
 import { Box, Flex, Heading } from "@chakra-ui/react";
 import React from "react";
-import GroupedBarChart from "../GroupedBarChart";
 
-import {
-  Menu,
-  MenuButton,
-  MenuList,
-  MenuItem,
-  Button,
-  Icon,
-  IconButton,
-} from "@chakra-ui/react";
+import { Menu, MenuButton, MenuList, MenuItem, Button } from "@chakra-ui/react";
 import { ChevronDownIcon } from "@chakra-ui/icons";
 import SimpleTable from "./SalesTeamTable";
 

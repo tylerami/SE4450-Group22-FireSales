@@ -1,8 +1,8 @@
 import React, { useContext } from "react";
 import { Box, Flex, Heading, Spinner } from "@chakra-ui/react";
-import TopNavBar from "../common/nav/TopNavBar";
+import TopNavBar from "components/common/nav/TopNavBar";
 import UserDashboardPage from "./dashboard/UserDashboardPage";
-import { useGlobalState } from "../utils/GlobalState";
+import { useGlobalState } from "components/utils/GlobalState";
 import ConversionsPage from "./conversions/ConversionsPage";
 import UserSettingsPage from "./settings/UserSettingsPage";
 import { AiOutlineDashboard } from "react-icons/ai";

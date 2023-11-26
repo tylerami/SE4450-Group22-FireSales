@@ -3,7 +3,7 @@ import React from "react";
 
 import { Box } from "@chakra-ui/react"; // Using Chakra UI for the box
 import SideNavBarButton from "./SideNavBarButton";
-import Logo from "../Logo";
+import Logo from "components/common/Logo";
 import { Tab } from "@components/common/nav/Tab";
 import { useGlobalState } from "components/utils/GlobalState";
 

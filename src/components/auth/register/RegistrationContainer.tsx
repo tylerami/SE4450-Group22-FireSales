@@ -20,7 +20,7 @@ import { authService } from "services/implementations/AuthFirebaseService";
 import { useGlobalState } from "components/utils/GlobalState";
 import { ConversionService } from "services/interfaces/ConversionService";
 import { DependencyInjection } from "models/utils/DependencyInjection";
-import { UserContext } from "../UserProvider";
+import { UserContext } from "components/auth/UserProvider";
 import { User } from "@models/User";
 import { UserService } from "services/interfaces/UserService";
 import Logo from "components/common/Logo";
