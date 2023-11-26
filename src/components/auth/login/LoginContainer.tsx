@@ -21,6 +21,7 @@ import { UserContext } from "../UserProvider";
 import { DependencyInjection } from "@models/utils/DependencyInjection";
 import { authService } from "services/implementations/AuthFirebaseService";
 import { User } from "models/User";
+import Logo from "components/common/Logo";
 
 const LoginContainer = ({ goToRegister = () => {} }) => {
   const navigate = useNavigate();
@@ -89,12 +90,15 @@ const LoginContainer = ({ goToRegister = () => {} }) => {
   return (
     <Flex
       p={10}
+      pt={6}
       borderRadius={"16"}
       width={"30em"}
       alignItems={"center"}
       flexDirection={"column"}
       background={"white"}
     >
+      <Logo size="5em" />
+      <Box h={6} />
       <Heading size="lg">Sign in</Heading>
       <Box h={3} />
       <Flex>

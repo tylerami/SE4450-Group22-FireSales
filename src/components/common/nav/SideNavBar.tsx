@@ -3,7 +3,7 @@ import React from "react";
 
 import { Box } from "@chakra-ui/react"; // Using Chakra UI for the box
 import SideNavBarButton from "./SideNavBarButton";
-import Logo from "../../utils/Logo";
+import Logo from "../Logo";
 import { Tab } from "@components/common/nav/Tab";
 import { useGlobalState } from "components/utils/GlobalState";
 
@@ -29,7 +29,7 @@ const SideNavBar = ({ tabs }: Props) => {
       background={"rgba(237, 125, 49, 0.26)"}
     >
       <Box minH={8} />
-      <Logo size={"1.5em"}></Logo>
+      <Logo size={"4em"}></Logo>
       <Box h={4} />
 
       <Flex

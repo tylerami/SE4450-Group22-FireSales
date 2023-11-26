@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import SalesTeamListWidget from "./team/SalesTeamListWidget";
-import { Box, Flex, Heading, IconButton, Menu, Spacer } from "@chakra-ui/react";
+import { Box, Flex, Heading, IconButton, Spacer } from "@chakra-ui/react";
 import { User } from "../../../models/User";
 import { ChevronLeftIcon } from "@chakra-ui/icons";
 import { Conversion } from "models/Conversion";
@@ -14,13 +14,14 @@ import { CompensationGroupService } from "services/interfaces/CompensationGroupS
 import UserPerformanceWidget from "./performance/UserPerformanceWidget";
 import AdminConversionHistoryWidget from "./conversions/AdminConversionHistoryWidget";
 import Filter, { FilterDefinition } from "components/utils/Filter";
-import { DayOfTheWeek } from "@models/enums/Timeframe";
+import { DayOfTheWeek } from "models/enums/Timeframe";
 import { PayoutPreferrences } from "models/PayoutPreferrences";
 import useSuccessNotification from "components/utils/SuccessNotification";
 
 type Props = {};
 
 const AdminSalesTeamPage = (props: Props) => {
+  // state
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
   const [users, setUsers] = useState<User[]>([]);
@@ -29,6 +30,8 @@ const AdminSalesTeamPage = (props: Props) => {
   const [compensationGroups, setCompensationGroups] = useState<
     CompensationGroup[]
   >([]);
+
+  // services
   const userService: UserService = DependencyInjection.userService();
   const conversionService: ConversionService =
     DependencyInjection.conversionService();
@@ -36,6 +39,10 @@ const AdminSalesTeamPage = (props: Props) => {
 
   const compGroupService: CompensationGroupService =
     DependencyInjection.compensationGroupService();
+
+  // fetch data
+  const [updateTrigger, setUpdateTrigger] = useState<number>(0);
+  const refresh = () => setUpdateTrigger(updateTrigger + 1);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -64,7 +71,13 @@ const AdminSalesTeamPage = (props: Props) => {
     fetchUsers();
     fetchConversions();
     fetchPayouts();
-  }, [compGroupService, conversionService, payoutService, userService]);
+  }, [
+    compGroupService,
+    conversionService,
+    payoutService,
+    userService,
+    updateTrigger,
+  ]);
 
   const getUserConversions = (): Conversion[] =>
     conversions.filter((conversion) => {
@@ -81,16 +94,18 @@ const AdminSalesTeamPage = (props: Props) => {
 
   const showSuccess = useSuccessNotification();
 
-  const setPayoutDay = async (user: User, day: DayOfTheWeek | undefined) => {
+  const setPayoutDay = async (day: DayOfTheWeek | null) => {
+    if (!selectedUser) return;
+
     const updatedUser: User = new User({
-      ...user,
+      ...selectedUser,
       payoutPreferrences: new PayoutPreferrences({
-        ...user.payoutPreferrences,
+        ...selectedUser.payoutPreferrences,
         preferredPayoutDay: day ?? null,
       }),
     });
     await userService.update(updatedUser);
-    console.log("asdsd ", updatedUser);
+    setPaymentDay(day);
     showSuccess({ message: `Payout day updated to ${day}.` });
   };
 
@@ -116,19 +131,33 @@ const AdminSalesTeamPage = (props: Props) => {
     const compGroup: CompensationGroup | undefined = compensationGroups.find(
       (compGroup) => compGroup.id === user.compensationGroupId
     );
-
+    console.log(user.payoutPreferrences?.preferredPayoutDay);
     setPaymentDay(user.payoutPreferrences?.preferredPayoutDay ?? null);
     setSelectedCompGroup(compGroup ?? null);
   };
 
-  const filterDefinition: FilterDefinition<CompensationGroup> = {
+  const deselectUser = () => {
+    setSelectedUser(null);
+    refresh();
+  };
+
+  const payoutDayFilterDef: FilterDefinition<DayOfTheWeek> = {
+    options: [null, ...Object.values(DayOfTheWeek)],
+    onChange: (day: DayOfTheWeek | null) => setPayoutDay(day),
+    label: (day: DayOfTheWeek | null) => {
+      if (!day) return "UNASSIGNED";
+      return day;
+    },
+    value: paymentDay,
+  };
+
+  const compGroupFilterDef: FilterDefinition<CompensationGroup> = {
     options: [null, ...compensationGroups],
     onChange: (group: CompensationGroup | null) => assignCompGroup(group),
     label: (group: CompensationGroup | null) => {
       if (!group) return "UNASSIGNED";
       return group.id;
     },
-    refresh: undefined,
     value: selectedCompGroup,
   };
 
@@ -140,7 +169,7 @@ const AdminSalesTeamPage = (props: Props) => {
           <Flex alignItems={"center"} alignSelf={"left"} width={"100%"}>
             <IconButton
               size="md"
-              onClick={() => selectUser(null)}
+              onClick={deselectUser}
               aria-label="icon-button"
               icon={<ChevronLeftIcon />}
             />
@@ -148,10 +177,18 @@ const AdminSalesTeamPage = (props: Props) => {
               {selectedUser.getFullName()}
             </Heading>
             <Spacer />
-            <Heading mx={4} size="sm" fontWeight={400}>
-              Compensation Group:
-            </Heading>
-            <Filter filter={filterDefinition} />
+            <React.Fragment>
+              <Heading mx={4} size="sm" fontWeight={400}>
+                Payout Day:
+              </Heading>
+              <Filter filter={payoutDayFilterDef} />
+            </React.Fragment>
+            <React.Fragment>
+              <Heading mx={4} size="sm" fontWeight={400}>
+                Compensation Group:
+              </Heading>
+              <Filter filter={compGroupFilterDef} />
+            </React.Fragment>
           </Flex>
 
           <AdminConversionHistoryWidget

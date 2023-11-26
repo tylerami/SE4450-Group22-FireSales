@@ -23,6 +23,7 @@ import { DependencyInjection } from "models/utils/DependencyInjection";
 import { UserContext } from "../UserProvider";
 import { User } from "@models/User";
 import { UserService } from "services/interfaces/UserService";
+import Logo from "components/common/Logo";
 
 const COMP_GROUP_ID_FOR_ASSIGNED_USERS = "newbies-A";
 
@@ -185,12 +186,15 @@ const RegistrationContainer = ({ goToLogin = () => {} }) => {
   return (
     <Flex
       p={10}
+      pt={6}
       borderRadius={"16"}
       width={"30em"}
       alignItems={"center"}
       flexDirection={"column"}
       background={"white"}
     >
+      <Logo size="5em" />
+      <Box h={6} />
       <Heading size="lg">Sign up</Heading>
       <Box h={3} />
       <Flex>
@@ -208,9 +212,7 @@ const RegistrationContainer = ({ goToLogin = () => {} }) => {
         </Text>
       </Flex>
       <Box h={8} />
-
       {/* name input group */}
-
       <Flex width={"100%"} justifyContent={"space-between"}>
         <Flex width={"48%"} flexDirection={"column"}>
           <Text color="gray" fontSize="0.8em">
@@ -246,9 +248,7 @@ const RegistrationContainer = ({ goToLogin = () => {} }) => {
           </InputGroup>
         </Flex>
       </Flex>
-
       <Box h={4} />
-
       {/* email input group */}
       <Flex width={"100%"} flexDirection={"column"}>
         <Text color="gray" fontSize="0.8em">
@@ -266,9 +266,7 @@ const RegistrationContainer = ({ goToLogin = () => {} }) => {
           ></Input>
         </InputGroup>
       </Flex>
-
       <Box h={4} />
-
       {/* password input group  */}
       <Flex width={"100%"} flexDirection={"column"}>
         <Text color="gray" fontSize="0.8em">
@@ -295,11 +293,8 @@ const RegistrationContainer = ({ goToLogin = () => {} }) => {
           </InputRightElement>
         </InputGroup>
       </Flex>
-
       <Box h={4} />
-
       {/* confirm password input group  */}
-
       <Flex width={"100%"} flexDirection={"column"}>
         <Text color="gray" fontSize="0.8em">
           Confirm password*
@@ -325,11 +320,8 @@ const RegistrationContainer = ({ goToLogin = () => {} }) => {
           </InputRightElement>
         </InputGroup>
       </Flex>
-
       <Box h={4} />
-
       {/* Registration code  */}
-
       <Flex width={"100%"} flexDirection={"column"}>
         <Text color="gray" fontSize="0.8em">
           Do you have a registration code? (Optional)
@@ -346,9 +338,7 @@ const RegistrationContainer = ({ goToLogin = () => {} }) => {
           ></Input>
         </InputGroup>
       </Flex>
-
       <Box h={6} />
-
       <Flex align="center" mt={4}>
         <Checkbox
           isChecked={acceptedTerms}
@@ -372,9 +362,7 @@ const RegistrationContainer = ({ goToLogin = () => {} }) => {
           .
         </Text>
       </Flex>
-
       <Box h={6} />
-
       {/* sign up button */}
       <Button
         width={"100%"}
@@ -388,13 +376,11 @@ const RegistrationContainer = ({ goToLogin = () => {} }) => {
         Create an account
       </Button>
       <Box h={2} />
-
       {errorMessage && (
         <Text color="red" my={1}>
           {errorMessage}
         </Text>
       )}
-
       {/* button divider */}
       <Flex w="100%" alignItems={"center"} justifyContent={"space-between"}>
         <Box w="45%" h="1px" background="black" opacity={0.2} />
@@ -404,9 +390,7 @@ const RegistrationContainer = ({ goToLogin = () => {} }) => {
         </Text>
         <Box w="45%" h="1px" background="black" opacity={0.2} />{" "}
       </Flex>
-
       <Box h={4} />
-
       {/* google sign in button */}
       <Button
         leftIcon={<FcGoogle />}

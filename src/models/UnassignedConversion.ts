@@ -12,6 +12,9 @@ export type ConversionAttachmentGroup = {
   attachments: File[];
 };
 
+// Should this simply be a Conversion with a null userId?
+// --> Arugment against is primarily the changing of IDs, and strong typing making it clear that this is a different type of object
+
 export class UnassignedConversion {
   assignmentCode: string;
   id: string;
