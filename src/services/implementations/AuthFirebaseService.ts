@@ -1,4 +1,3 @@
-// AuthService.ts
 import { User } from "models/User";
 import { Providers, auth } from "config/firebase";
 import {
