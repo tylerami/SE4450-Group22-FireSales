@@ -1,0 +1,22 @@
+- for now, ignore everying in /components
+- obviously, not testing /assets, /config
+
+
+
+
+- for models, lots of testing to be done, but arguably a lower priority
+- definitely test lots of the helping functions in /models/Conversion
+
+- /models/utils, we want to test pretty much everying, maybe except DepInj. 
+
+- /models/enums/Timeframe, bunch of functions we should test
+
+
+
+- we're gonna need to mock the Firestore object --> primary dependency of like every service
+- we're gonna need to mock the imageService, userService ( dependency of authService)
+        I would probably do auth service last (don't even think we can? )
+
+- we have to look into mocking the Firestore client SDK and what that entails, 
+        specifically can we pass mocks into the SDKs functions or do we need to mock those functions? 
+

@@ -1,6 +1,7 @@
-import React, { useEffect } from "react";
+import React, { useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth } from "config/firebase";
+import { UserContext } from "./UserProvider";
 
 const AuthChecker = ({
   children,
@@ -11,11 +12,13 @@ const AuthChecker = ({
 }) => {
   const navigate = useNavigate();
 
+  const { currentUser } = useContext(UserContext);
+
   useEffect(() => {
     if (!auth.currentUser) {
       navigate("/login");
     }
-    if (adminOnly && auth.currentUser) {
+    if (adminOnly && currentUser && !currentUser.isAdmin()) {
       navigate("/");
     }
   });
