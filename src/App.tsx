@@ -27,7 +27,7 @@ function App() {
   if (loading) return <Center></Center>;
 
   return (
-    <Box h={"100vh"} background="red">
+    <Box h={"100vh"}>
       <BrowserRouter basename={process.env.PUBLIC_URL}>
         <GlobalStateProvider>
           <UserProvider>
