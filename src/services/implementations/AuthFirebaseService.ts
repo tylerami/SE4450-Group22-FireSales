@@ -11,6 +11,9 @@ import { UserService } from "services/interfaces/UserService";
 import { AuthService } from "services/interfaces/AuthService";
 import { DependencyInjection } from "models/utils/DependencyInjection";
 
+/**
+ * Implementation of the AuthService interface using Firebase authentication.
+ */
 export class AuthFirebaseService implements AuthService {
   userService: UserService;
 
@@ -18,6 +21,12 @@ export class AuthFirebaseService implements AuthService {
     this.userService = userService;
   }
 
+  /**
+   * Sign in with email and password.
+   * @param email - The user's email.
+   * @param password - The user's password.
+   * @returns A Promise that resolves to the authenticated user or null if authentication fails.
+   */
   public async signInWithEmailAndPassword(
     email: string,
     password: string
@@ -40,6 +49,10 @@ export class AuthFirebaseService implements AuthService {
     return user;
   }
 
+  /**
+   * Sign in with Google.
+   * @returns A Promise that resolves to the authenticated user or null if authentication fails.
+   */
   public async signInWithGoogle(): Promise<User | null> {
     const fbUserCredential: UserCredential | null = await signInWithPopup(
       auth,
@@ -62,6 +75,15 @@ export class AuthFirebaseService implements AuthService {
     return user;
   }
 
+  /**
+   * Register a new user with email and password.
+   * @param firstName - The user's first name.
+   * @param lastName - The user's last name.
+   * @param email - The user's email.
+   * @param password - The user's password.
+   * @returns A Promise that resolves to the created user or null if registration fails.
+   * @throws Error if the email is already in use or the password is invalid.
+   */
   public async registerWithEmail({
     firstName,
     lastName,
@@ -102,6 +124,10 @@ export class AuthFirebaseService implements AuthService {
     return await this.userService.create(newUser);
   }
 
+  /**
+   * Listen for changes in the user's authentication state.
+   * @param callback - A callback function that will be called with the current user or null.
+   */
   public onUserStateChanged(callback: (user: User | null) => void) {
     auth.onAuthStateChanged(async (firebaseUser: FirebaseUser | null) => {
       if (!firebaseUser) {

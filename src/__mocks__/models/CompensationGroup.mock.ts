@@ -13,8 +13,7 @@ export function generateSampleCompensationGroups(
       new CompensationGroup({
         id: `group${i}`,
         affiliateLinks: affiliateLinks,
-        createdAt: new Date(),
-        updatedAt: i % 2 === 0 ? new Date() : undefined, // Randomly assign updatedAt
+        timestamp: new Date(),
         enabled: Math.random() > 0.5, // Randomly set enabled status
         currency: Currency.CAD,
       })

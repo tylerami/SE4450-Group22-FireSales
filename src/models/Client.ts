@@ -5,8 +5,7 @@ import { Timestamp, DocumentData } from "firebase/firestore";
 export class Client {
   id: string;
   name: string;
-  createdAt: Date;
-  updatedAt: Date | null;
+  timestamp: Date;
   affiliateDeals: AffiliateDeal[];
   enabled: boolean;
   avgPaymentDays: number | null;
@@ -14,24 +13,21 @@ export class Client {
   constructor({
     id,
     name,
-    createdAt = new Date(),
-    updatedAt = null,
+    timestamp = new Date(),
     affiliateDeals,
     enabled = true,
     avgPaymentDays = null,
   }: {
     id: string;
     name: string;
-    createdAt?: Date;
-    updatedAt?: Date | null;
+    timestamp?: Date;
     affiliateDeals?: AffiliateDeal[];
     enabled?: boolean;
     avgPaymentDays?: number | null;
   }) {
     this.id = id;
     this.name = name;
-    this.createdAt = createdAt;
-    this.updatedAt = updatedAt;
+    this.timestamp = timestamp;
     this.affiliateDeals = affiliateDeals ?? [];
     this.enabled = enabled;
     this.avgPaymentDays = avgPaymentDays;
@@ -72,8 +68,7 @@ export class Client {
     return {
       id: this.id,
       name: this.name,
-      createdAt: this.createdAt ? Timestamp.fromDate(this.createdAt) : null,
-      updatedAt: this.updatedAt ? Timestamp.fromDate(this.updatedAt) : null,
+      timestamp: this.timestamp ? Timestamp.fromDate(this.timestamp) : null,
       affiliateDeals: this.affiliateDeals.map((deal) => deal.toFirestoreDoc()),
       enabled: this.enabled,
       avgPaymentDays: this.avgPaymentDays,
@@ -84,14 +79,17 @@ export class Client {
     return new Client({
       id: doc.id,
       name: doc.name,
-      createdAt: doc.createdAt ? doc.createdAt.toDate() : new Date(),
-      updatedAt: doc.updatedAt ? doc.updatedAt.toDate() : undefined,
+      timestamp: doc.timestamp ? doc.timestamp.toDate() : new Date(),
       affiliateDeals: doc.affiliateDeals.map((docDeal) =>
         AffiliateDeal.fromFirestoreDoc(docDeal)
       ),
       enabled: doc.enabled,
       avgPaymentDays: doc.avgPaymentDays,
     });
+  }
+
+  public firestoreDocId(): string {
+    return `${this.id}_${this.timestamp.toISOString()}`;
   }
 }
 

@@ -4,34 +4,33 @@ import { Timestamp, DocumentData } from "firebase/firestore";
 
 export class CompensationGroup {
   id: string;
-  // this should be consistent with the AffiliateDealContainer in Client
   affiliateLinks: AffiliateLink[];
-  createdAt: Date;
-  updatedAt?: Date;
+  timestamp: Date;
   enabled: boolean;
   currency: Currency;
 
   constructor({
     id,
     affiliateLinks = [],
-    createdAt = new Date(),
-    updatedAt,
+    timestamp = new Date(),
     enabled = true,
     currency = Currency.CAD,
   }: {
     id: string;
     affiliateLinks?: AffiliateLink[];
-    createdAt?: Date;
-    updatedAt?: Date;
+    timestamp?: Date;
     enabled: boolean;
     currency?: Currency;
   }) {
     this.id = id;
     this.affiliateLinks = affiliateLinks;
-    this.createdAt = createdAt;
-    this.updatedAt = updatedAt;
+    this.timestamp = timestamp;
     this.enabled = enabled;
     this.currency = currency;
+  }
+
+  public firestoreDocId(): string {
+    return `${this.id}_${this.timestamp.toISOString()}`;
   }
 
   public clientIds(): string[] {
@@ -46,8 +45,7 @@ export class CompensationGroup {
     return {
       id: this.id,
       affiliateLinks: affiliateLinksForFirestore,
-      createdAt: this.createdAt ? Timestamp.fromDate(this.createdAt) : null,
-      updatedAt: this.updatedAt ? Timestamp.fromDate(this.updatedAt) : null,
+      timestamp: this.timestamp ? Timestamp.fromDate(this.timestamp) : null,
       enabled: this.enabled,
       currency: this.currency,
     };
@@ -61,8 +59,7 @@ export class CompensationGroup {
     return new CompensationGroup({
       id: doc.id,
       affiliateLinks: affiliateLinksFromFirestore,
-      createdAt: doc.createdAt ? doc.createdAt.toDate() : new Date(),
-      updatedAt: doc.updatedAt ? doc.updatedAt.toDate() : undefined,
+      timestamp: doc.createdAt ? doc.createdAt.toDate() : new Date(),
       enabled: doc.enabled,
       currency: doc.currency as Currency,
     });

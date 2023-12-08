@@ -15,6 +15,9 @@ import {
 } from "firebase/firestore";
 import { ImageService } from "services/interfaces/ImageService";
 
+/**
+ * Implementation of the ConversionService interface using Firebase Firestore.
+ */
 export class ConversionFirebaseService implements ConversionService {
   private db: Firestore;
   private imageService: ImageService;
@@ -23,6 +26,13 @@ export class ConversionFirebaseService implements ConversionService {
     this.db = db;
     this.imageService = imageService;
   }
+
+  /**
+   * Creates a new Conversion document in Firestore.
+   * @param conversion The Conversion object to create.
+   * @param attachments Optional array of File objects representing attachments.
+   * @returns A Promise that resolves to the created Conversion object.
+   */
   async create(
     conversion: Conversion,
     attachments: File[] = []
@@ -40,6 +50,11 @@ export class ConversionFirebaseService implements ConversionService {
     return conversion;
   }
 
+  /**
+   * Updates multiple Conversion documents in Firestore using a batch write.
+   * @param conversions An array of Conversion objects to update.
+   * @returns A Promise that resolves to the updated Conversion objects.
+   */
   async updateBulk(conversions: Conversion[]): Promise<Conversion[]> {
     const batch = writeBatch(this.db);
 
@@ -59,6 +74,12 @@ export class ConversionFirebaseService implements ConversionService {
     return conversions;
   }
 
+  /**
+   * Updates a single Conversion document in Firestore.
+   * @param conversion The Conversion object to update.
+   * @param newAttachments Optional array of File objects representing new attachments.
+   * @returns A Promise that resolves to the updated Conversion object.
+   */
   async update(
     conversion: Conversion,
     newAttachments: File[] = []
@@ -76,6 +97,11 @@ export class ConversionFirebaseService implements ConversionService {
     return conversion;
   }
 
+  /**
+   * Creates multiple Conversion documents in Firestore using a batch write.
+   * @param items An array of objects containing a Conversion and optional attachments.
+   * @returns A Promise that resolves to the created Conversion objects.
+   */
   async createBulk(
     items: { conversion: Conversion; attachments?: File[] | undefined }[]
   ): Promise<Conversion[]> {
@@ -99,6 +125,22 @@ export class ConversionFirebaseService implements ConversionService {
     await batch.commit();
     return conversions;
   }
+
+  /**
+   * Queries Conversion documents in Firestore based on specified criteria.
+   * @param userId The user ID to filter by.
+   * @param clientId The client ID to filter by.
+   * @param startDate The start date to filter by.
+   * @param endDate The end date to filter by.
+   * @param minAmount The minimum amount to filter by.
+   * @param maxAmount The maximum amount to filter by.
+   * @param minCommission The minimum commission to filter by.
+   * @param maxCommission The maximum commission to filter by.
+   * @param compensationGroupId The compensation group ID to filter by.
+   * @param referralLinkType The referral link type to filter by.
+   * @param includeUnasigned Whether to include unassigned conversions in the result.
+   * @returns A Promise that resolves to an array of Conversion objects.
+   */
   async query({
     userId,
     clientId,
@@ -189,6 +231,12 @@ export class ConversionFirebaseService implements ConversionService {
       ...assignedConversions,
     ];
   }
+
+  /**
+   * Creates multiple UnassignedConversion documents in Firestore using a batch write.
+   * @param items An array of objects containing an UnassignedConversion and optional attachments.
+   * @returns A Promise that resolves to the created UnassignedConversion objects.
+   */
   async createBulkUnassigned(
     items: {
       conversion: UnassignedConversion;
@@ -231,12 +279,23 @@ export class ConversionFirebaseService implements ConversionService {
     return conversions;
   }
 
+  /**
+   * Checks if an assignment code is valid.
+   * @param code The assignment code to check.
+   * @returns A Promise that resolves to a boolean indicating if the code is valid.
+   */
   async isAssignmentCodeValid(code: string): Promise<boolean> {
     const docRef = doc(this.assignmentCodesCollection(), code);
     const docSnapshot = await getDoc(docRef);
     const docData = docSnapshot.data();
     return docData?.used === false;
   }
+
+  /**
+   * Queries UnassignedConversion documents in Firestore based on specified criteria.
+   * @param assignmentCode The assignment code to filter by.
+   * @returns A Promise that resolves to an array of UnassignedConversion objects.
+   */
   async queryUnassigned({ assignmentCode }: { assignmentCode?: string }) {
     let queryRef = query(this.unassignedConversionsCollection());
     if (assignmentCode) {
@@ -249,6 +308,12 @@ export class ConversionFirebaseService implements ConversionService {
     );
   }
 
+  /**
+   * Assigns UnassignedConversion documents to a user based on an assignment code.
+   * @param assignmentCode The assignment code to filter by.
+   * @param userId The user ID to assign the conversions to.
+   * @returns A Promise that resolves to an array of Conversion objects.
+   */
   async assignConversionsWithCode({
     assignmentCode,
     userId,

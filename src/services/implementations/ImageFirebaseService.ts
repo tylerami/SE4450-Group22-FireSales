@@ -9,6 +9,13 @@ import {
 import { Conversion } from "@models/Conversion";
 import { UnassignedConversion } from "@models/UnassignedConversion";
 
+/**
+ * Returns the path for storing conversion attachments in Firebase Storage.
+ * @param userId The user ID.
+ * @param conversionId The conversion ID.
+ * @param id The attachment ID.
+ * @returns The path for storing conversion attachments.
+ */
 const getConversionAttachmentsPath = (
   userId: string,
   conversionId: string,
@@ -17,6 +24,13 @@ const getConversionAttachmentsPath = (
   return `/conversions/${userId}/${conversionId}/${id}-${new Date().toISOString()})}`;
 };
 
+/**
+ * Returns the path for storing unassigned conversion attachments in Firebase Storage.
+ * @param assignmentCode The assignment code.
+ * @param conversionId The conversion ID.
+ * @param id The attachment ID.
+ * @returns The path for storing unassigned conversion attachments.
+ */
 const getUnassignedConversionAttachmentsPath = (
   assignmentCode: string,
   conversionId: string,
@@ -25,12 +39,26 @@ const getUnassignedConversionAttachmentsPath = (
   return `/conversions/unassigned/${assignmentCode}/${conversionId}/${id}-${new Date().toISOString()})}`;
 };
 
+/**
+ * Implementation of the ImageService interface using Firebase Storage.
+ */
 class ImageFirebaseService implements ImageService {
   private storage: FirebaseStorage;
 
+  /**
+   * Constructs a new ImageFirebaseService instance.
+   * @param storage The FirebaseStorage instance.
+   */
   constructor(storage: FirebaseStorage) {
     this.storage = storage;
   }
+
+  /**
+   * Uploads conversion attachments to Firebase Storage.
+   * @param conversion The conversion object.
+   * @param attachments The list of attachments to upload.
+   * @returns The updated conversion object.
+   */
   async uploadConversionAttachments(
     conversion: Conversion,
     attachments: File[]
@@ -51,6 +79,12 @@ class ImageFirebaseService implements ImageService {
     return conversion.addConversionAttachmentUrls(newAttachmentUrls);
   }
 
+  /**
+   * Uploads unassigned conversion attachments to Firebase Storage.
+   * @param unassignedConv The unassigned conversion object.
+   * @param attachments The list of attachments to upload.
+   * @returns The updated unassigned conversion object.
+   */
   async uploadUnassignedConversionAttachments(
     unassignedConv: UnassignedConversion,
     attachments: File[]
@@ -75,6 +109,11 @@ class ImageFirebaseService implements ImageService {
     return unassignedConv.addConversionAttachmentUrls(newAttachmentUrls);
   }
 
+  /**
+   * Gets the download URL of an image from Firebase Storage.
+   * @param path The path of the image.
+   * @returns The download URL of the image, or null if it doesn't exist.
+   */
   async getImageUrl(path: string): Promise<string | null> {
     try {
       const storageRef = ref(this.storage, path);
@@ -85,6 +124,14 @@ class ImageFirebaseService implements ImageService {
       return null;
     }
   }
+
+  /**
+   * Uploads an image to Firebase Storage.
+   * @param path The path to store the image.
+   * @param file The image file to upload.
+   * @param fileName The name of the file (optional).
+   * @returns The download URL of the uploaded image.
+   */
   async uploadImage(
     path: string,
     file: File,

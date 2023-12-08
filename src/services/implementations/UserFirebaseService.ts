@@ -13,6 +13,9 @@ import {
   updateDoc,
 } from "firebase/firestore";
 
+/**
+ * Implementation of the UserService interface using Firebase Firestore.
+ */
 export class UserFirebaseService implements UserService {
   private db: Firestore;
 
@@ -20,6 +23,11 @@ export class UserFirebaseService implements UserService {
     this.db = db;
   }
 
+  /**
+   * Retrieves the hot takes account for a given user ID.
+   * @param uid The user ID.
+   * @returns The hot takes account information, or null if not found.
+   */
   async getHotTakesAccount(
     uid: string
   ): Promise<{ email: string; fullName: string } | null> {
@@ -34,12 +42,24 @@ export class UserFirebaseService implements UserService {
       fullName: data.fullName,
     };
   }
+
+  /**
+   * Creates a new user.
+   * @param user The user object.
+   * @returns The created user.
+   */
   async create(user: User): Promise<User> {
     console.log("creating user, ", user);
     const docRef = doc(this.usersCollection(), user.uid);
     await setDoc(docRef, user.toFirestoreDoc());
     return user;
   }
+
+  /**
+   * Retrieves a user by ID.
+   * @param userId The user ID.
+   * @returns The user object, or null if not found.
+   */
   async get(userId: string): Promise<User | null> {
     console.log(`Getting user with id ${userId}`);
     const docRef = doc(this.usersCollection(), userId);
@@ -50,11 +70,23 @@ export class UserFirebaseService implements UserService {
     console.log(`Found user with id ${userId}`);
     return User.fromFirestoreDoc(docSnap.data());
   }
+
+  /**
+   * Updates a user.
+   * @param user The updated user object.
+   * @returns The updated user.
+   */
   async update(user: User): Promise<User> {
     const docRef = doc(this.usersCollection(), user.uid);
     await updateDoc(docRef, user.toFirestoreDoc());
     return user;
   }
+
+  /**
+   * Retrieves all users.
+   * @param includeAdmins Whether to include admin users (default: false).
+   * @returns An array of users.
+   */
   async getAll(
     {
       includeAdmins = false,

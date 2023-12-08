@@ -163,8 +163,6 @@ const ClientSettingsEditor = ({ existingClient, exit }: Props) => {
       name: displayName,
       affiliateDeals: deals,
       enabled: enabled,
-      updatedAt: new Date(),
-      createdAt: editMode ? existingClient?.createdAt : new Date(),
     });
     const result = await clientService.set(client);
     console.log("Upserted client", result);

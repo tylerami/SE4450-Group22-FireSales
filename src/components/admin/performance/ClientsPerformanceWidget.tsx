@@ -19,6 +19,7 @@ import {
   averageCommission,
   averageCpa,
   filterConversionsByTimeframe,
+  totalCostOfConversions,
   totalGrossProfit,
   totalRevenue,
 } from "models/Conversion";
@@ -136,9 +137,15 @@ const ClientsPerformanceWidget = (props: Props) => {
         getValue: (conv: Conversion[]) => formatMoney(totalRevenue(conv)),
       },
       {
+        label: "COGS",
+        getValue: (conv: Conversion[]) =>
+          formatMoney(totalCostOfConversions(conv)),
+      },
+      {
         label: "Profit",
         getValue: (conv: Conversion[]) => formatMoney(totalGrossProfit(conv)),
       },
+
       {
         label: "Avg. Commission",
         getValue: (conv: Conversion[]) => formatMoney(averageCommission(conv)),
@@ -275,7 +282,7 @@ const ClientsPerformanceWidget = (props: Props) => {
 
       <Box h={4}></Box>
 
-      <Flex my={4} justifyContent={"space-evenly"}>
+      <Flex my={4} gap={2} justifyContent={"space-evenly"}>
         {performanceMetricsContent.map(({ title, value }, i) => (
           <PerformanceMetricBox key={i} title={title} value={value} />
         ))}
