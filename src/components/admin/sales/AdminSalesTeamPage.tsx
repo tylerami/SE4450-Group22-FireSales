@@ -1,6 +1,13 @@
 import React, { useEffect, useState } from "react";
 import SalesTeamListWidget from "./team/SalesTeamListWidget";
-import { Box, Flex, Heading, IconButton, Spacer } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  Flex,
+  Heading,
+  IconButton,
+  Spacer,
+} from "@chakra-ui/react";
 import { User } from "models//User";
 import { ChevronLeftIcon } from "@chakra-ui/icons";
 import { Conversion } from "models/Conversion";
@@ -17,6 +24,7 @@ import Filter, { FilterDefinition } from "components/utils/Filter";
 import { DayOfTheWeek } from "models/enums/Timeframe";
 import { PayoutPreferrences } from "models/PayoutPreferrences";
 import useSuccessNotification from "components/utils/SuccessNotification";
+import { Role } from "models/enums/Role";
 
 type Props = {};
 
@@ -164,6 +172,19 @@ const AdminSalesTeamPage = (props: Props) => {
     value: selectedCompGroup,
   };
 
+  const toggleAdmin = async () => {
+    if (!selectedUser) return;
+
+    const updatedUser: User = new User({
+      ...selectedUser,
+      roles: selectedUser.isAdmin()
+        ? [Role.salesperson]
+        : [Role.salesperson, Role.admin],
+    });
+    await userService.update(updatedUser);
+    selectUser(updatedUser);
+  };
+
   return (
     <Flex w="100%" alignItems={"center"} direction={"column"} gap={8}>
       <Box />
@@ -179,7 +200,24 @@ const AdminSalesTeamPage = (props: Props) => {
             <Heading mx={6} size="xl" fontWeight={400} color="#ED7D31">
               {selectedUser.getFullName()}
             </Heading>
+            {selectedUser.isAdmin() && (
+              <Button
+                isActive={false}
+                _hover={{
+                  cursor: "default",
+                }}
+              >
+                {" "}
+                ADMIN{" "}
+              </Button>
+            )}
             <Spacer />
+            <Button
+              colorScheme={!selectedUser.isAdmin() ? "red" : "blackAlpha"}
+              onClick={toggleAdmin}
+            >
+              {selectedUser.isAdmin() ? "Remove Admin" : "Make Admin"}
+            </Button>
             <React.Fragment>
               <Heading mx={4} size="sm" fontWeight={400}>
                 Payout Day:

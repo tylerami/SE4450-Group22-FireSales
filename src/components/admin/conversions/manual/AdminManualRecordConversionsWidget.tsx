@@ -7,66 +7,67 @@ import { ConversionService } from "services/interfaces/ConversionService";
 import { DependencyInjection } from "models/utils/DependencyInjection";
 import { RiSubtractLine } from "react-icons/ri";
 import useSuccessNotification from "components/utils/SuccessNotification";
+import useErrorNotification from "components/utils/ErrorNotification";
+import RecordConversionTile from "components/users/conversions/recording/manual/ManualRecordConversionTile";
 import AdminRecordConversionTile from "./AdminManualRecordConversionTile";
 
-// Since the Props type is empty, we can omit it and also the props parameter
 const AdminManualRecordConversionsWidget = ({
   compensationGroup,
+  refresh = () => {},
 }: {
   compensationGroup: CompensationGroup;
+  refresh?: () => void;
 }) => {
+  // SERVICES
   const conversionService: ConversionService =
     DependencyInjection.conversionService();
 
-  const [rowCount, setRowCount] = useState(1);
+  // CONVERSION STATE
   // conversions is an object with keys of row numbers and values of Conversion objects
-  const [conversions, setConversions] = useState<
+  // undefined values indicate that the conversion is not valid -->  this is why a map is used instead of an array
+  const [conversionsGroups, setConversionsGroups] = useState<
     Record<number, ConversionAttachmentGroup | undefined>
-  >({});
+  >({
+    0: undefined,
+  });
 
+  const setConversionGroup = useCallback(
+    (
+      rowNumber: number,
+      conversionGroup: ConversionAttachmentGroup | null | undefined
+    ) => {
+      if (conversionGroup === null) {
+        conversionGroup = undefined;
+      }
+      setConversionsGroups((currentConversions) => {
+        return {
+          ...currentConversions,
+          [rowNumber]: conversionGroup as ConversionAttachmentGroup | undefined,
+        };
+      });
+    },
+    []
+  );
+
+  // ERROR HANDLING
+  // This is a map of row numbers to error messages
   const [errorsByRow, setErrorsByRow] = useState<
     Record<number, string | undefined>
   >({});
 
-  const [conversionValidity, setConversionValidity] = useState<
-    Record<number, boolean>
-  >({});
+  const checkAllConversionsValid = (): boolean => {
+    let foundError = false;
 
-  const [loading, setLoading] = useState<boolean>(false);
+    for (let i = 0; i < rowCount; i++) {
+      if (!conversionsGroups[i]) {
+        setRowError(i, "Please fill out all fields");
+        foundError = true;
+      } else {
+        setRowError(i, undefined);
+      }
+    }
 
-  function errorsPresent() {
-    return Object.values(errorsByRow).some((error) => error !== undefined);
-  }
-
-  function allConversionsValid() {
-    console.log(conversionValidity);
-    const result =
-      Object.values(conversionValidity).every((valid) => valid ?? true) &&
-      !errorsPresent();
-    console.log("allConversionsValid", result);
-    return result;
-  }
-
-  function setConversionValid(rowNumber: number, valid: boolean) {
-    setConversionValidity((currentValid) => {
-      return {
-        ...currentValid,
-        [rowNumber]: valid,
-      };
-    });
-  }
-
-  const showSuccess = useSuccessNotification();
-
-  const reset = () => {
-    console.log("resetting");
-    setRowCount(0);
-    setConversions({});
-    setErrorsByRow({});
-    setConversionValidity({});
-    setTimeout(() => {
-      setRowCount(1);
-    }, 100);
+    return !foundError;
   };
 
   function setRowError(rowNumber: number, error: string | null | undefined) {
@@ -81,79 +82,22 @@ const AdminManualRecordConversionsWidget = ({
     });
   }
 
-  const addRow = useCallback(() => {
-    setRowCount((currentRowCount) => currentRowCount + 1);
-  }, []);
+  const showError = useErrorNotification();
 
-  const deleteRow = useCallback(() => {
-    setRowError(rowCount - 1, undefined);
-    setConversionValidity((currentValidity) => {
-      const newValidity = { ...currentValidity };
-      delete newValidity[rowCount - 1];
-      return newValidity;
-    });
-    setRowCount((currentRowCount) => currentRowCount - 1);
-  }, [rowCount]);
-
-  const setConversion = useCallback(
-    (
-      rowNumber: number,
-      conversion: ConversionAttachmentGroup | null | undefined
-    ) => {
-      if (conversion === null) {
-        conversion = undefined;
-      }
-      setConversions((currentConversions) => {
-        return {
-          ...currentConversions,
-          [rowNumber]: conversion as ConversionAttachmentGroup | undefined,
-        };
-      });
-    },
-    []
-  );
-
-  const areConversionErrorsPresent = (): boolean => {
-    let foundError = false;
-
-    if (!allConversionsValid()) {
-      foundError = true;
-    }
-
-    for (const [row, isValid] of Object.entries(conversionValidity)) {
-      if (!isValid) {
-        setRowError(Number(row), "Please fill out all fields");
-        foundError = true;
-      }
-    }
-
-    for (let i = 0; i < rowCount; i++) {
-      if (!conversions[i]) {
-        setRowError(i, "Please fill out all fields");
-        foundError = true;
-      } else {
-        setRowError(i, undefined);
-      }
-    }
-
-    if (!foundError) {
-      setErrorsByRow({});
-      setConversionValidity({});
-    }
-
-    return foundError;
-  };
-
+  // This function is called when the user clicks the "Record Conversions" button
+  // It will record all conversions that are valid
   async function recordConversions() {
     if (loading) return;
 
-    if (areConversionErrorsPresent()) {
+    if (!checkAllConversionsValid()) {
+      showError({
+        message: "Error recording conversions.",
+      });
       return;
     }
-    console.log("No errors found --> recording conversions!");
 
     const conversionAttachmentGroups: ConversionAttachmentGroup[] =
-      Object.values(conversions).filter(
+      Object.values(conversionsGroups).filter(
         (group) => group !== undefined
       ) as ConversionAttachmentGroup[];
 
@@ -161,29 +105,43 @@ const AdminManualRecordConversionsWidget = ({
     const result = await conversionService.createBulk(
       conversionAttachmentGroups
     );
-    console.log("result", result);
+
     if (result) {
       showSuccess({
         message: `Successfully recorded ${result.length} conversions`,
       });
-      reset();
+      resetAllRows();
+      refresh();
     }
+
     setLoading(false);
   }
 
-  // Generate an array of RecordConversionTile components
-  const recordConversionTiles = Array.from({ length: rowCount }, (_, i) => (
-    <Box key={`${i}-box`}>
-      <AdminRecordConversionTile
-        compensationGroup={compensationGroup}
-        errorText={errorsByRow[i]}
-        rowIndex={i + 1}
-        setConversionGroup={(conversion) => setConversion(i, conversion)}
-        key={i}
-        setIsValid={(bool) => setConversionValid(i, bool)}
-      />
-    </Box>
-  ));
+  const resetAllRows = () => {
+    setRowCount(0);
+    setConversionsGroups({});
+    setErrorsByRow({});
+    setTimeout(() => {
+      setRowCount(1);
+    }, 100);
+  };
+
+  // ROW COUNT
+  const [rowCount, setRowCount] = useState(1);
+
+  const addRow = useCallback(() => {
+    setRowCount((currentRowCount) => currentRowCount + 1);
+  }, []);
+
+  const deleteRow = useCallback(() => {
+    setRowError(rowCount - 1, undefined);
+    setConversionGroup(rowCount - 1, undefined);
+    setRowCount((currentRowCount) => currentRowCount - 1);
+  }, [rowCount, setConversionGroup]);
+
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const showSuccess = useSuccessNotification();
 
   return (
     <Flex
@@ -196,7 +154,19 @@ const AdminManualRecordConversionsWidget = ({
     >
       <Box h={2} />
 
-      {recordConversionTiles}
+      {Array.from({ length: rowCount }, (_, i) => (
+        <Box key={`${i}-box`}>
+          <AdminRecordConversionTile
+            compensationGroup={compensationGroup}
+            errorText={errorsByRow[i]}
+            rowIndex={i + 1}
+            setConversionGroup={(conversion) =>
+              setConversionGroup(i, conversion)
+            }
+            key={i}
+          />
+        </Box>
+      ))}
 
       <Box h={0} />
 

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useState } from "react";
 import {
   Flex,
   Input,
@@ -23,14 +23,16 @@ import { CompensationGroup } from "models/CompensationGroup";
 import { Customer } from "models/Customer";
 import { CustomerService } from "services/interfaces/CustomerService";
 import { DependencyInjection } from "models/utils/DependencyInjection";
+import { formatMoney } from "models/utils/Money";
 import { parseDateString } from "models/utils/Date";
 
 type Props = {
   compensationGroup: CompensationGroup;
   errorText?: string;
-  setConversionGroup: (conversionGroup: ConversionAttachmentGroup) => void;
+  setConversionGroup: (
+    conversionGroup: ConversionAttachmentGroup | null
+  ) => void;
   rowIndex?: number;
-  setIsValid: (bool: boolean) => void;
 };
 
 const AdminRecordConversionTile = ({
@@ -38,23 +40,42 @@ const AdminRecordConversionTile = ({
   errorText,
   setConversionGroup,
   rowIndex,
-  setIsValid,
 }: Props) => {
+  // SERVICES
   const customerService: CustomerService =
     DependencyInjection.customerService();
 
-  const [dateString, setDate] = useState<string>("");
+  // STATE VARIABLES
+  const [dateString, setDateString] = useState<string>("");
   const [affiliateLink, setAffiliateLink] = useState<AffiliateLink | null>(
     null
   );
   const [customerName, setCustomerName] = useState<string>("");
-  const [customer, setCustomer] = useState<Customer | null>(null);
-  const [commission, setCommission] = useState<string>("");
   const [saleAmount, setSaleAmount] = useState<string>("");
   const [attachments, setAttachments] = useState<File[]>([]);
 
-  const changeCustomer = async (customerName: string) => {
-    setCustomerName(customerName);
+  const dateValid = (ds: string = dateString): boolean => {
+    return parseDateString(ds, "yyyy-mm-dd") != null;
+  };
+
+  const customerNameValid = (custName: string = customerName) =>
+    custName.trim() !== "" && custName.length > 3;
+
+  const affiliateLinkValid = (link: AffiliateLink | null = affiliateLink) =>
+    link != null;
+
+  const saleAmountValid = (amountString: string = saleAmount) => {
+    if (affiliateLink == null) return true;
+    return amountString.trim() !== "" && affiliateLink != null;
+  };
+
+  const getCustomer = async (
+    customerName: string
+  ): Promise<Customer | null> => {
+    if (!customerNameValid(customerName)) {
+      return null;
+    }
+
     let customer: Customer = new Customer({
       fullName: customerName,
     });
@@ -67,17 +88,78 @@ const AdminRecordConversionTile = ({
       }
     }
 
-    setCustomer(customer);
+    return customer;
   };
+
+  // CONVERSION VALIDATION
+  const { currentUser } = useContext(UserContext);
+
+  const handleSave = async ({
+    dateString: newDateString = dateString,
+    affiliateLink: newAffiliateLink = affiliateLink,
+    customerName: newCustomerName = customerName,
+    saleAmount: newSaleAmount = saleAmount,
+    attachments: newAttachments = attachments,
+  }: {
+    dateString?: string;
+    affiliateLink?: AffiliateLink | null;
+    customerName?: string;
+    saleAmount?: string;
+    attachments?: File[];
+  }) => {
+    if (!currentUser) return;
+
+    const conversionIsValid =
+      dateValid(newDateString) &&
+      affiliateLinkValid(newAffiliateLink) &&
+      customerNameValid(newCustomerName) &&
+      saleAmountValid(newSaleAmount);
+
+    if (!conversionIsValid) {
+      setConversionGroup(null);
+      return;
+    }
+
+    const dateOccurred: Date | null = parseDateString(
+      newDateString,
+      "yyyy-mm-dd"
+    );
+    const customer: Customer | null = await getCustomer(newCustomerName);
+
+    if (affiliateLink == null || customer == null || dateOccurred == null)
+      return;
+
+    const conversion: Conversion = Conversion.fromManualInput({
+      dateOccurred,
+      affiliateLink,
+      customer,
+      amount: Number(newSaleAmount),
+      compensationGroupId: compensationGroup.id,
+      userId: currentUser.uid,
+    });
+
+    const conversionGroup: ConversionAttachmentGroup = {
+      conversion,
+      attachments: newAttachments,
+    };
+    setConversionGroup(conversionGroup);
+  };
+
+  // STATE CHANGE HANDLERS
+
+  // Affiliate links are sorted by client ID
+  const affiliateLinks: AffiliateLink[] = compensationGroup.affiliateLinks;
+  affiliateLinks.sort((a, b) => a.clientId.localeCompare(b.clientId));
 
   const handleSelectAffiliateLink = (affiliateLink: AffiliateLink) => {
     setAffiliateLink(affiliateLink);
   };
 
+  // Attachment handling
   const handleFilesChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    console.log(event.target.files);
-    setAttachments(Array.from(event.target.files ?? []));
-    handleSave();
+    const files: File[] = Array.from(event.target.files ?? []);
+    setAttachments(files);
+    handleSave({ attachments: files });
   };
 
   const triggerFileUpload = () => {
@@ -90,76 +172,11 @@ const AdminRecordConversionTile = ({
   const handleAttachmentsButton = () => {
     if (attachments.length > 0) {
       setAttachments([]);
+      handleSave({ attachments: [] });
     } else {
       triggerFileUpload();
     }
   };
-
-  const { currentUser } = useContext(UserContext);
-
-  const handleSave = async () => {
-    if (!currentUser) return;
-
-    if (customer == null || customerName.trim() === "") {
-      setIsValid(false);
-      return;
-    }
-
-    if (!affiliateLink) {
-      setIsValid(false);
-      return;
-    }
-
-    if (dateString.trim() === "") {
-      setIsValid(false);
-      return;
-    }
-
-    const dateOccurred = parseDateString(dateString, "yyyy-mm-dd");
-    if (dateOccurred == null) {
-      return;
-    }
-
-    let conversion: Conversion = Conversion.fromManualInput({
-      dateOccurred,
-      affiliateLink,
-      customer,
-      amount: Number(saleAmount),
-      compensationGroupId: compensationGroup.id,
-      userId: currentUser.uid,
-    });
-
-    conversion = new Conversion({
-      ...conversion,
-      affiliateLink: new AffiliateLink({
-        ...conversion.affiliateLink,
-        commission: Number(commission),
-      }),
-    });
-
-    const conversionGroup: ConversionAttachmentGroup = {
-      conversion,
-      attachments,
-    };
-    setConversionGroup(conversionGroup);
-  };
-
-  const affiliateLinks: AffiliateLink[] = compensationGroup.affiliateLinks;
-
-  affiliateLinks.sort((a, b) => a.clientId.localeCompare(b.clientId));
-
-  const attachmentsValid = attachments.length > 0;
-  const dateValid = dateString.trim() !== "";
-  const customerValid = customer != null && customerName.trim() !== "";
-  const affiliateLinkValid = affiliateLink != null;
-
-  useEffect(() => {
-    const validateConversion = () =>
-      dateValid && customerValid && affiliateLinkValid;
-
-    setIsValid(validateConversion());
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [affiliateLinkValid, attachmentsValid, customerValid, dateValid]);
 
   return (
     // Entire component row
@@ -192,12 +209,11 @@ const AdminRecordConversionTile = ({
         >
           <Input
             type="date"
-            fontSize={"sm"}
-            width={"30%"}
+            width={"35%"}
             value={dateString}
             onChange={(e) => {
-              setDate(e.target.value);
-              handleSave();
+              setDateString(e.target.value);
+              handleSave({ dateString: e.target.value });
             }}
           />
           <Menu>
@@ -218,7 +234,7 @@ const AdminRecordConversionTile = ({
                   key={index}
                   onClick={() => {
                     handleSelectAffiliateLink(link);
-                    handleSave();
+                    handleSave({ affiliateLink: link });
                   }}
                 >
                   {link.description()}
@@ -227,7 +243,7 @@ const AdminRecordConversionTile = ({
             </MenuList>
           </Menu>
 
-          <Flex alignItems={"center"} direction={"column"} width={"20%"}>
+          <Flex alignItems={"center"} direction={"column"} width={"25%"}>
             <InputGroup width={"100%"}>
               <InputLeftElement>
                 <Icon as={FaDollarSign} color="gray" />
@@ -239,24 +255,7 @@ const AdminRecordConversionTile = ({
                 value={saleAmount}
                 onChange={(e) => {
                   setSaleAmount(e.target.value);
-                  handleSave();
-                }}
-              />
-            </InputGroup>
-          </Flex>
-          <Flex alignItems={"center"} direction={"column"} width={"20%"}>
-            <InputGroup width={"100%"}>
-              <InputLeftElement>
-                <Icon as={FaDollarSign} color="gray" />
-              </InputLeftElement>
-              <Input
-                pl={8}
-                type="number"
-                placeholder="Commission"
-                value={commission}
-                onChange={(e) => {
-                  setCommission(e.target.value);
-                  handleSave();
+                  handleSave({ saleAmount: e.target.value });
                 }}
               />
             </InputGroup>
@@ -264,7 +263,7 @@ const AdminRecordConversionTile = ({
         </Flex>
         {/* SECOND ROW */}
         <Flex
-          w={{ base: "100%", xl: "35%" }}
+          w={{ base: "100%", xl: "40%" }}
           justifyContent={"space-between"}
           gap={4}
         >
@@ -273,8 +272,8 @@ const AdminRecordConversionTile = ({
             placeholder="Customer Name"
             value={customerName}
             onChange={(e) => {
-              changeCustomer(e.target.value);
-              handleSave();
+              setCustomerName(e.target.value);
+              handleSave({ customerName: e.target.value });
             }}
           />
 
@@ -284,26 +283,33 @@ const AdminRecordConversionTile = ({
                 colorScheme={attachments.length > 0 ? "red" : "gray"}
                 size="md"
                 w="100%"
-                onClick={handleAttachmentsButton}
+                onClick={() => {
+                  console.log("clicked");
+                  handleAttachmentsButton();
+                }}
               >
                 <Input
                   accept="image/*"
                   type="file"
                   multiple
                   hidden
-                  onChange={handleFilesChange}
+                  onChange={(e) => {
+                    handleFilesChange(e);
+                  }}
                   id={`file-upload-${rowIndex}`}
                 />
                 {attachments.length <= 0 ? " Upload Files" : "Remove Files"}
               </Button>
             </InputGroup>
 
-            <Box h={1} />
-            {attachments.map((file, index) => (
-              <Text fontSize="2xs" key={index} textAlign={"center"} ml={2}>
-                {file.name}
-              </Text>
-            ))}
+            <React.Fragment>
+              <Box h={1} />
+              {attachments.map((file, index) => (
+                <Text fontSize="2xs" key={index} textAlign={"center"} ml={2}>
+                  {file.name}
+                </Text>
+              ))}
+            </React.Fragment>
           </Flex>
         </Flex>
       </Flex>
