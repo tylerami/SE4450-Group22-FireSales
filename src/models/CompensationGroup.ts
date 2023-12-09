@@ -2,6 +2,8 @@ import { AffiliateLink } from "./AffiliateLink";
 import { Currency } from "./enums/Currency";
 import { Timestamp, DocumentData } from "firebase/firestore";
 
+export const ADMIN_COMP_GROUP_ID = "ADMIN";
+
 export class CompensationGroup {
   id: string;
   affiliateLinks: AffiliateLink[];

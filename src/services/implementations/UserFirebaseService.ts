@@ -12,6 +12,7 @@ import {
   setDoc,
   updateDoc,
 } from "firebase/firestore";
+import { ADMIN_COMP_GROUP_ID } from "models/CompensationGroup";
 
 /**
  * Implementation of the UserService interface using Firebase Firestore.
@@ -68,7 +69,36 @@ export class UserFirebaseService implements UserService {
       return null;
     }
     console.log(`Found user with id ${userId}`);
-    return User.fromFirestoreDoc(docSnap.data());
+    let user: User = User.fromFirestoreDoc(docSnap.data());
+
+    if (user.isAdmin() && user.compensationGroupId !== ADMIN_COMP_GROUP_ID) {
+      user = this.fixAdminCompGroup(user);
+    } else if (
+      !user.isAdmin() &&
+      user.compensationGroupId === ADMIN_COMP_GROUP_ID
+    ) {
+      user = this.removeAdminCompGroup(user);
+    }
+
+    return user;
+  }
+
+  private removeAdminCompGroup(user: User) {
+    user = {
+      ...user,
+      compensationGroupId: null,
+    };
+    this.update(user);
+    return user;
+  }
+
+  private fixAdminCompGroup(user: User) {
+    user = {
+      ...user,
+      compensationGroupId: ADMIN_COMP_GROUP_ID,
+    };
+    this.update(user);
+    return user;
   }
 
   /**
