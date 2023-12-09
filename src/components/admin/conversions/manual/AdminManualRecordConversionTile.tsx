@@ -23,7 +23,6 @@ import { CompensationGroup } from "models/CompensationGroup";
 import { Customer } from "models/Customer";
 import { CustomerService } from "services/interfaces/CustomerService";
 import { DependencyInjection } from "models/utils/DependencyInjection";
-import { formatMoney } from "models/utils/Money";
 import { parseDateString } from "models/utils/Date";
 
 type Props = {
@@ -101,7 +100,7 @@ const AdminRecordConversionTile = ({
   const handleSave = async () => {
     if (!currentUser) return;
 
-    if (customer == null) {
+    if (customer == null || customerName.trim() === "") {
       setIsValid(false);
       return;
     }
@@ -117,6 +116,9 @@ const AdminRecordConversionTile = ({
     }
 
     const dateOccurred = parseDateString(dateString, "yyyy-mm-dd");
+    if (dateOccurred == null) {
+      return;
+    }
 
     let conversion: Conversion = Conversion.fromManualInput({
       dateOccurred,
@@ -148,7 +150,7 @@ const AdminRecordConversionTile = ({
 
   const attachmentsValid = attachments.length > 0;
   const dateValid = dateString.trim() !== "";
-  const customerValid = customer != null;
+  const customerValid = customer != null && customerName.trim() !== "";
   const affiliateLinkValid = affiliateLink != null;
 
   useEffect(() => {

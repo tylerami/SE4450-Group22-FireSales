@@ -1,13 +1,36 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Box, Flex, Heading, Text } from "@chakra-ui/react";
 import RecordConversionsWidget from "./recording/RecordConversionsWidget";
 import ConversionHistoryWidget from "./history/ConversionHistoryWidget";
 import { UserContext } from "components/auth/UserProvider";
+import { ConversionService } from "services/interfaces/ConversionService";
+import { DependencyInjection } from "models/utils/DependencyInjection";
+import { Conversion } from "models/Conversion";
 
 type Props = {};
 
 const ConversionsPage = (props: Props) => {
   const { currentUser } = useContext(UserContext);
+
+  const conversionService: ConversionService =
+    DependencyInjection.conversionService();
+
+  const [conversions, setConversions] = useState<Conversion[]>([]);
+  const [updateTrigger, setUpdateTrigger] = useState<boolean>(false);
+  const refresh = () => setUpdateTrigger(!updateTrigger);
+
+  useEffect(() => {
+    const fetchConversions = async () => {
+      if (!currentUser) return;
+
+      const conversions = await conversionService.query({
+        userId: currentUser.uid,
+      });
+      setConversions(conversions);
+    };
+
+    fetchConversions();
+  }, [conversionService, currentUser, updateTrigger]);
 
   const [isConversionSelected, setIsConversionSelected] =
     useState<boolean>(false);
@@ -23,6 +46,7 @@ const ConversionsPage = (props: Props) => {
           {!isConversionSelected && (
             <React.Fragment>
               <RecordConversionsWidget
+                refresh={refresh}
                 minimizeRecordConversion={minimizeRecordConversion}
                 setMinimizeRecordConversions={setMinimizeRecordConversions}
               />
@@ -30,6 +54,7 @@ const ConversionsPage = (props: Props) => {
             </React.Fragment>
           )}
           <ConversionHistoryWidget
+            conversions={conversions}
             setIsConversionSelected={setIsConversionSelected}
           />
         </React.Fragment>

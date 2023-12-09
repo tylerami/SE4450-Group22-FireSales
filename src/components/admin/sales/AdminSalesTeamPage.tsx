@@ -127,7 +127,10 @@ const AdminSalesTeamPage = (props: Props) => {
 
   const selectUser = (user: User | null) => {
     setSelectedUser(user);
-    if (user === null) return;
+    if (user === null) {
+      refresh();
+      return;
+    }
     const compGroup: CompensationGroup | undefined = compensationGroups.find(
       (compGroup) => compGroup.id === user.compensationGroupId
     );
@@ -194,6 +197,7 @@ const AdminSalesTeamPage = (props: Props) => {
           <AdminConversionHistoryWidget
             conversions={getUserConversions()}
             setConversionIsSelected={setIsConversionSelected}
+            refresh={refresh}
           />
           {displayPerformanceWidget && (
             <UserPerformanceWidget

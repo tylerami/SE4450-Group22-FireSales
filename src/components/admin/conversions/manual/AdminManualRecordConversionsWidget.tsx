@@ -10,7 +10,7 @@ import useSuccessNotification from "components/utils/SuccessNotification";
 import AdminRecordConversionTile from "./AdminManualRecordConversionTile";
 
 // Since the Props type is empty, we can omit it and also the props parameter
-const AdminManualRecordConversionsWidgetContent = ({
+const AdminManualRecordConversionsWidget = ({
   compensationGroup,
 }: {
   compensationGroup: CompensationGroup;
@@ -40,10 +40,11 @@ const AdminManualRecordConversionsWidgetContent = ({
 
   function allConversionsValid() {
     console.log(conversionValidity);
-    return (
+    const result =
       Object.values(conversionValidity).every((valid) => valid ?? true) &&
-      !errorsPresent()
-    );
+      !errorsPresent();
+    console.log("allConversionsValid", result);
+    return result;
   }
 
   function setConversionValid(rowNumber: number, valid: boolean) {
@@ -112,7 +113,7 @@ const AdminManualRecordConversionsWidgetContent = ({
     []
   );
 
-  const checkConversionErrors = (): boolean => {
+  const areConversionErrorsPresent = (): boolean => {
     let foundError = false;
 
     if (!allConversionsValid()) {
@@ -140,15 +141,16 @@ const AdminManualRecordConversionsWidgetContent = ({
       setConversionValidity({});
     }
 
-    return !foundError;
+    return foundError;
   };
 
   async function recordConversions() {
     if (loading) return;
 
-    if (!checkConversionErrors()) {
+    if (areConversionErrorsPresent()) {
       return;
     }
+    console.log("No errors found --> recording conversions!");
 
     const conversionAttachmentGroups: ConversionAttachmentGroup[] =
       Object.values(conversions).filter(
@@ -221,4 +223,4 @@ const AdminManualRecordConversionsWidgetContent = ({
   );
 };
 
-export default AdminManualRecordConversionsWidgetContent;
+export default AdminManualRecordConversionsWidget;

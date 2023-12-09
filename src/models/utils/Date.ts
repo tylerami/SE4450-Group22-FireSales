@@ -14,13 +14,17 @@ export function formatDateString(date: Date | undefined) {
 export function parseDateString(
   dateStr: string,
   format: "yyyy-mm-dd" | "yyyy-dd-mm"
-): Date {
+): Date | null {
+  if (!dateStr || dateStr.trim() === "") {
+    return null;
+  }
+
   // Split the date string into parts
   const parts = dateStr.split("-");
 
   // Validate parts length
   if (parts.length !== 3) {
-    throw new Error("Invalid date format");
+    return null;
   }
 
   let year: number, month: number, day: number;

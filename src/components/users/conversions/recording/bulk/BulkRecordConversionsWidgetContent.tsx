@@ -19,9 +19,13 @@ import { parseDateString } from "models/utils/Date";
 
 type Props = {
   compensationGroup: CompensationGroup | null;
+  refresh: () => void;
 };
 
-const BulkRecordConversionsWidgetContent = ({ compensationGroup }: Props) => {
+const BulkRecordConversionsWidgetContent = ({
+  compensationGroup,
+  refresh,
+}: Props) => {
   // Services
   const conversionService: ConversionService =
     DependencyInjection.conversionService();
@@ -72,7 +76,14 @@ const BulkRecordConversionsWidgetContent = ({ compensationGroup }: Props) => {
       const clients: Client[] = generateSampleClients(5);
 
       const dateString: string = values[1];
-      const dateOccurred: Date = parseDateString(dateString, "yyyy-mm-dd");
+      const dateOccurred: Date | null = parseDateString(
+        dateString,
+        "yyyy-mm-dd"
+      );
+      if (dateOccurred === null) {
+        console.log("Invalid date");
+        return null;
+      }
 
       const sportsbookName: string = values[2];
       const typeString: string = values[3]?.toLowerCase();

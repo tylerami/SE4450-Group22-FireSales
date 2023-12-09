@@ -1,7 +1,7 @@
 import { Box, Flex } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 import AdminRecordConversionsWidget from "./bulk/AdminRecordConversionsWidget";
-import AdminManualRecordConversionsWidgetContent from "./manual/AdminManualRecordConversionsWidgetContent";
+import AdminManualRecordConversionsWidget from "./manual/AdminManualRecordConversionsWidget";
 import {
   ADMIN_COMP_GROUP_ID,
   CompensationGroup,
@@ -37,9 +37,7 @@ const AdminRecordConversionsPage = (props: Props) => {
       <AdminRecordConversionsWidget />
       <Box h={10} />
       {compGroup && (
-        <AdminManualRecordConversionsWidgetContent
-          compensationGroup={compGroup}
-        />
+        <AdminManualRecordConversionsWidget compensationGroup={compGroup} />
       )}
       <Box h={40} />
     </Flex>

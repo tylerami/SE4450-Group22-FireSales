@@ -9,6 +9,7 @@ import {
   Input,
   Spacer,
   Switch,
+  filter,
 } from "@chakra-ui/react";
 import { FiSearch } from "react-icons/fi";
 import { Icon, IconButton } from "@chakra-ui/react";
@@ -195,6 +196,10 @@ const SalesTeamListWidget = ({
           user.getFullName().toLowerCase().indexOf(userSearch.toLowerCase()) >
           -1
       );
+    }
+
+    if (!showAdmins) {
+      filteredUsers = filteredUsers.filter((user) => !user.isAdmin());
     }
 
     return filteredUsers;

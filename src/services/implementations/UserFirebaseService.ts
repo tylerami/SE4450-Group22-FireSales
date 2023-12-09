@@ -71,33 +71,6 @@ export class UserFirebaseService implements UserService {
     console.log(`Found user with id ${userId}`);
     let user: User = User.fromFirestoreDoc(docSnap.data());
 
-    if (user.isAdmin() && user.compensationGroupId !== ADMIN_COMP_GROUP_ID) {
-      user = this.fixAdminCompGroup(user);
-    } else if (
-      !user.isAdmin() &&
-      user.compensationGroupId === ADMIN_COMP_GROUP_ID
-    ) {
-      user = this.removeAdminCompGroup(user);
-    }
-
-    return user;
-  }
-
-  private removeAdminCompGroup(user: User) {
-    user = {
-      ...user,
-      compensationGroupId: null,
-    };
-    this.update(user);
-    return user;
-  }
-
-  private fixAdminCompGroup(user: User) {
-    user = {
-      ...user,
-      compensationGroupId: ADMIN_COMP_GROUP_ID,
-    };
-    this.update(user);
     return user;
   }
 
@@ -108,7 +81,8 @@ export class UserFirebaseService implements UserService {
    */
   async update(user: User): Promise<User> {
     const docRef = doc(this.usersCollection(), user.uid);
-    await updateDoc(docRef, user.toFirestoreDoc());
+    const res = await updateDoc(docRef, user.toFirestoreDoc());
+    console.log("updated user", res, user.toFirestoreDoc(), user.uid);
     return user;
   }
 
@@ -132,7 +106,38 @@ export class UserFirebaseService implements UserService {
     if (!includeAdmins) {
       users = users.filter((user) => !user.isAdmin());
     }
+
+    for (let user of users) {
+      if (user.isAdmin() && user.compensationGroupId !== ADMIN_COMP_GROUP_ID) {
+        user = this.fixAdminCompGroup(user);
+      } else if (
+        !user.isAdmin() &&
+        user.compensationGroupId === ADMIN_COMP_GROUP_ID
+      ) {
+        user = this.removeAdminCompGroup(user);
+      }
+    }
+
     return users;
+  }
+
+  private removeAdminCompGroup(user: User) {
+    user = new User({
+      ...user,
+      compensationGroupId: null,
+    });
+    this.update(user);
+    return user;
+  }
+
+  private fixAdminCompGroup(user: User) {
+    user = new User({
+      ...user,
+      compensationGroupId: ADMIN_COMP_GROUP_ID,
+    });
+    console.log("fixing admin comp group", user);
+    this.update(user);
+    return user;
   }
 
   private hotTakesAccountsCollection(): CollectionReference {

@@ -13,22 +13,23 @@ import { Client } from "models/Client";
 
 type Props = {
   setIsConversionSelected: (isConversionSelected: boolean) => void;
+  conversions: Conversion[];
 };
 
-const ConversionHistoryWidget = ({ setIsConversionSelected }: Props) => {
-  const conversionService: ConversionService =
-    DependencyInjection.conversionService();
-
+const ConversionHistoryWidget = ({
+  conversions,
+  setIsConversionSelected,
+}: Props) => {
   const compGroupService: CompensationGroupService =
     DependencyInjection.compensationGroupService();
 
   const clientService: ClientService = DependencyInjection.clientService();
 
-  const [conversions, setConversions] = useState<Conversion[]>([]);
   const [selectedConversion, setSelectedConversion] =
     useState<Conversion | null>(null);
   const [compGroup, setCompGroup] = useState<CompensationGroup | null>(null);
   const [clients, setClients] = useState<Client[]>([]);
+
   const [updateTrigger, setUpdateTrigger] = useState<boolean>(false);
   const refresh = () => setUpdateTrigger(!updateTrigger);
 
@@ -51,25 +52,9 @@ const ConversionHistoryWidget = ({ setIsConversionSelected }: Props) => {
       setClients(clients);
     };
 
-    const fetchConversions = async () => {
-      if (!currentUser) return;
-
-      const conversions = await conversionService.query({
-        userId: currentUser.uid,
-      });
-      setConversions(conversions);
-    };
-
-    fetchConversions();
     fetchCompGroup();
     fetchClients();
-  }, [
-    clientService,
-    compGroupService,
-    conversionService,
-    currentUser,
-    updateTrigger,
-  ]);
+  }, [clientService, compGroupService, currentUser, updateTrigger]);
 
   const selectConversion = (conversion: Conversion) => {
     setSelectedConversion(conversion);

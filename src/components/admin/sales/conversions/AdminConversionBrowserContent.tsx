@@ -379,7 +379,7 @@ const AdminConversionBrowserContent = ({
                           ? "#FA9D45"
                           : conv.status === ConversionStatus.rejected
                           ? "#F71010"
-                          : "#4BF84B"
+                          : "#048B04"
                         : undefined
                     }
                     fontWeight={i === tableColumns.length - 1 ? 700 : undefined}

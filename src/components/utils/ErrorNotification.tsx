@@ -18,7 +18,7 @@ const useErrorNotification = () => {
         id,
         title: message,
         status: "error", // Changed to 'error' to reflect error status
-        duration: 5000,
+        duration: 2000,
         isClosable: true,
         position: "bottom-right",
       });

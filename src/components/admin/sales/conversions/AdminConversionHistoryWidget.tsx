@@ -13,11 +13,13 @@ import { Client } from "models/Client";
 type Props = {
   conversions: Conversion[];
   setConversionIsSelected: (isBooled: boolean) => void;
+  refresh: () => void;
 };
 
 const AdminConversionHistoryWidget = ({
   conversions,
   setConversionIsSelected,
+  refresh,
 }: Props) => {
   const compGroupService: CompensationGroupService =
     DependencyInjection.compensationGroupService();
@@ -55,6 +57,7 @@ const AdminConversionHistoryWidget = ({
   const exit = () => {
     setSelectedConversion(null);
     setConversionIsSelected(false);
+    refresh();
   };
 
   const selectConversion = (conversion: Conversion) => {

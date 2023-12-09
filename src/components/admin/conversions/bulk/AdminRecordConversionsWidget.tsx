@@ -82,10 +82,14 @@ const AdminRecordConversionsWidgetContent = (props: Props) => {
       const values: string[] = csvRow.split(",");
 
       const dateString: string = values[columnCount - 6];
-      let dateOccurred: Date;
+      let dateOccurred: Date | null;
 
       try {
         dateOccurred = parseDateString(dateString, "yyyy-mm-dd");
+        if (dateOccurred === null) {
+          console.log("Invalid date");
+          return null;
+        }
       } catch (e: any) {
         console.log(e, dateString, csvRow);
         return null;

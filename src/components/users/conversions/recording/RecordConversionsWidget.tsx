@@ -21,6 +21,7 @@ const ENABLE_BULK_MODE = false;
 type Props = {
   minimizeRecordConversion: boolean;
   setMinimizeRecordConversions: (minimizeRecordConversion: boolean) => void;
+  refresh: () => void;
 };
 
 enum RecordMode {
@@ -31,6 +32,7 @@ enum RecordMode {
 const RecordConversionsWidget = ({
   minimizeRecordConversion,
   setMinimizeRecordConversions,
+  refresh,
 }: Props) => {
   const compGroupService: CompensationGroupService =
     DependencyInjection.compensationGroupService();
@@ -104,10 +106,12 @@ const RecordConversionsWidget = ({
             recordMode === RecordMode.manual ? (
               <ManualRecordConversionsWidgetContent
                 compensationGroup={compensationGroup}
+                refresh={refresh}
               />
             ) : (
               <BulkRecordConversionsWidgetContent
                 compensationGroup={compensationGroup}
+                refresh={refresh}
               />
             )
           ) : (

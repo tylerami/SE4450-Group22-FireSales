@@ -134,6 +134,9 @@ const SalesTeamListTable = ({
       <Tbody>
         {currentPageUsers.map((user, index) => (
           <Tr
+            backgroundColor={
+              user.compensationGroupId == null ? "orange.100" : "white"
+            }
             _hover={{ background: "rgba(237, 125, 49, 0.26)" }}
             key={index}
             transition={"all 0.2s ease-in-out"}
