@@ -138,7 +138,7 @@ const RecordConversionTile = ({
     if (affiliateLink == null || customer == null || dateOccurred == null)
       return;
 
-    const conversion: Conversion = Conversion.fromManualInput({
+    const conversion: Conversion = new Conversion({
       dateOccurred,
       affiliateLink,
       customer,

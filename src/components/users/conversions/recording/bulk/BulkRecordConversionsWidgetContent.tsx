@@ -2,7 +2,6 @@ import React, { useContext, useState } from "react";
 import { Button, Input, InputGroup, Spinner } from "@chakra-ui/react";
 import { Box, Text, Flex } from "@chakra-ui/react";
 import { Conversion, ConversionAttachmentGroup } from "models/Conversion";
-import { filterCsvHeaders, getCsvFileContent } from "models/utils/File";
 import { generateSampleClients } from "__mocks__/models/Client.mock";
 import { findClosestMatch } from "models/utils/String";
 import { Client } from "models/Client";
@@ -16,6 +15,7 @@ import { DependencyInjection } from "models/utils/DependencyInjection";
 import BulkRecordConversionsInstructions from "./BulkRecordConversionsInstructions";
 import BulkRecordConversionsProcessedTable from "./BulkRecordConversionsProcessedTable";
 import { parseDateString } from "models/utils/Date";
+import { filterCsvHeaders, getCsvFileContent } from "models/utils/CsvParser";
 
 type Props = {
   compensationGroup: CompensationGroup | null;
@@ -116,7 +116,7 @@ const BulkRecordConversionsWidgetContent = ({
         return null;
       }
 
-      const conversion: Conversion = Conversion.fromManualInput({
+      const conversion: Conversion = new Conversion({
         dateOccurred,
         userId,
         affiliateLink: matchedAffiliateLink,

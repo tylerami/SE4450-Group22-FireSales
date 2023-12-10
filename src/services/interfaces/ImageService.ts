@@ -1,6 +1,5 @@
 // make the interface more concrete, with only certain options for getting/setting images (categories)
 
-import { UnassignedConversion } from "models/UnassignedConversion";
 import { Conversion } from "models/Conversion";
 
 export interface ImageService {
@@ -14,8 +13,4 @@ export interface ImageService {
     conversion: Conversion,
     attachments: File[]
   ): Promise<Conversion>;
-  uploadUnassignedConversionAttachments(
-    unassignedConv: UnassignedConversion,
-    attachments: File[]
-  ): Promise<UnassignedConversion>;
 }

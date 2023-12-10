@@ -1,5 +1,4 @@
 import { Conversion } from "models/Conversion";
-import { UnassignedConversion } from "models/UnassignedConversion";
 
 export interface ConversionService {
   create(conversion: Conversion, attachments?: File[]): Promise<Conversion>;
@@ -34,16 +33,7 @@ export interface ConversionService {
     referralLinkType?: string;
     includeUnasigned?: boolean;
   }): Promise<Conversion[]>;
-  // this should save the unassigned conversions to a collection called 'unassigned-conversions'
-  createBulkUnassigned(
-    items: Array<{
-      conversion: UnassignedConversion;
-      attachments?: File[];
-    }>
-  ): Promise<UnassignedConversion[]>;
-  // this should pull all unassigned conversions attached to a code,
-  // convert them to conversions using assignConversionsToUser()
-  // and save them to the conversions collection
+
   assignConversionsWithCode({
     assignmentCode,
     userId,

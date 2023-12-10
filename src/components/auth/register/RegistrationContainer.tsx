@@ -169,6 +169,7 @@ const RegistrationContainer = ({ goToLogin = () => {} }) => {
       ...user,
       compensationGroupId: COMP_GROUP_ID_FOR_ASSIGNED_USERS,
     });
+
     return await conversionService.assignConversionsWithCode({
       assignmentCode: registrationCode.trim(),
       userId: user.uid,

@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from "react";
-import { Box, Button, Flex } from "@chakra-ui/react";
+import { Box, Button, Flex, Heading } from "@chakra-ui/react";
 import { AddIcon } from "@chakra-ui/icons";
 import { ConversionAttachmentGroup } from "models/Conversion";
 import { CompensationGroup } from "models/CompensationGroup";
@@ -152,6 +152,9 @@ const AdminManualRecordConversionsWidget = ({
       boxShadow={"3px 4px 12px rgba(0, 0, 0, 0.2)"}
       gap={2}
     >
+      <Heading as="h1" fontSize={"1.2em"} fontWeight={700}>
+        Record Admin Conversions
+      </Heading>
       <Box h={2} />
 
       {Array.from({ length: rowCount }, (_, i) => (

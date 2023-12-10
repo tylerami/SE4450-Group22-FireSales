@@ -1,31 +1,39 @@
 import React, { useEffect, useState } from "react";
-import { Button, Heading, Input, InputGroup, Spinner } from "@chakra-ui/react";
+import {
+  Button,
+  Heading,
+  Input,
+  InputGroup,
+  Spacer,
+  Spinner,
+} from "@chakra-ui/react";
 import { Box, Text, Flex } from "@chakra-ui/react";
-import { filterCsvHeaders, getCsvFileContent } from "models/utils/File";
-import { findClosestMatch } from "models/utils/String";
 import { Client } from "models/Client";
-import { ReferralLinkType } from "models/enums/ReferralLinkType";
-import { AffiliateLink } from "models/AffiliateLink";
-import { Customer } from "models/Customer";
 import { ConversionService } from "services/interfaces/ConversionService";
 import { DependencyInjection } from "models/utils/DependencyInjection";
-import { parseDateString } from "models/utils/Date";
 import AdminRecordConversionsProcessedTable from "./AdminRecordConversionsProcessedTable";
 import AdminRecordConversionsInstructions from "./AdminRecordConversionsInstructions";
-import { UnassignedConversion } from "models/UnassignedConversion";
-import { AffiliateDeal } from "models/AffiliateDeal";
 import { ClientService } from "services/interfaces/ClientService";
 import useSuccessNotification from "components/utils/SuccessNotification";
+import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
+import {
+  filterCsvHeaders,
+  getCsvFileContent,
+  mapCsvRowToConversion,
+} from "models/utils/CsvParser";
+import { Conversion, ConversionAttachmentGroup } from "models/Conversion";
 
 type Props = {};
 
 const AdminRecordConversionsWidgetContent = (props: Props) => {
-  // Services
+  // SERVICES
   const conversionService: ConversionService =
     DependencyInjection.conversionService();
   const clientClient: ClientService = DependencyInjection.clientService();
 
-  // State
+  // STATE
+  const [collapsed, setCollapsed] = useState<boolean>(false);
+
   const [errorText, setErrorText] = useState<string | null>(null);
   const [processing, setProcessing] = useState<boolean>(false);
   const [csvFile, setCsvFile] = useState<File | null>(null);
@@ -33,13 +41,13 @@ const AdminRecordConversionsWidgetContent = (props: Props) => {
   const [attachments, setAttachments] = useState<File[]>([]);
   const [conversionsByNumber, setConversionsByNumber] = useState<Record<
     number,
-    UnassignedConversion
+    Conversion
   > | null>(null);
   const [assignmentCode, setAssignmentCode] = useState("");
 
   const [clients, setClients] = useState<Client[]>([]);
 
-  // Get clients
+  // CLIENT DATA FETCHING
   useEffect(() => {
     const fetchClients = async () => {
       const clients = await clientClient.getAll();
@@ -49,10 +57,10 @@ const AdminRecordConversionsWidgetContent = (props: Props) => {
     fetchClients();
   }, [clientClient]);
 
-  // Process the CSV file into conversions
-  const processCsvFile = async (
+  // CSV PROCESSING
+  async function processCsvFile(
     csvFile: File
-  ): Promise<Record<number, UnassignedConversion>> => {
+  ): Promise<Record<number, Conversion>> {
     setProcessing(true);
     let csvContent = await getCsvFileContent(csvFile);
 
@@ -74,88 +82,10 @@ const AdminRecordConversionsWidgetContent = (props: Props) => {
       expectedHeaders,
       keywordMatchThreshold: 3,
     });
-    console.log(csvContent);
 
-    const mapCsvRowToConversion = (
-      csvRow: string
-    ): UnassignedConversion | null => {
-      const values: string[] = csvRow.split(",");
-
-      const dateString: string = values[columnCount - 6];
-      let dateOccurred: Date | null;
-
-      try {
-        dateOccurred = parseDateString(dateString, "yyyy-mm-dd");
-        if (dateOccurred === null) {
-          console.log("Invalid date");
-          return null;
-        }
-      } catch (e: any) {
-        console.log(e, dateString, csvRow);
-        return null;
-      }
-
-      const sportsbookName: string = values[columnCount - 5];
-      const typeString: string = values[columnCount - 4]?.toLowerCase();
-      const referralType: ReferralLinkType = typeString.includes("sports")
-        ? ReferralLinkType.sports
-        : ReferralLinkType.casino;
-
-      const matchedClient: Client | null = findClosestMatch<Client>(
-        sportsbookName,
-        clients,
-        (client) => client.name
-      );
-      if (matchedClient === null) {
-        console.log("No client match");
-        return null;
-      }
-
-      const betSize = Number(values[columnCount - 3].replaceAll("$", ""));
-      const commission = Number(values[columnCount - 2].replaceAll("$", ""));
-      const customerName = values[columnCount - 1];
-
-      const matchedAffiliateDeal: AffiliateDeal | undefined = Object.values(
-        matchedClient.affiliateDeals
-      ).find(
-        (deal) =>
-          deal.clientId === matchedClient.id &&
-          (deal.type === referralType || deal.type === null)
-      );
-      if (matchedAffiliateDeal === undefined) {
-        console.log("No affiliate deal match");
-        return null;
-      }
-
-      const affiliateLink: AffiliateLink = new AffiliateLink({
-        clientId: matchedClient.id,
-        clientName: matchedClient.name,
-        type: referralType,
-        link: matchedAffiliateDeal.link,
-        commission,
-        minBetSize: betSize,
-        cpa: matchedAffiliateDeal.cpa,
-      });
-
-      console.log("creating conversion with assignment code", assignmentCode);
-
-      const conversion: UnassignedConversion =
-        UnassignedConversion.fromManualInput({
-          dateOccurred,
-          assignmentCode,
-          affiliateLink,
-          amount: betSize,
-          customer: new Customer({
-            fullName: customerName,
-          }),
-        });
-
-      console.log("created conversion", conversion);
-      return conversion;
-    };
-
+    // MAIN LOOP FOR CSV ROW PROCESSING
     const rows: string[] = csvContent.split("\n");
-    const conversionsByNumber: Record<number, UnassignedConversion> = {};
+    const conversionsByNumber: Record<number, Conversion> = {};
 
     for (let i = 0; i < rows.length; i++) {
       const row = rows[i];
@@ -163,9 +93,13 @@ const AdminRecordConversionsWidgetContent = (props: Props) => {
         continue;
       }
       const convNumber = columnCount > 6 ? Number(row.split(",")[0]) : i + 1;
-      console.log(row.split(","));
-      console.log(convNumber);
-      const conversion = mapCsvRowToConversion(row.replace("\r", ""));
+
+      const csvRow: string = row.replace("\r", "");
+      const conversion = mapCsvRowToConversion({
+        csvRow,
+        assignmentCode,
+        clients,
+      });
       if (conversion !== null) {
         conversionsByNumber[convNumber] = conversion;
       }
@@ -175,20 +109,46 @@ const AdminRecordConversionsWidgetContent = (props: Props) => {
       }
     }
 
-    setConversionsByNumber(conversionsByNumber);
     setProcessing(false);
+    setConversionsByNumber(conversionsByNumber);
     return conversionsByNumber;
-  };
+  }
 
-  type UnassignedConversionAttachmentGroup = {
-    conversion: UnassignedConversion;
-    attachments: File[];
-  };
+  // CONVERSION RECORDING
+  const showSuccess = useSuccessNotification();
 
-  // Create groups of conversions with attachments for recording
-  const createConversionGroups = async (): Promise<
-    UnassignedConversionAttachmentGroup[]
-  > => {
+  async function recordConversions() {
+    if (assignmentCode.trim() === "") {
+      setErrorText("Please enter an assignment code");
+      return;
+    }
+
+    let conversionGroups: ConversionAttachmentGroup[];
+    try {
+      conversionGroups = await createConversionGroups();
+    } catch (e: any) {
+      console.log(e);
+      setErrorText(e.message);
+      return;
+    }
+
+    // create bulk unassigned
+    const result = await conversionService.createBulk(conversionGroups);
+
+    if (result !== undefined && result !== null) {
+      setErrorText(null);
+      handleCsvChange(null);
+      setAssignmentCode("");
+      showSuccess({
+        message: `Successfully recorded ${result.length} conversions`,
+      });
+    } else {
+      setErrorText(result);
+    }
+  }
+
+  // CONVERSION GROUP CREATION
+  const createConversionGroups = (): ConversionAttachmentGroup[] => {
     if (conversionsByNumber == null) {
       throw new Error("No conversions to record");
     }
@@ -210,13 +170,16 @@ const AdminRecordConversionsWidgetContent = (props: Props) => {
       return attachmentsForConv;
     };
 
-    const conversionGroups: UnassignedConversionAttachmentGroup[] = [];
+    const conversionGroups: ConversionAttachmentGroup[] = [];
     for (const convNumber of Object.keys(conversionsByNumber)) {
-      let conversion: UnassignedConversion = conversionsByNumber[convNumber];
-      conversion = conversion.withNewAssignmentCode(assignmentCode);
+      let conversion: Conversion = conversionsByNumber[convNumber];
+      conversion = new Conversion({
+        ...conversion,
+        assignmentCode,
+      });
 
       const attachments = getAttachmentsForConversion(Number(convNumber));
-      const conversionGroup: UnassignedConversionAttachmentGroup = {
+      const conversionGroup: ConversionAttachmentGroup = {
         conversion,
         attachments,
       };
@@ -226,41 +189,7 @@ const AdminRecordConversionsWidgetContent = (props: Props) => {
     return conversionGroups;
   };
 
-  const showSuccess = useSuccessNotification();
-
-  // Record the conversions once ready
-  async function recordConversions() {
-    if (assignmentCode.trim() === "") {
-      setErrorText("Please enter an assignment code");
-      return;
-    }
-
-    let conversionGroups: UnassignedConversionAttachmentGroup[];
-    try {
-      conversionGroups = await createConversionGroups();
-    } catch (e: any) {
-      console.log(e);
-      setErrorText(e.message);
-      return;
-    }
-
-    const result = await conversionService.createBulkUnassigned(
-      conversionGroups
-    );
-    console.log(result);
-    if (result !== undefined && result !== null) {
-      setErrorText(null);
-      handleCsvChange(null);
-      setAssignmentCode("");
-      showSuccess({
-        message: `Successfully recorded ${result.length} conversions`,
-      });
-    } else {
-      setErrorText(result);
-    }
-  }
-
-  // Handling input changes
+  // INPUT HANDLING
 
   const triggerCsvUpload = () => {
     if (csvFile !== null) {
@@ -306,6 +235,7 @@ const AdminRecordConversionsWidgetContent = (props: Props) => {
     }
   };
 
+  // NAMED VARIABLES FOR CONDITIONAL RENDERING
   const csvUploaded = csvFile !== null;
   const attachmentsUploaded = attachments.length > 0;
 
@@ -328,86 +258,99 @@ const AdminRecordConversionsWidgetContent = (props: Props) => {
         <Heading as="h1" fontSize={"1.2em"} fontWeight={700}>
           Manually Upload Conversions
         </Heading>
+        <Spacer />
+        <Button
+          width={"10em"}
+          onClick={() => setCollapsed((prevCollapsed) => !prevCollapsed)}
+          leftIcon={collapsed ? <ChevronDownIcon /> : <ChevronUpIcon />}
+        >
+          {collapsed ? "Expand" : "Collapse"}
+        </Button>
       </Flex>
-      {processing ? (
-        <Spinner size="xl" />
-      ) : conversions != null ? (
-        <AdminRecordConversionsProcessedTable
-          attachments={attachments}
-          conversionsByNumber={conversionsByNumber}
-        />
-      ) : (
-        <AdminRecordConversionsInstructions />
+      {!collapsed && (
+        <React.Fragment>
+          {processing ? (
+            <Spinner size="xl" />
+          ) : conversions != null ? (
+            <AdminRecordConversionsProcessedTable
+              attachments={attachments}
+              conversionsByNumber={conversionsByNumber}
+            />
+          ) : (
+            <AdminRecordConversionsInstructions />
+          )}
+
+          <Box h={2} />
+          <Text>
+            Enter an assignment code that a user can use to claim these
+            conversions:
+          </Text>
+          <Input
+            focusBorderColor="#ED7D31"
+            placeholder="Assignment Code..."
+            value={assignmentCode}
+            onChange={(e) => setAssignmentCode(e.target.value)}
+          />
+          <Box h={2} />
+          <Flex gap={4} justifyContent={"space-evenly"} alignItems={"start"}>
+            <InputGroup width={"full"}>
+              <Button
+                colorScheme={csvUploaded ? "red" : undefined}
+                size="md"
+                w="100%"
+                onClick={triggerCsvUpload}
+              >
+                <Input
+                  type="file"
+                  accept=".csv"
+                  hidden
+                  onChange={(e) => handleCsvChange(e.target.files)}
+                  id="csv-upload"
+                  name="csv-upload"
+                />
+                {csvUploaded ? "Remove " + csvFile.name : "Upload CSV"}
+              </Button>
+            </InputGroup>
+
+            <InputGroup width={"full"}>
+              <Button
+                colorScheme={attachmentsUploaded ? "red" : undefined}
+                size="md"
+                w="100%"
+                onClick={triggerAttachmentsUpload}
+              >
+                <Input
+                  type="file"
+                  multiple
+                  accept="image/*"
+                  hidden
+                  onChange={(e) => handleAttachementsChange(e.target.files)}
+                  id="attachments-upload"
+                  name="attachments-upload"
+                />
+                {attachmentsUploaded
+                  ? "Remove " + attachments.length + " attachments"
+                  : "Upload Attachments"}
+              </Button>
+            </InputGroup>
+          </Flex>
+          <Box />
+          <Button
+            isDisabled={!csvFile || !conversionsReadyToRecord}
+            size="lg"
+            isLoading={processing}
+            colorScheme="orange"
+            onClick={recordConversions}
+          >
+            {csvFile
+              ? conversionsReadyToRecord
+                ? "Record Conversions"
+                : "Fix Errors"
+              : "Upload CSV to Record Conversions"}
+          </Button>
+          {errorText && <Text color={"red"}>{errorText}</Text>}
+        </React.Fragment>
       )}
-
-      <Box h={2} />
-      <Text>
-        Enter an assignment code that a user can use to claim these conversions:
-      </Text>
-      <Input
-        focusBorderColor="#ED7D31"
-        placeholder="Assignment Code..."
-        value={assignmentCode}
-        onChange={(e) => setAssignmentCode(e.target.value)}
-      />
-      <Box h={2} />
-      <Flex gap={4} justifyContent={"space-evenly"} alignItems={"start"}>
-        <InputGroup width={"full"}>
-          <Button
-            colorScheme={csvUploaded ? "red" : undefined}
-            size="md"
-            w="100%"
-            onClick={triggerCsvUpload}
-          >
-            <Input
-              type="file"
-              accept=".csv"
-              hidden
-              onChange={(e) => handleCsvChange(e.target.files)}
-              id="csv-upload"
-              name="csv-upload"
-            />
-            {csvUploaded ? "Remove " + csvFile.name : "Upload CSV"}
-          </Button>
-        </InputGroup>
-
-        <InputGroup width={"full"}>
-          <Button
-            colorScheme={attachmentsUploaded ? "red" : undefined}
-            size="md"
-            w="100%"
-            onClick={triggerAttachmentsUpload}
-          >
-            <Input
-              type="file"
-              multiple
-              accept="image/*"
-              hidden
-              onChange={(e) => handleAttachementsChange(e.target.files)}
-              id="attachments-upload"
-              name="attachments-upload"
-            />
-            {attachmentsUploaded
-              ? "Remove " + attachments.length + " attachments"
-              : "Upload Attachments"}
-          </Button>
-        </InputGroup>
-      </Flex>
-      <Box />
-      <Button
-        isDisabled={!csvFile || !conversionsReadyToRecord}
-        size="lg"
-        isLoading={processing}
-        colorScheme="orange"
-        onClick={recordConversions}
-      >
-        {csvFile
-          ? conversionsReadyToRecord
-            ? "Record Conversions"
-            : "Fix Errors"
-          : "Upload CSV to Record Conversions"}
-      </Button>
-      {errorText && <Text color={"red"}>{errorText}</Text>}
     </Flex>
   );
 };

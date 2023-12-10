@@ -11,7 +11,6 @@ import {
   getIntervalStart,
 } from "./enums/Timeframe";
 import { Timestamp, DocumentData } from "firebase/firestore";
-import { UnassignedConversion } from "./UnassignedConversion";
 
 export type ConversionAttachmentGroup = {
   conversion: Conversion;
@@ -22,9 +21,10 @@ export class Conversion {
   id: string;
   dateOccurred: Date;
   loggedAt: Date;
-  userId: string;
+  userId: string | null;
   status: ConversionStatus;
   compensationGroupId: string | null;
+  assignmentCode: string | null;
   affiliateLink: AffiliateLink;
   customer: Customer;
   amount: number; // Bet size
@@ -33,87 +33,67 @@ export class Conversion {
   messages: Array<Message>;
 
   constructor({
-    id,
+    // One of userId or assignmentCode must be provided
+    assignmentCode = null,
+    userId = null,
+    // The following are mandatory
     dateOccurred,
-    loggedAt,
-    userId,
-    status,
-    compensationGroupId = null,
-    affiliateLink,
     customer,
     amount,
-    attachmentUrls,
-    currency,
+    affiliateLink,
+    // The following are optional
+    id,
+    loggedAt = new Date(),
+    status = ConversionStatus.pending,
+    compensationGroupId = null,
+    attachmentUrls = [],
+    currency = Currency.CAD,
     messages = [],
   }: {
-    id: string;
+    id?: string;
     dateOccurred: Date;
-    loggedAt: Date;
-    userId?: string;
-    status: ConversionStatus;
+    loggedAt?: Date;
+    userId?: string | null;
+    status?: ConversionStatus;
     compensationGroupId?: string | null;
+    assignmentCode?: string | null;
     affiliateLink: AffiliateLink;
     customer: Customer;
     amount: number;
     attachmentUrls?: string[];
-    currency: Currency;
+    currency?: Currency;
     messages?: Array<Message>;
   }) {
-    this.id = id;
+    if (userId === null && assignmentCode === null) {
+      throw new Error(
+        "userId and assignmentCode cannot both be null in Conversion constructor"
+      );
+    }
+    this.id =
+      id ??
+      getConversionId({
+        dateOccurred,
+        clientId: affiliateLink.clientId,
+        userIdOrAssignmentCode: userId ?? assignmentCode!,
+        customerId: customer.id,
+      });
     this.dateOccurred = dateOccurred;
     this.loggedAt = loggedAt;
-    this.userId = userId ?? "UNASSIGNED";
+    this.userId = userId;
     this.status = status;
     this.compensationGroupId = compensationGroupId;
     this.affiliateLink = affiliateLink;
+    this.assignmentCode = assignmentCode;
     this.customer = customer;
     this.amount = amount;
-    this.attachmentUrls = attachmentUrls ?? [];
+    this.attachmentUrls = attachmentUrls;
     this.currency = currency;
     this.messages = messages;
   }
 
-  static fromManualInput({
-    dateOccurred,
-    userId,
-    compensationGroupId,
-    affiliateLink,
-    customer,
-    amount,
-    attachmentUrls,
-    currency = Currency.CAD,
-  }: {
-    dateOccurred: Date;
-    userId: string;
-    compensationGroupId: string;
-    affiliateLink: AffiliateLink;
-    currency?: Currency;
-    customer: Customer;
-    amount: number;
-    attachmentUrls?: Array<string>;
-  }) {
-    const id = getConversionId({
-      dateOccurred,
-      clientId: affiliateLink.clientId,
-      userId,
-      customerId: customer.id,
-    });
-
-    const loggedAt = new Date();
-    return new Conversion({
-      id,
-      dateOccurred,
-      loggedAt,
-      userId,
-      status: ConversionStatus.pending,
-      compensationGroupId,
-      affiliateLink,
-      customer,
-      amount,
-      attachmentUrls,
-      currency,
-    });
-  }
+  public isUnassigned = (): boolean => {
+    return this.userId === null;
+  };
 
   public addMessage = (message: Message): Conversion => {
     return new Conversion({
@@ -182,6 +162,7 @@ export class Conversion {
       status: this.status,
       compensationGroupId: this.compensationGroupId,
       affiliateLink: this.affiliateLink.toFirestoreDoc(),
+      assignmentCode: this.assignmentCode,
       customer: this.customer.toFirestoreDoc(),
       amount: this.amount,
       attachmentUrls: this.attachmentUrls,
@@ -199,6 +180,7 @@ export class Conversion {
       status: doc.status as ConversionStatus,
       compensationGroupId: doc.compensationGroupId,
       affiliateLink: AffiliateLink.fromFirestoreDoc(doc.affiliateLink),
+      assignmentCode: doc.assignmentCode,
       customer: Customer.fromFirestoreDoc(doc.customer),
       amount: doc.amount,
       attachmentUrls: doc.attachmentUrls,
@@ -371,15 +353,15 @@ export function setConversionStatus(
 export function getConversionId({
   dateOccurred,
   clientId,
-  userId,
+  userIdOrAssignmentCode,
   customerId,
 }: {
   dateOccurred: Date;
   clientId: string;
-  userId: string;
+  userIdOrAssignmentCode: string;
   customerId: string;
 }): string {
   return `${formatDateString(
     dateOccurred
-  )}_${userId}_${clientId}_${customerId}`;
+  )}_${userIdOrAssignmentCode}_${clientId}_${customerId}`;
 }

@@ -1,5 +1,4 @@
 import { Conversion } from "models/Conversion";
-import { UnassignedConversion } from "models/UnassignedConversion";
 import { ConversionService } from "services/interfaces/ConversionService";
 import {
   CollectionReference,
@@ -8,6 +7,7 @@ import {
   doc,
   getDoc,
   getDocs,
+  orderBy,
   query,
   setDoc,
   where,
@@ -152,7 +152,7 @@ export class ConversionFirebaseService implements ConversionService {
     maxCommission,
     compensationGroupId,
     referralLinkType,
-    includeUnasigned = false,
+    includeUnasigned = true,
   }: {
     userId?: string | undefined;
     clientId?: string | undefined;
@@ -168,14 +168,7 @@ export class ConversionFirebaseService implements ConversionService {
   }): Promise<Conversion[]> {
     let queryRef = query(this.conversionsCollection());
 
-    if (userId) {
-      queryRef = query(queryRef, where("userId", "==", userId));
-    }
-
-    if (clientId) {
-      queryRef = query(queryRef, where("clientId", "==", clientId));
-    }
-
+    // Use date as inequality filter for maximum search performance
     if (startDate) {
       queryRef = query(queryRef, where("date", ">=", startDate));
     }
@@ -184,20 +177,13 @@ export class ConversionFirebaseService implements ConversionService {
       queryRef = query(queryRef, where("date", "<=", endDate));
     }
 
-    if (minAmount) {
-      queryRef = query(queryRef, where("amount", ">=", minAmount));
+    // Use other filters as equality filters
+    if (userId) {
+      queryRef = query(queryRef, where("userId", "==", userId));
     }
 
-    if (maxAmount) {
-      queryRef = query(queryRef, where("amount", "<=", maxAmount));
-    }
-
-    if (minCommission) {
-      queryRef = query(queryRef, where("commission", ">=", minCommission));
-    }
-
-    if (maxCommission) {
-      queryRef = query(queryRef, where("commission", "<=", maxCommission));
+    if (clientId) {
+      queryRef = query(queryRef, where("clientId", "==", clientId));
     }
 
     if (compensationGroupId) {
@@ -207,75 +193,51 @@ export class ConversionFirebaseService implements ConversionService {
       );
     }
 
-    if (referralLinkType) {
-      queryRef = query(
-        queryRef,
-        where("referralLinkType", "==", referralLinkType)
-      );
-    }
+    queryRef = query(queryRef, orderBy("date", "desc"));
 
     const querySnapshot = await getDocs(queryRef);
-    const assignedConversions = querySnapshot.docs.map((doc) =>
+    let conversions = querySnapshot.docs.map((doc) =>
       Conversion.fromFirestoreDoc(doc.data())
     );
 
-    let unassignedConversions: UnassignedConversion[] = [];
-    if (includeUnasigned) {
-      unassignedConversions = await this.queryUnassigned({});
-    }
-
-    return [
-      ...unassignedConversions.map((unassignedConv) =>
-        unassignedConv.asConversionWithoutAssignment()
-      ),
-      ...assignedConversions,
-    ];
-  }
-
-  /**
-   * Creates multiple UnassignedConversion documents in Firestore using a batch write.
-   * @param items An array of objects containing an UnassignedConversion and optional attachments.
-   * @returns A Promise that resolves to the created UnassignedConversion objects.
-   */
-  async createBulkUnassigned(
-    items: {
-      conversion: UnassignedConversion;
-      attachments?: File[] | undefined;
-    }[]
-  ): Promise<UnassignedConversion[]> {
-    const batch = writeBatch(this.db);
-    const conversions: UnassignedConversion[] = [];
-
-    // establish assignment codes
-    const assignmentCodes: string[] = Array.from(
-      new Set(items.map((item) => item.conversion.assignmentCode))
-    );
-
-    for (const assignmentCode of assignmentCodes) {
-      await this.setAssignmentCodeStatus(assignmentCode, false);
-    }
-
-    // create unassigned conversions
-
-    for (let { conversion: unassignedConv, attachments } of items) {
-      const docRef = doc(
-        this.unassignedConversionsCollection(),
-        unassignedConv.id
-      );
-
-      if (attachments) {
-        unassignedConv =
-          await this.imageService.uploadUnassignedConversionAttachments(
-            unassignedConv,
-            attachments
-          );
+    // Apply additional filters
+    conversions = conversions.filter((conversion) => {
+      if (minAmount && conversion.amount < minAmount) {
+        return false;
       }
 
-      batch.set(docRef, unassignedConv.toFirestoreDoc());
-      conversions.push(unassignedConv);
-    }
+      if (maxAmount && conversion.amount > maxAmount) {
+        return false;
+      }
 
-    await batch.commit();
+      if (
+        minCommission &&
+        conversion.affiliateLink.commission < minCommission
+      ) {
+        return false;
+      }
+
+      if (
+        maxCommission &&
+        conversion.affiliateLink.commission > maxCommission
+      ) {
+        return false;
+      }
+
+      if (!includeUnasigned && !conversion.userId) {
+        return false;
+      }
+
+      if (
+        referralLinkType &&
+        conversion.affiliateLink.type !== referralLinkType
+      ) {
+        return false;
+      }
+
+      return true;
+    });
+
     return conversions;
   }
 
@@ -291,29 +253,6 @@ export class ConversionFirebaseService implements ConversionService {
     return docData?.used === false;
   }
 
-  /**
-   * Queries UnassignedConversion documents in Firestore based on specified criteria.
-   * @param assignmentCode The assignment code to filter by.
-   * @returns A Promise that resolves to an array of UnassignedConversion objects.
-   */
-  async queryUnassigned({ assignmentCode }: { assignmentCode?: string }) {
-    let queryRef = query(this.unassignedConversionsCollection());
-    if (assignmentCode) {
-      queryRef = query(queryRef, where("assignmentCode", "==", assignmentCode));
-    }
-
-    const querySnapshot = await getDocs(queryRef);
-    return querySnapshot.docs.map((doc) =>
-      UnassignedConversion.fromFirestoreDoc(doc.data())
-    );
-  }
-
-  /**
-   * Assigns UnassignedConversion documents to a user based on an assignment code.
-   * @param assignmentCode The assignment code to filter by.
-   * @param userId The user ID to assign the conversions to.
-   * @returns A Promise that resolves to an array of Conversion objects.
-   */
   async assignConversionsWithCode({
     assignmentCode,
     userId,
@@ -321,24 +260,25 @@ export class ConversionFirebaseService implements ConversionService {
     assignmentCode: string;
     userId: string;
   }): Promise<Conversion[]> {
-    const unassignedConversions: UnassignedConversion[] =
-      await this.queryUnassigned({ assignmentCode });
+    const queryRef = query(
+      this.unassignedConversionsCollection(),
+      where("assignmentCode", "==", assignmentCode)
+    );
 
-    await this.setAssignmentCodeStatus(assignmentCode, true);
+    const querySnapshot = await getDocs(queryRef);
+    const conversions = querySnapshot.docs.map((doc) =>
+      Conversion.fromFirestoreDoc(doc.data())
+    );
 
     const batch = writeBatch(this.db);
 
-    const conversions: Conversion[] = unassignedConversions.map(
-      (unassignedConv) => unassignedConv.assignToUser(userId)
-    );
-
     for (const conversion of conversions) {
       const docRef = doc(this.conversionsCollection(), conversion.id);
-      batch.set(docRef, conversion.toFirestoreDoc());
+      batch.update(docRef, { userId });
     }
 
     await batch.commit();
-
+    await this.setAssignmentCodeStatus(assignmentCode, true);
     return conversions;
   }
 
