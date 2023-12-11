@@ -18,7 +18,7 @@ import useSuccessNotification from "components/utils/SuccessNotification";
 import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
 import {
   filterCsvHeaders,
-  getCsvFileContent,
+  getCsvFileContent as getCsvRows,
   mapCsvRowToConversion,
 } from "models/utils/CsvParser";
 import { Conversion, ConversionAttachmentGroup } from "models/Conversion";
@@ -43,7 +43,7 @@ const AdminRecordConversionsWidgetContent = (props: Props) => {
     number,
     Conversion
   > | null>(null);
-  const [assignmentCode, setAssignmentCode] = useState("");
+  //const [assignmentCode, setAssignmentCode] = useState("");
 
   const [clients, setClients] = useState<Client[]>([]);
 
@@ -62,42 +62,43 @@ const AdminRecordConversionsWidgetContent = (props: Props) => {
     csvFile: File
   ): Promise<Record<number, Conversion>> {
     setProcessing(true);
-    let csvContent = await getCsvFileContent(csvFile);
+    let csvContentRows: string[][] = await getCsvRows(csvFile);
 
-    const columnCount = csvContent
-      .split("\n")[0]
-      .split(",")
-      .filter((item) => item.trim() !== "").length;
+    const firstCellContent = csvContentRows[0][0];
+    console.log(
+      "First cell content: " + firstCellContent,
+      Number(firstCellContent)
+    );
+
+    const firstColumnIsNumber = !isNaN(Number(firstCellContent));
+
+    console.log("First column is number: " + firstColumnIsNumber);
 
     const expectedHeaders = [
-      ...(columnCount > 6 ? ["number"] : []),
+      ...(firstColumnIsNumber ? ["number"] : []),
       "date",
       "sportsbook",
       "type",
       "size",
       "name",
+      "affiliate",
     ];
-    csvContent = filterCsvHeaders({
-      csvContent,
+    csvContentRows = filterCsvHeaders({
+      csvContentRows,
       expectedHeaders,
       keywordMatchThreshold: 3,
     });
 
     // MAIN LOOP FOR CSV ROW PROCESSING
-    const rows: string[] = csvContent.split("\n");
     const conversionsByNumber: Record<number, Conversion> = {};
 
-    for (let i = 0; i < rows.length; i++) {
-      const row = rows[i];
-      if (row.replaceAll(",", "").trim() === "") {
-        continue;
-      }
-      const convNumber = columnCount > 6 ? Number(row.split(",")[0]) : i + 1;
+    for (let i = 0; i < csvContentRows.length; i++) {
+      const csvRow: string[] = csvContentRows[i];
 
-      const csvRow: string = row.replace("\r", "");
+      const convNumber = firstColumnIsNumber ? Number(csvRow[0]) : i + 1;
+
       const conversion = mapCsvRowToConversion({
         csvRow,
-        assignmentCode,
         clients,
       });
       if (conversion !== null) {
@@ -118,10 +119,7 @@ const AdminRecordConversionsWidgetContent = (props: Props) => {
   const showSuccess = useSuccessNotification();
 
   async function recordConversions() {
-    if (assignmentCode.trim() === "") {
-      setErrorText("Please enter an assignment code");
-      return;
-    }
+    setProcessing(true);
 
     let conversionGroups: ConversionAttachmentGroup[];
     try {
@@ -138,13 +136,13 @@ const AdminRecordConversionsWidgetContent = (props: Props) => {
     if (result !== undefined && result !== null) {
       setErrorText(null);
       handleCsvChange(null);
-      setAssignmentCode("");
       showSuccess({
         message: `Successfully recorded ${result.length} conversions`,
       });
     } else {
       setErrorText(result);
     }
+    setProcessing(false);
   }
 
   // CONVERSION GROUP CREATION
@@ -173,11 +171,6 @@ const AdminRecordConversionsWidgetContent = (props: Props) => {
     const conversionGroups: ConversionAttachmentGroup[] = [];
     for (const convNumber of Object.keys(conversionsByNumber)) {
       let conversion: Conversion = conversionsByNumber[convNumber];
-      conversion = new Conversion({
-        ...conversion,
-        assignmentCode,
-      });
-
       const attachments = getAttachmentsForConversion(Number(convNumber));
       const conversionGroup: ConversionAttachmentGroup = {
         conversion,
@@ -200,13 +193,19 @@ const AdminRecordConversionsWidgetContent = (props: Props) => {
     console.log("Triggering CSV upload");
     const fileInput = document.getElementById("csv-upload");
     if (fileInput) {
+      console.log("Clicking file input");
+      (fileInput as HTMLInputElement).value = "";
       (fileInput as HTMLInputElement).click();
     }
   };
 
-  const handleCsvChange = (files: FileList | null) => {
-    const csv = Array.from(files ?? [])[0];
-    if (csv) {
+  const handleCsvChange = (
+    event: React.ChangeEvent<HTMLInputElement> | null
+  ) => {
+    console.log(event);
+    const csv = Array.from(event?.target.files ?? [])[0];
+    console.log(csv);
+    if (csv && event) {
       setCsvFile(csv);
       processCsvFile(csv);
     } else {
@@ -281,7 +280,7 @@ const AdminRecordConversionsWidgetContent = (props: Props) => {
           )}
 
           <Box h={2} />
-          <Text>
+          {/* <Text>
             Enter an assignment code that a user can use to claim these
             conversions:
           </Text>
@@ -291,7 +290,7 @@ const AdminRecordConversionsWidgetContent = (props: Props) => {
             value={assignmentCode}
             onChange={(e) => setAssignmentCode(e.target.value)}
           />
-          <Box h={2} />
+          <Box h={2} /> */}
           <Flex gap={4} justifyContent={"space-evenly"} alignItems={"start"}>
             <InputGroup width={"full"}>
               <Button
@@ -304,9 +303,11 @@ const AdminRecordConversionsWidgetContent = (props: Props) => {
                   type="file"
                   accept=".csv"
                   hidden
-                  onChange={(e) => handleCsvChange(e.target.files)}
+                  onChange={(e) => {
+                    console.log("hello");
+                    handleCsvChange(e);
+                  }}
                   id="csv-upload"
-                  name="csv-upload"
                 />
                 {csvUploaded ? "Remove " + csvFile.name : "Upload CSV"}
               </Button>

@@ -21,7 +21,7 @@ import { useGlobalState } from "components/utils/GlobalState";
 import { ConversionService } from "services/interfaces/ConversionService";
 import { DependencyInjection } from "models/utils/DependencyInjection";
 import { UserContext } from "components/auth/UserProvider";
-import { User } from "@models/User";
+import { User } from "models/User";
 import { UserService } from "services/interfaces/UserService";
 import Logo from "components/common/Logo";
 
@@ -128,10 +128,11 @@ const RegistrationContainer = ({ goToLogin = () => {} }) => {
   const register = async () => {
     if (!validateRegistration()) return;
 
-    if (
-      registrationCode.trim() !== "" &&
-      !conversionService.isAssignmentCodeValid(registrationCode.trim())
-    ) {
+    const codeIsValid: boolean = await conversionService.isAssignmentCodeValid(
+      registrationCode.trim()
+    );
+
+    if (registrationCode.trim() !== "" && !codeIsValid) {
       setErrorMessage("Invalid registration code.");
       return;
     }
@@ -152,11 +153,11 @@ const RegistrationContainer = ({ goToLogin = () => {} }) => {
     }
     if (user) {
       setCurrentUser(user);
-      navigate("/");
-      setActiveTabIndex(0);
       if (registrationCode.trim() !== "") {
         await handleRegistrationCodeUsed(user);
       }
+      navigate("/");
+      setActiveTabIndex(0);
     } else {
       setErrorMessage("Error occurred during registration.");
     }
@@ -165,10 +166,14 @@ const RegistrationContainer = ({ goToLogin = () => {} }) => {
   };
 
   const handleRegistrationCodeUsed = async (user: User) => {
-    await userService.update({
-      ...user,
-      compensationGroupId: COMP_GROUP_ID_FOR_ASSIGNED_USERS,
-    });
+    console.log("handleRegistrationCodeUsed", user);
+    // const updatedUser: User = new User({
+    //   ...user,
+    //   compensationGroupId: COMP_GROUP_ID_FOR_ASSIGNED_USERS,
+    // });
+
+    // await userService.update(updatedUser);
+    // setCurrentUser(updatedUser);
 
     return await conversionService.assignConversionsWithCode({
       assignmentCode: registrationCode.trim(),

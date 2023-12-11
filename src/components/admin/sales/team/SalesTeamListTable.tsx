@@ -26,21 +26,28 @@ import { Payout } from "models/Payout";
 import { formatMoney } from "models/utils/Money";
 import { ConversionStatus } from "models/enums/ConversionStatus";
 
+export type UserOrAssignmentCode = {
+  user?: User;
+  assignmentCode?: string;
+};
+
 type Props = {
   filteredConversions: Conversion[];
-  currentPageUsers: User[];
+  currentPageUsersAndCodes: UserOrAssignmentCode[];
   filteredPayouts: Payout[];
   selectUser: (user: User) => void;
 };
 
 const SalesTeamListTable = ({
   filteredConversions,
-  currentPageUsers,
+  currentPageUsersAndCodes,
   filteredPayouts,
   selectUser,
 }: Props) => {
   const getUser = (uid: string): User => {
-    const user = currentPageUsers.find((user) => user.uid === uid);
+    const user = currentPageUsersAndCodes.find(
+      (userOrCode: UserOrAssignmentCode) => userOrCode.user?.uid === uid
+    )?.user;
     if (!user) {
       throw new Error(`User with uid ${uid} not found`);
     }
@@ -51,54 +58,73 @@ const SalesTeamListTable = ({
     return filteredConversions.filter((conv) => conv.userId === uid);
   };
 
-  const getAccountBalance = (uid: string): number => {
+  const getAssignmentCodeConversions = (code: string): Conversion[] => {
+    return filteredConversions.filter((conv) => conv.assignmentCode === code);
+  };
+
+  const getConversions = (userOrCode: UserOrAssignmentCode): Conversion[] => {
+    return userOrCode.user
+      ? getUserConversions(userOrCode.user.uid)
+      : getAssignmentCodeConversions(userOrCode.assignmentCode!);
+  };
+
+  const getAccountBalance = (userOrCode: UserOrAssignmentCode): number => {
+    const totalConversions = getConversions(userOrCode);
+    if (!userOrCode.user) {
+      return totalCommission(totalConversions);
+    }
+
     const totalPayout = filteredPayouts.reduce(
       (total, payout) => total + payout.amount,
       0
     );
 
-    const totalEarnings = totalCommission(getUserConversions(uid));
+    const totalEarnings = totalCommission(totalConversions);
     return totalEarnings - totalPayout;
   };
 
   const tableColumns: {
     header: string;
-    getValue?: (uid: string) => string;
+    getValue?: (userOrCode: UserOrAssignmentCode) => string;
   }[] = [
     {
       header: "Name",
     },
     {
       header: "Conversions",
-      getValue: (uid) => getUserConversions(uid).length.toString(),
+      getValue: (userOrCode) => getConversions(userOrCode).length.toString(),
     },
     ...(useBreakpointValue({ base: false, lg: true })
       ? [
           {
             header: "Earnings",
-            getValue: (uid) =>
-              formatMoney(totalCommission(getUserConversions(uid))),
+            getValue: (userOrCode) =>
+              formatMoney(totalCommission(getConversions(userOrCode))),
           },
         ]
       : []),
     {
       header: "Profit",
-      getValue: (uid) => formatMoney(totalGrossProfit(getUserConversions(uid))),
+      getValue: (userOrCode) =>
+        formatMoney(totalGrossProfit(getConversions(userOrCode))),
     },
     {
       header: "Amount Due",
-      getValue: (uid) => formatMoney(getAccountBalance(uid)),
+      getValue: (userOrCode) => formatMoney(getAccountBalance(userOrCode)),
     },
     {
       header: "Sales Group",
-      getValue: (uid) => getUser(uid).compensationGroupId ?? "UNASSIGNED",
+      getValue: (userOrCode) =>
+        userOrCode.user
+          ? getUser(userOrCode.user.uid).compensationGroupId ?? "UNASSIGNED"
+          : "UNASSIGNED",
     },
     ...(useBreakpointValue({ base: false, "2xl": true })
       ? [
           {
             header: "Avg. Commission",
-            getValue: (uid) =>
-              formatMoney(averageCommission(getUserConversions(uid))),
+            getValue: (userOrCode) =>
+              formatMoney(averageCommission(getConversions(userOrCode))),
           },
         ]
       : []),
@@ -106,15 +132,15 @@ const SalesTeamListTable = ({
       ? [
           {
             header: "Avg. Bet Size",
-            getValue: (uid) =>
-              formatMoney(averageBetSize(getUserConversions(uid))),
+            getValue: (userOrCode) =>
+              formatMoney(averageBetSize(getConversions(userOrCode))),
           },
         ]
       : []),
     {
       header: "Unverified conv.",
-      getValue: (uid) =>
-        getUserConversions(uid)
+      getValue: (userOrCode) =>
+        getConversions(userOrCode)
           .filter((conv) => conv.status === ConversionStatus.pending)
           .length.toString(),
     },
@@ -132,25 +158,31 @@ const SalesTeamListTable = ({
         </Tr>
       </Thead>
       <Tbody>
-        {currentPageUsers.map((user, index) => (
+        {currentPageUsersAndCodes.map((userOrCode, index) => (
           <Tr
             backgroundColor={
-              user.compensationGroupId == null ? "orange.100" : "white"
+              userOrCode.user && userOrCode.user?.compensationGroupId == null
+                ? "orange.100"
+                : "white"
             }
             _hover={{ background: "rgba(237, 125, 49, 0.26)" }}
             key={index}
             transition={"all 0.2s ease-in-out"}
             cursor={"pointer"}
-            onClick={(e) => selectUser(user)}
+            onClick={(e) => {
+              if (userOrCode.user) {
+                selectUser(userOrCode.user);
+              }
+            }}
             height={"5em"}
           >
             <Td maxWidth={"10em"} textAlign="center">
               <Flex justifyContent={"left"}>
-                {user.profilePictureSrc ? (
+                {userOrCode.user && userOrCode.user.profilePictureSrc ? (
                   <Image
                     borderRadius="full"
                     boxSize="40px"
-                    src={user.profilePictureSrc}
+                    src={userOrCode.user.profilePictureSrc}
                     alt={""}
                     mr={2}
                   />
@@ -161,7 +193,8 @@ const SalesTeamListTable = ({
                 )}
 
                 <Text ml={2} textAlign={"left"}>
-                  {user.getFullName()}
+                  {userOrCode.user?.getFullName() ??
+                    `${userOrCode.assignmentCode} (Unregistered)`}
                 </Text>
               </Flex>
             </Td>
@@ -170,7 +203,7 @@ const SalesTeamListTable = ({
               (column, index) =>
                 column.getValue && (
                   <Td textAlign={"center"} key={index}>
-                    {column.getValue(user.uid)}
+                    {column.getValue(userOrCode)}
                   </Td>
                 )
             )}

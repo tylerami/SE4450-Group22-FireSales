@@ -8,6 +8,6 @@ export interface UserService {
   } | null>;
   create(user: User): Promise<User>;
   get(userId: string): Promise<User | null>;
-  update(user: User | Partial<User>): Promise<User>;
+  update(user: User): Promise<User>;
   getAll({ includeAdmins }?: { includeAdmins: boolean }): Promise<User[]>;
 }

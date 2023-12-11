@@ -98,6 +98,10 @@ const AdminRecordConversionsProcessedTable = ({
         formatMoney(conv.affiliateLink.commission),
     },
     {
+      label: "Code",
+      getValue: (conv: Conversion) => conv.assignmentCode ?? "N/A",
+    },
+    {
       label: "Attachments",
       getValue: (conv: Conversion) => {
         const convNumber = getConversionNumber(conv);

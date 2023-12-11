@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import {
   Box,
   Flex,
@@ -167,9 +168,16 @@ const ClientsPerformanceWidget = (props: Props) => {
   const sameAffiliateDeal = (
     conversion: Conversion,
     deal: AffiliateDeal
-  ): boolean =>
-    conversion.affiliateLink.clientId === deal.clientId &&
-    conversion.affiliateLink.type === deal.type;
+  ): boolean => {
+    if (deal.type === null) {
+      return conversion.affiliateLink.clientId === deal.clientId;
+    }
+
+    return (
+      conversion.affiliateLink.clientId === deal.clientId &&
+      conversion.affiliateLink.type === deal.type
+    );
+  };
 
   const getAffiliateDealGroups = useCallback(() => {
     let relevantConversions = filterConversionsByTimeframe(
@@ -177,28 +185,36 @@ const ClientsPerformanceWidget = (props: Props) => {
       timeframe
     );
 
-    let revelantConversions = relevantConversions.filter(
+    relevantConversions = relevantConversions.filter(
       (conv) =>
         selectedCompensationGroup === null ||
         conv.compensationGroupId === selectedCompensationGroup?.id
     );
 
-    const affiliateDealGroups: {
+    relevantConversions = relevantConversions.filter(
+      (conv) =>
+        selectedClient === null ||
+        conv.affiliateLink.clientId === selectedClient?.id
+    );
+
+    let affiliateDealGroups: {
       deal: AffiliateDeal;
       conversions: Conversion[];
     }[] = getAllAffiliateDeals(clients).map((deal, i) => ({
       deal,
-      conversions: revelantConversions.filter((conv) =>
+      conversions: relevantConversions.filter((conv) =>
         sameAffiliateDeal(conv, deal)
       ),
     }));
 
+    affiliateDealGroups = affiliateDealGroups.filter(
+      (group) => group.conversions.length > 0
+    );
+
     affiliateDealGroups.sort(
       (a, b) => b.conversions.length - a.conversions.length
     );
-    affiliateDealGroups.sort((a, b) =>
-      a.deal.clientName.localeCompare(b.deal.clientName)
-    );
+
     return affiliateDealGroups;
   }, [clients, conversions, selectedCompensationGroup, timeframe]);
 

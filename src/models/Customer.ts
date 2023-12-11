@@ -1,5 +1,6 @@
 import { generateUserID } from "models/utils/Identification";
 import { DocumentData } from "firebase/firestore";
+import { capitalizeEachWordFirstLetter } from "./utils/String";
 
 // Deprecate function
 export function customerIdFromName(fullName: string) {
@@ -21,7 +22,7 @@ export class Customer {
     email?: string | null;
   }) {
     this.id = id;
-    this.fullName = fullName;
+    this.fullName = capitalizeEachWordFirstLetter(fullName);
     this.email = email;
   }
 

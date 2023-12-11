@@ -124,9 +124,15 @@ const UserPerformanceWidget = ({ conversions }: Props) => {
   const sameAffiliateDeal = (
     conversion: Conversion,
     deal: AffiliateDeal
-  ): boolean =>
-    conversion.affiliateLink.clientId === deal.clientId &&
-    conversion.affiliateLink.type === deal.type;
+  ): boolean => {
+    if (deal.type === null) {
+      return conversion.affiliateLink.clientId === deal.clientId;
+    }
+    return (
+      conversion.affiliateLink.clientId === deal.clientId &&
+      conversion.affiliateLink.type === deal.type
+    );
+  };
 
   const affiliateDealGroups: {
     deal: AffiliateDeal;

@@ -13,10 +13,20 @@ const AdminRecordConversionsInstructions = (props: Props) => {
     "Bet Size ($CAD)",
     "Commission ($CAD)",
     "Customer name",
+    "Affiliate name",
   ];
 
   const rows = [
-    ["1", "2023-10-05", "PointsBet", "sportsbook", "80", "30", "Mitch Marner"],
+    [
+      "1",
+      "2023-10-05",
+      "PointsBet",
+      "sportsbook",
+      "80",
+      "30",
+      "Mitch Marner",
+      "James White",
+    ],
     [
       "2",
       "2023-10-06",
@@ -25,8 +35,18 @@ const AdminRecordConversionsInstructions = (props: Props) => {
       "100",
       "30",
       "Auston Matthews",
+      "James White",
     ],
-    ["3", "2023-10-06", "UniBet", "casino", "100", "30", "Auston Matthews"],
+    [
+      "3",
+      "2023-10-06",
+      "UniBet",
+      "casino",
+      "100",
+      "30",
+      "Auston Matthews",
+      "James White",
+    ],
   ];
 
   const textSize = "0.8em";

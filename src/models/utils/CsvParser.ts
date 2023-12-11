@@ -7,44 +7,76 @@ import { AffiliateLink } from "models/AffiliateLink";
 import { Customer } from "models/Customer";
 import { Conversion } from "models/Conversion";
 
+type RawCsvRowData = {
+  dateString: string;
+  sportsbookName: string;
+  typeString: string;
+  betSizeString: string;
+  commissionString: string;
+  customerName: string;
+  affiliateName: string;
+};
+
+const parseRowValues = (csvRow: string[]): RawCsvRowData => {
+  // remove empty cells from the front and back of the row:
+  let rawValues = csvRow.slice();
+  while (rawValues[0] === "") {
+    rawValues.shift();
+  }
+  while (rawValues[rawValues.length - 1] === "") {
+    rawValues.pop();
+  }
+
+  const firstColumnIsNumber = !isNaN(Number(rawValues[0]));
+
+  let i = firstColumnIsNumber ? 1 : 0;
+
+  return {
+    dateString: rawValues[i++]?.replaceAll("/", "-").replaceAll(" ", "") ?? "",
+    sportsbookName: rawValues[i++] ?? "",
+    typeString: rawValues[i++] ?? "",
+    betSizeString: rawValues[i++]?.replaceAll("$", "") ?? "",
+    commissionString: rawValues[i++]?.replaceAll("$", "") ?? "",
+    customerName: rawValues[i++] ?? "",
+    affiliateName: rawValues[i++] ?? "",
+  };
+};
+
 // CSV ROW MAPPING
 export const mapCsvRowToConversion = ({
   csvRow,
   clients,
-  assignmentCode,
 }: {
-  csvRow: string;
+  csvRow: string[];
   clients: Client[];
-  assignmentCode: string;
 }): Conversion | null => {
-  const columnCount = csvRow
-    .split(",")
-    .filter((item) => item.trim() !== "").length;
+  const rawValues: RawCsvRowData = parseRowValues(csvRow);
 
-  const values: string[] = csvRow.split(",");
-
-  const dateString: string = values[columnCount - 6];
+  // Parse date
   let dateOccurred: Date | null;
-
   try {
-    dateOccurred = parseDateString(dateString, "yyyy-mm-dd");
+    dateOccurred = parseDateString(rawValues.dateString, "yyyy-mm-dd");
     if (dateOccurred === null) {
       console.log("Invalid date");
       return null;
     }
   } catch (e: any) {
-    console.log(e, dateString, csvRow);
+    console.log(e, rawValues.dateString, csvRow);
     return null;
   }
 
-  const sportsbookName: string = values[columnCount - 5];
-  const typeString: string = values[columnCount - 4]?.toLowerCase();
-  const referralType: ReferralLinkType = typeString.includes("sports")
-    ? ReferralLinkType.sports
-    : ReferralLinkType.casino;
+  // Parse referral type
+  let referralType: ReferralLinkType | null = null;
+  if (rawValues.typeString.trim().toLowerCase().includes("sports")) {
+    referralType = ReferralLinkType.sports;
+  }
+  if (rawValues.typeString.trim().toLowerCase().includes("casino")) {
+    referralType = ReferralLinkType.casino;
+  }
 
+  // Find client
   const matchedClient: Client | null = findClosestMatch<Client>(
-    sportsbookName,
+    rawValues.sportsbookName,
     clients,
     (client) => client.name
   );
@@ -53,10 +85,14 @@ export const mapCsvRowToConversion = ({
     return null;
   }
 
-  const betSize = Number(values[columnCount - 3].replaceAll("$", ""));
-  const commission = Number(values[columnCount - 2].replaceAll("$", ""));
-  const customerName = values[columnCount - 1];
+  // Parse bet size and commission
+  const betSize = Number(rawValues.betSizeString);
+  const commission = Number(rawValues.commissionString);
 
+  // Parse customer name
+  const customerName = rawValues.customerName;
+
+  // Find affiliate deal
   const matchedAffiliateDeal: AffiliateDeal | undefined = Object.values(
     matchedClient.affiliateDeals
   ).find(
@@ -69,6 +105,7 @@ export const mapCsvRowToConversion = ({
     return null;
   }
 
+  // Create affiliate link
   const affiliateLink: AffiliateLink = new AffiliateLink({
     clientId: matchedClient.id,
     clientName: matchedClient.name,
@@ -78,6 +115,12 @@ export const mapCsvRowToConversion = ({
     minBetSize: betSize,
     cpa: matchedAffiliateDeal.cpa,
   });
+
+  // Create assignment code
+  const assignmentCode = rawValues.affiliateName
+    .toUpperCase()
+    .trim()
+    .replaceAll(" ", "-");
 
   console.log("creating conversion with assignment code", assignmentCode);
 
@@ -95,7 +138,7 @@ export const mapCsvRowToConversion = ({
   return conversion;
 };
 
-export async function getCsvFileContent(file: File): Promise<string> {
+export async function getCsvFileContent(file: File): Promise<string[][]> {
   return new Promise((resolve, reject) => {
     // Check if the file is a CSV file
     if (!file.name.endsWith(".csv")) {
@@ -107,9 +150,14 @@ export async function getCsvFileContent(file: File): Promise<string> {
 
     // Handle file reading success
     reader.onload = (event) => {
-      const result = event.target?.result;
+      let result = event.target?.result;
       if (typeof result === "string" && result.length > 0) {
-        resolve(result);
+        let rawRows = result.split("\n");
+        rawRows = rawRows.filter(
+          (row) => row.replaceAll(",", "").trim() !== ""
+        );
+        let rows: string[][] = rawRows.map((row) => row.split(","));
+        resolve(rows);
       } else {
         reject("The file is empty or couldn't be read as text.");
       }
@@ -126,21 +174,18 @@ export async function getCsvFileContent(file: File): Promise<string> {
 }
 
 export function filterCsvHeaders({
-  csvContent,
+  csvContentRows,
   keywordMatchThreshold = 3,
   expectedHeaders,
 }: {
-  csvContent: string;
+  csvContentRows: string[][];
   keywordMatchThreshold?: number;
   expectedHeaders: string[];
-}): string {
-  // Split the CSV content into lines
-  const lines = csvContent.split("\n");
-
+}): string[][] {
   // Count the number of keyword matches in the first line
   const matchCount = expectedHeaders.reduce(
     (count, keyword) =>
-      lines[0].toLowerCase().includes(keyword.toLowerCase())
+      csvContentRows[0].join(" ").toLowerCase().includes(keyword.toLowerCase())
         ? count + 1
         : count,
     0
@@ -148,9 +193,9 @@ export function filterCsvHeaders({
 
   // If the match count meets or exceeds the threshold, assume it's the header and remove it
   if (matchCount >= keywordMatchThreshold) {
-    return lines.slice(1).join("\n");
+    return csvContentRows.slice(1);
   }
 
   // If not, return the original content
-  return csvContent;
+  return csvContentRows;
 }

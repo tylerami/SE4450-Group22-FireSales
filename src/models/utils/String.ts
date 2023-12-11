@@ -86,3 +86,11 @@ export function findClosestMatch<T>(
     return null;
   }
 }
+
+export function capitalizeEachWordFirstLetter(string: string): string {
+  let words = string.split(" ");
+  words = words.map((word) => {
+    return word.charAt(0).toUpperCase() + word.slice(1);
+  });
+  return words.join(" ");
+}

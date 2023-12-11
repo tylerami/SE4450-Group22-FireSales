@@ -7,15 +7,15 @@ export const formatMoney = (value: number, currency?: Currency) => {
   let currencySymbol = "";
   switch (currency) {
     case Currency.USD:
-      currencySymbol = "US$";
+      currencySymbol = "USD";
       break;
     case Currency.CAD:
-      currencySymbol = "CA$";
-      break;
-    default:
-      currencySymbol = "$";
+      currencySymbol = "CAD";
       break;
   }
+
+  let negativeSign = value < 0 ? "-" : "";
+  value = Math.abs(value);
 
   // Format the value based on the specified criteria
   if (value < 1000) {
@@ -29,5 +29,5 @@ export const formatMoney = (value: number, currency?: Currency) => {
     });
   }
 
-  return `${currencySymbol}${formattedValue}`;
+  return `${negativeSign}$${formattedValue}${currencySymbol}`;
 };

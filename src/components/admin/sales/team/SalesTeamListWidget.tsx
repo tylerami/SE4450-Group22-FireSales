@@ -9,7 +9,6 @@ import {
   Input,
   Spacer,
   Switch,
-  filter,
 } from "@chakra-ui/react";
 import { FiSearch } from "react-icons/fi";
 import { Icon, IconButton } from "@chakra-ui/react";
@@ -33,7 +32,7 @@ import { ReferralLinkType } from "models/enums/ReferralLinkType";
 import { CompensationGroup } from "models/CompensationGroup";
 import Filter, { FilterDefinition } from "components/utils/Filter";
 import { ConversionStatus } from "models/enums/ConversionStatus";
-import SalesTeamListTable from "./SalesTeamListTable";
+import SalesTeamListTable, { UserOrAssignmentCode } from "./SalesTeamListTable";
 import SalesTeamTotalsTable from "./SalesTeamTotalsTable";
 
 enum SortBy {
@@ -106,19 +105,38 @@ const SalesTeamListWidget = ({
     return filteredConversions;
   };
 
-  const getFilteredAndSortedUsers = () => {
+  const getFilteredSortedUsersAndCodes = (): UserOrAssignmentCode[] => {
     let filteredUsers: User[] = Object.assign([], users);
+
+    // get all assignment codes for conversions without a userId
+    const unassignedConversionCodes = new Set<string>();
+    for (const conv of conversions.filter((conv) => !conv.userId)) {
+      if (!conv.assignmentCode) continue;
+      unassignedConversionCodes.add(conv.assignmentCode);
+    }
+
+    let filteredUsersAndCodes: UserOrAssignmentCode[] = [
+      ...filteredUsers.map((user) => ({
+        user,
+      })),
+      ...Array.from(unassignedConversionCodes.values()).map((code: string) => ({
+        assignmentCode: code,
+      })),
+    ];
+
     if (compGroupFilter) {
-      filteredUsers = filteredUsers.filter(
-        (user) => user.compensationGroupId === compGroupFilter.id
+      filteredUsersAndCodes = filteredUsersAndCodes.filter(
+        (userOrCode) =>
+          userOrCode.user &&
+          userOrCode.user.compensationGroupId === compGroupFilter.id
       );
     }
 
     switch (sortBy) {
       case SortBy.Conversions:
-        filteredUsers.sort((a, b) => {
-          const aConversions = getUserConversions(a.uid);
-          const bConversions = getUserConversions(b.uid);
+        filteredUsersAndCodes.sort((a, b) => {
+          const aConversions = getConversions(a);
+          const bConversions = getConversions(b);
           return (
             (sortDirection === SortDirection.Ascending ? 1 : -1) *
             (aConversions.length - bConversions.length)
@@ -126,9 +144,9 @@ const SalesTeamListWidget = ({
         });
         break;
       case SortBy.Earnings:
-        filteredUsers.sort((a, b) => {
-          const aEarnings = totalCommission(getUserConversions(a.uid));
-          const bEarnings = totalCommission(getUserConversions(b.uid));
+        filteredUsersAndCodes.sort((a, b) => {
+          const aEarnings = totalCommission(getConversions(a));
+          const bEarnings = totalCommission(getConversions(b));
           return (
             (sortDirection === SortDirection.Ascending ? 1 : -1) *
             (aEarnings - bEarnings)
@@ -136,9 +154,9 @@ const SalesTeamListWidget = ({
         });
         break;
       case SortBy.ProfitGenerated:
-        filteredUsers.sort((a, b) => {
-          const aProfit = totalGrossProfit(getUserConversions(a.uid));
-          const bProfit = totalGrossProfit(getUserConversions(b.uid));
+        filteredUsersAndCodes.sort((a, b) => {
+          const aProfit = totalGrossProfit(getConversions(a));
+          const bProfit = totalGrossProfit(getConversions(b));
           return (
             (sortDirection === SortDirection.Ascending ? 1 : -1) *
             (aProfit - bProfit)
@@ -146,9 +164,9 @@ const SalesTeamListWidget = ({
         });
         break;
       case SortBy.AvgCommission:
-        filteredUsers.sort((a, b) => {
-          const aAvgCommission = averageCommission(getUserConversions(a.uid));
-          const bAvgCommission = averageCommission(getUserConversions(b.uid));
+        filteredUsersAndCodes.sort((a, b) => {
+          const aAvgCommission = averageCommission(getConversions(a));
+          const bAvgCommission = averageCommission(getConversions(b));
           return (
             (sortDirection === SortDirection.Ascending ? 1 : -1) *
             (aAvgCommission - bAvgCommission)
@@ -156,11 +174,11 @@ const SalesTeamListWidget = ({
         });
         break;
       case SortBy.UnverifiedConversions:
-        filteredUsers.sort((a, b) => {
-          const aUnverifiedConversions = getUserConversions(a.uid).filter(
+        filteredUsersAndCodes.sort((a, b) => {
+          const aUnverifiedConversions = getConversions(a).filter(
             (conv) => conv.status === ConversionStatus.pending
           );
-          const bUnverifiedConversions = getUserConversions(b.uid).filter(
+          const bUnverifiedConversions = getConversions(b).filter(
             (conv) => conv.status === ConversionStatus.pending
           );
           return (
@@ -171,38 +189,49 @@ const SalesTeamListWidget = ({
         break;
     }
 
+    const isUnassigned = (userOrCode: UserOrAssignmentCode): boolean => {
+      return userOrCode.user
+        ? userOrCode.user.compensationGroupId === null
+        : true;
+    };
+
     // bring all users without a compensationGroupId to the top. order remains untouched otherwise
     if (showUnassignedUsers) {
-      filteredUsers.sort((a, b) => {
-        if (a.compensationGroupId === null && b.compensationGroupId === null) {
+      filteredUsersAndCodes.sort((a, b) => {
+        if (isUnassigned(a) && isUnassigned(b)) {
           return 0;
-        } else if (a.compensationGroupId === null) {
+        } else if (isUnassigned(a)) {
           return -1;
-        } else if (b.compensationGroupId === null) {
+        } else if (isUnassigned(b)) {
           return 1;
         } else {
           return 0;
         }
       });
     } else {
-      filteredUsers = filteredUsers.filter(
-        (user) => user.compensationGroupId !== null
+      filteredUsersAndCodes = filteredUsersAndCodes.filter(
+        (userOrCode) => !isUnassigned(userOrCode)
       );
     }
 
     if (userSearch.trim() !== "") {
-      filteredUsers = filteredUsers.filter(
-        (user) =>
-          user.getFullName().toLowerCase().indexOf(userSearch.toLowerCase()) >
-          -1
+      filteredUsersAndCodes = filteredUsersAndCodes.filter(
+        (userOrCode) =>
+          userOrCode.user &&
+          userOrCode.user
+            .getFullName()
+            .toLowerCase()
+            .indexOf(userSearch.toLowerCase()) > -1
       );
     }
 
     if (!showAdmins) {
-      filteredUsers = filteredUsers.filter((user) => !user.isAdmin());
+      filteredUsersAndCodes = filteredUsersAndCodes.filter(
+        (userOrCode) => !userOrCode.user || !userOrCode.user.isAdmin()
+      );
     }
 
-    return filteredUsers;
+    return filteredUsersAndCodes;
   };
 
   const getFilteredPayouts = (): Payout[] => {
@@ -215,6 +244,18 @@ const SalesTeamListWidget = ({
 
   const getUserConversions = (uid: string): Conversion[] => {
     return getFilteredConversions().filter((conv) => conv.userId === uid);
+  };
+
+  const getAssignmentCodeConversions = (code: string): Conversion[] => {
+    return getFilteredConversions().filter(
+      (conv) => conv.assignmentCode === code
+    );
+  };
+
+  const getConversions = (userOrCode: UserOrAssignmentCode): Conversion[] => {
+    return userOrCode.user
+      ? getUserConversions(userOrCode.user.uid)
+      : getAssignmentCodeConversions(userOrCode.assignmentCode!);
   };
 
   const timeframes: Timeframe[] = Object.values(Timeframe).filter(
@@ -261,14 +302,12 @@ const SalesTeamListWidget = ({
     },
   ];
 
-  const filteredUsers = getFilteredAndSortedUsers();
+  const filteredUsersAndCodes = getFilteredSortedUsersAndCodes();
 
   // Pagination
   const [pageIndex, setPageIndex] = useState(0);
 
   const pageLength = 10;
-
-  const pageCount = Math.max(1, Math.ceil(filteredUsers.length / pageLength));
 
   const nextPage = () => {
     if (pageIndex === pageCount - 1) return;
@@ -280,10 +319,16 @@ const SalesTeamListWidget = ({
     setPageIndex((prev) => prev - 1);
   };
 
-  const currentPageUsers: User[] = filteredUsers.slice(
-    pageIndex * pageLength,
-    (pageIndex + 1) * pageLength
+  const pageCount = Math.max(
+    1,
+    Math.ceil(filteredUsersAndCodes.length / pageLength)
   );
+
+  const currentPageUsersAndCodes: UserOrAssignmentCode[] =
+    filteredUsersAndCodes.slice(
+      pageIndex * pageLength,
+      (pageIndex + 1) * pageLength
+    );
 
   return (
     <Flex
@@ -381,13 +426,13 @@ const SalesTeamListWidget = ({
 
       <Box h={10}></Box>
       <SalesTeamListTable
-        currentPageUsers={currentPageUsers}
+        currentPageUsersAndCodes={currentPageUsersAndCodes}
         filteredConversions={getFilteredConversions()}
         selectUser={setSelectedUser}
         filteredPayouts={getFilteredPayouts()}
       />
 
-      {filteredUsers.length > 0 ? (
+      {filteredUsersAndCodes.length > 0 ? (
         <React.Fragment>
           <Heading mt={4} minW="30%" as="h1" size="sm" fontWeight={700}>
             Totals

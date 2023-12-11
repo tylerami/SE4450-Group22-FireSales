@@ -123,6 +123,17 @@ export class ConversionFirebaseService implements ConversionService {
     }
 
     await batch.commit();
+
+    // Set assignment codes as used
+    const assignmentCodes: Set<string> = new Set();
+    for (const conversion of conversions) {
+      if (!conversion.userId && conversion.assignmentCode) {
+        assignmentCodes.add(conversion.assignmentCode);
+      }
+    }
+
+    this.setAssignmentCodeStatusBulk(Array.from(assignmentCodes), false);
+
     return conversions;
   }
 
@@ -154,27 +165,27 @@ export class ConversionFirebaseService implements ConversionService {
     referralLinkType,
     includeUnasigned = true,
   }: {
-    userId?: string | undefined;
-    clientId?: string | undefined;
-    startDate?: Date | undefined;
-    endDate?: Date | undefined;
-    minAmount?: number | undefined;
-    maxAmount?: number | undefined;
-    minCommission?: number | undefined;
-    maxCommission?: number | undefined;
-    compensationGroupId?: string | undefined;
-    referralLinkType?: string | undefined;
+    userId?: string;
+    clientId?: string;
+    startDate?: Date;
+    endDate?: Date;
+    minAmount?: number;
+    maxAmount?: number;
+    minCommission?: number;
+    maxCommission?: number;
+    compensationGroupId?: string;
+    referralLinkType?: string;
     includeUnasigned: boolean;
   }): Promise<Conversion[]> {
     let queryRef = query(this.conversionsCollection());
 
     // Use date as inequality filter for maximum search performance
     if (startDate) {
-      queryRef = query(queryRef, where("date", ">=", startDate));
+      queryRef = query(queryRef, where("dateOccurred", ">=", startDate));
     }
 
     if (endDate) {
-      queryRef = query(queryRef, where("date", "<=", endDate));
+      queryRef = query(queryRef, where("dateOccurred", "<=", endDate));
     }
 
     // Use other filters as equality filters
@@ -193,12 +204,14 @@ export class ConversionFirebaseService implements ConversionService {
       );
     }
 
-    queryRef = query(queryRef, orderBy("date", "desc"));
+    queryRef = query(queryRef, orderBy("dateOccurred", "desc"));
 
     const querySnapshot = await getDocs(queryRef);
     let conversions = querySnapshot.docs.map((doc) =>
       Conversion.fromFirestoreDoc(doc.data())
     );
+
+    console.log("found conversions", conversions.length, startDate);
 
     // Apply additional filters
     conversions = conversions.filter((conversion) => {
@@ -261,7 +274,7 @@ export class ConversionFirebaseService implements ConversionService {
     userId: string;
   }): Promise<Conversion[]> {
     const queryRef = query(
-      this.unassignedConversionsCollection(),
+      this.conversionsCollection(),
       where("assignmentCode", "==", assignmentCode)
     );
 
@@ -277,17 +290,32 @@ export class ConversionFirebaseService implements ConversionService {
       batch.update(docRef, { userId });
     }
 
-    await batch.commit();
+    const result = await batch.commit();
+    console.log(result);
     await this.setAssignmentCodeStatus(assignmentCode, true);
     return conversions;
   }
 
-  private setAssignmentCodeStatus(
+  private async setAssignmentCodeStatusBulk(
+    assignmentCodes: string[],
+    used: boolean
+  ): Promise<void> {
+    const batch = writeBatch(this.db);
+
+    for (const assignmentCode of assignmentCodes) {
+      const docRef = doc(this.assignmentCodesCollection(), assignmentCode);
+      batch.set(docRef, { used, id: assignmentCode });
+    }
+
+    await batch.commit();
+  }
+
+  private async setAssignmentCodeStatus(
     assignmentCode: string,
-    status: boolean
+    used: boolean
   ): Promise<void> {
     const docRef = doc(this.assignmentCodesCollection(), assignmentCode);
-    return setDoc(docRef, { id: assignmentCode, used: status });
+    return setDoc(docRef, { id: assignmentCode, used });
   }
 
   private assignmentCodesCollection(): CollectionReference {
@@ -296,9 +324,5 @@ export class ConversionFirebaseService implements ConversionService {
 
   private conversionsCollection(): CollectionReference {
     return collection(this.db, "conversions");
-  }
-
-  private unassignedConversionsCollection(): CollectionReference {
-    return collection(this.db, "unassignedConversions");
   }
 }

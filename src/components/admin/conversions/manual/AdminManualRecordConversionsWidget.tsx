@@ -8,7 +8,6 @@ import { DependencyInjection } from "models/utils/DependencyInjection";
 import { RiSubtractLine } from "react-icons/ri";
 import useSuccessNotification from "components/utils/SuccessNotification";
 import useErrorNotification from "components/utils/ErrorNotification";
-import RecordConversionTile from "components/users/conversions/recording/manual/ManualRecordConversionTile";
 import AdminRecordConversionTile from "./AdminManualRecordConversionTile";
 
 const AdminManualRecordConversionsWidget = ({
@@ -143,6 +142,15 @@ const AdminManualRecordConversionsWidget = ({
 
   const showSuccess = useSuccessNotification();
 
+  const buttonDisabled = (): boolean => {
+    for (let i = 0; i < rowCount; i++) {
+      if (conversionsGroups[i] === undefined) {
+        return true;
+      }
+    }
+    return false;
+  };
+
   return (
     <Flex
       p={26}
@@ -185,6 +193,7 @@ const AdminManualRecordConversionsWidget = ({
       </Flex>
       <Box />
       <Button
+        isDisabled={buttonDisabled()}
         isLoading={loading}
         size="lg"
         colorScheme="orange"

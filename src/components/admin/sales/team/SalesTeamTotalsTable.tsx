@@ -14,6 +14,7 @@ import {
   averageCommission,
   totalCommission,
   totalGrossProfit,
+  totalRevenue,
 } from "models/Conversion";
 import { Payout } from "models/Payout";
 import { formatMoney } from "models/utils/Money";
@@ -46,10 +47,14 @@ const SalesTeamTotalsTable = ({
       header: "Conversions",
       value: filteredConversions.length.toString(),
     },
+    {
+      header: "Revenue",
+      value: formatMoney(totalRevenue(filteredConversions)),
+    },
     ...(useBreakpointValue({ base: false, lg: true })
       ? [
           {
-            header: "Earnings",
+            header: "COGS",
             value: formatMoney(totalCommission(filteredConversions)),
           },
         ]

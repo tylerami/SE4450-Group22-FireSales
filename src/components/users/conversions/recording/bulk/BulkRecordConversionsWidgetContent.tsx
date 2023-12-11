@@ -48,7 +48,7 @@ const BulkRecordConversionsWidgetContent = ({
     csvFile: File
   ): Promise<Record<number, Conversion>> => {
     setProcessing(true);
-    let csvContent = await getCsvFileContent(csvFile);
+    let csvContentRows: string[][] = await getCsvFileContent(csvFile);
 
     const expectedHeaders = [
       "number",
@@ -58,12 +58,12 @@ const BulkRecordConversionsWidgetContent = ({
       "size",
       "name",
     ];
-    csvContent = filterCsvHeaders({
-      csvContent,
+    csvContentRows = filterCsvHeaders({
+      csvContentRows,
       expectedHeaders,
       keywordMatchThreshold: 3,
     });
-    console.log(csvContent);
+    console.log(csvContentRows);
 
     const mapCsvRowToConversion = (csvRow: string): Conversion | null => {
       const userId = currentUser?.uid;
@@ -130,14 +130,13 @@ const BulkRecordConversionsWidgetContent = ({
       return conversion;
     };
 
-    const rows: string[] = csvContent.split("\n");
     const conversionsByNumber: Record<number, Conversion> = {};
 
-    for (let i = 0; i < rows.length; i++) {
-      const row = rows[i];
-      const convNumber = Number(row.split(",")[0]);
+    for (let i = 0; i < csvContentRows.length; i++) {
+      const row = csvContentRows[i];
+      const convNumber = Number(row[0]);
 
-      const conversion = mapCsvRowToConversion(row.replace("\r", ""));
+      const conversion = mapCsvRowToConversion(row.join(","));
       console.log(`Conversion ${convNumber}: `, conversion);
       if (conversion !== null) {
         conversionsByNumber[convNumber] = conversion;
