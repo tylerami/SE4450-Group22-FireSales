@@ -1,5 +1,5 @@
 import { Box, Flex, Heading, Text } from "@chakra-ui/react";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Timeframe, getTimeframeLabel } from "models/enums/Timeframe";
 import {
   Conversion,
@@ -20,6 +20,7 @@ import { formatMoney } from "models/utils/Money";
 import { AffiliateDeal } from "models/AffiliateDeal";
 import Filter, { FilterDefinition } from "components/utils/Filter";
 import MobilePerformanceMetricBox from "./MobilePerformanceMetricBox";
+import { UserContext } from "components/auth/UserProvider";
 
 type Props = {
   conversions: Conversion[];
@@ -32,26 +33,21 @@ const MobileUserPerformanceWidget = ({ conversions }: Props) => {
   const compGroupService: CompensationGroupService =
     DependencyInjection.compensationGroupService();
 
+  const { currentUser } = useContext(UserContext);
+
   // Filters
   const [timeframe, setSelectedTimeframe] = useState<Timeframe>(
     Timeframe.lastMonth
   );
   const [clients, setClients] = useState<Client[]>([]);
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
-
-  const [selectedReferralLinkType, setSelectedReferralLinkType] =
-    useState<ReferralLinkType | null>(null);
+  const [compGroup, setCompGroup] = useState<CompensationGroup | null>(null);
 
   const getFilteredConversions = () => {
     let tempConversions = conversions;
     if (selectedClient) {
       tempConversions = tempConversions.filter(
         (conv) => conv.affiliateLink.clientId === selectedClient.id
-      );
-    }
-    if (selectedReferralLinkType) {
-      tempConversions = tempConversions.filter(
-        (conv) => conv.affiliateLink.type === selectedReferralLinkType
       );
     }
 
@@ -70,8 +66,23 @@ const MobileUserPerformanceWidget = ({ conversions }: Props) => {
       setClients(clients);
     };
 
+    const fetchCompGroup = async () => {
+      const compGroupId: string | null =
+        currentUser?.compensationGroupId ?? null;
+      if (!compGroupId) return;
+
+      const compGroup = await compGroupService.get(compGroupId);
+      setCompGroup(compGroup);
+    };
+
+    fetchCompGroup();
     fetchClients();
-  }, [conversionService, compGroupService, clientService]);
+  }, [
+    conversionService,
+    compGroupService,
+    clientService,
+    currentUser?.compensationGroupId,
+  ]);
 
   const tableColumns: {
     label: string;
@@ -139,11 +150,18 @@ const MobileUserPerformanceWidget = ({ conversions }: Props) => {
 
   // Define filters
 
+  const getRelevantClients = (): Client[] => {
+    if (compGroup == null) return clients;
+    return clients.filter((client) =>
+      compGroup.affiliateLinks.map((link) => link.clientId).includes(client.id)
+    );
+  };
+
   const filters: FilterDefinition<
     Client | CompensationGroup | Timeframe | ReferralLinkType
   >[] = [
     {
-      options: [null, ...clients],
+      options: [null, ...getRelevantClients()],
       onChange: (value) => setSelectedClient(value as Client),
       value: selectedClient,
 

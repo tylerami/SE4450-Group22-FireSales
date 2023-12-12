@@ -6,24 +6,17 @@ import {
   Icon,
   Heading,
   Circle,
-  Button,
   Spinner,
 } from "@chakra-ui/react";
 import { FiUser } from "react-icons/fi";
-import { useNavigate } from "react-router-dom";
 import { UserContext } from "components/auth/UserProvider";
-import { useGlobalState } from "components/utils/GlobalState";
 
 interface TopNavBarProps {
   pageName: string;
 }
 
 const MobileTopNavBar: React.FC<TopNavBarProps> = ({ pageName }) => {
-  const navigate = useNavigate();
-
   const { currentUser } = useContext(UserContext);
-
-  const { setActiveTabIndex } = useGlobalState();
 
   return (
     <Flex

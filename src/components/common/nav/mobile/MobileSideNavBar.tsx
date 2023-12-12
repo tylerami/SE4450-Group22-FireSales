@@ -52,7 +52,7 @@ const MobileSideNavBar = ({ tabs }: Props) => {
       justifyContent={"start"}
       height={"100%"}
       overflowY={"auto"}
-      background={"#FFDCBBCA"}
+      background={"#FFDCBB"}
     >
       <Box minH={8} />
       <IconButton
