@@ -14,6 +14,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { Timeframe, getTimeframeLabel } from "models/enums/Timeframe";
 import {
   Conversion,
+  allClientIds,
   averageBetSize,
   averageCommission,
   filterConversionsByTimeframe,
@@ -24,7 +25,6 @@ import { DependencyInjection } from "models/utils/DependencyInjection";
 import { Client, getAllAffiliateDeals } from "models/Client";
 import { CompensationGroup } from "models/CompensationGroup";
 import { ClientService } from "services/interfaces/ClientService";
-import { CompensationGroupService } from "services/interfaces/CompensationGroupService";
 import {
   ReferralLinkType,
   getReferralLinkTypeLabel,
@@ -46,8 +46,6 @@ const UserPerformanceWidget = ({ conversions }: Props) => {
   const conversionService: ConversionService =
     DependencyInjection.conversionService();
   const clientService: ClientService = DependencyInjection.clientService();
-  const compGroupService: CompensationGroupService =
-    DependencyInjection.compensationGroupService();
 
   // Filters
   const [timeframe, setSelectedTimeframe] = useState<Timeframe>(
@@ -55,7 +53,6 @@ const UserPerformanceWidget = ({ conversions }: Props) => {
   );
   const [clients, setClients] = useState<Client[]>([]);
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
-  const [compGroup, setCompGroup] = useState<CompensationGroup | null>(null);
 
   const [selectedReferralLinkType, setSelectedReferralLinkType] =
     useState<ReferralLinkType | null>(null);
@@ -88,24 +85,8 @@ const UserPerformanceWidget = ({ conversions }: Props) => {
       setClients(clients);
     };
 
-    const fetchCompGroup = async () => {
-      const compGroupId: string | null =
-        currentUser?.compensationGroupId ?? null;
-      if (!compGroupId) return;
-
-      const compGroup = await compGroupService.get(compGroupId);
-      setCompGroup(compGroup);
-    };
-
-    fetchCompGroup();
-
     fetchClients();
-  }, [
-    conversionService,
-    compGroupService,
-    clientService,
-    currentUser?.compensationGroupId,
-  ]);
+  }, [conversionService, clientService, currentUser?.compensationGroupId]);
 
   const tableColumns: {
     label: string;
@@ -176,10 +157,8 @@ const UserPerformanceWidget = ({ conversions }: Props) => {
   // Define filters
 
   const getRelevantClients = (): Client[] => {
-    if (compGroup == null) return clients;
-    return clients.filter((client) =>
-      compGroup.affiliateLinks.map((link) => link.clientId).includes(client.id)
-    );
+    const clientIds = allClientIds(conversions);
+    return clients.filter((client) => clientIds.includes(client.id));
   };
 
   const filters: FilterDefinition<

@@ -275,6 +275,13 @@ export function totalCostOfConversions(conversions: Array<Conversion>): number {
   }, 0);
 }
 
+export function allClientIds(conversions: Array<Conversion>): string[] {
+  const clientIds = conversions.map(
+    (conversion) => conversion.affiliateLink.clientId
+  );
+  return [...new Set(clientIds)];
+}
+
 export function averageUnitContribution(
   conversions: Array<Conversion>
 ): number {
