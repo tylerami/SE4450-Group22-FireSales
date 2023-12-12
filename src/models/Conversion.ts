@@ -230,6 +230,15 @@ export function totalCommission(conversions: Array<Conversion>): number {
   }, 0);
 }
 
+export function totalUnpaidCommission(conversions: Array<Conversion>): number {
+  return conversions.reduce((total, conversion) => {
+    if (conversion.isApprovedNotPaid()) {
+      return total + conversion.affiliateLink.commission;
+    }
+    return total;
+  }, 0);
+}
+
 export function averageCpa(conversions: Array<Conversion>): number {
   if (conversions.length === 0) {
     return 0;

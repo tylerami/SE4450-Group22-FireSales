@@ -1,12 +1,34 @@
 import { Box, Center, Flex, Heading, Spinner } from "@chakra-ui/react";
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { UserContext } from "components/auth/UserProvider";
 import MobileAffiliateLinkWidget from "./affiliate_links/MobileAffiliateLinkWidget";
+import { Conversion } from "models/Conversion";
+import { ConversionService } from "services/interfaces/ConversionService";
+import { DependencyInjection } from "models/utils/DependencyInjection";
+import MobileUserPerformanceWidget from "./performance/MobilePerformanceWidget";
 
 type Props = {};
 
 const MobileDashboardPage = (props: Props) => {
   const { currentUser } = useContext(UserContext);
+
+  const [conversions, setConversions] = useState<Conversion[]>([]);
+
+  const conversionService: ConversionService =
+    DependencyInjection.conversionService();
+
+  useEffect(() => {
+    const fetchConversions = async () => {
+      if (!currentUser?.uid) {
+        return;
+      }
+      const fetchedConversions = await conversionService.query({
+        userId: currentUser?.uid,
+      });
+      setConversions(fetchedConversions ?? []);
+    };
+    fetchConversions();
+  }, [conversionService, currentUser?.uid]);
 
   if (!currentUser) {
     return (
@@ -18,7 +40,7 @@ const MobileDashboardPage = (props: Props) => {
 
   return (
     <React.Fragment>
-      <Flex alignSelf="start" px={8} py={6}>
+      <Flex alignSelf="start" px={8} py={5}>
         <Heading size="lg" mr={2} fontWeight={400}>
           Welcome,
         </Heading>
@@ -29,6 +51,7 @@ const MobileDashboardPage = (props: Props) => {
 
       {/* Column: Performance chart and table */}
       <Flex width={"100%"} direction="column" gap={6} alignItems={"center"}>
+        <MobileUserPerformanceWidget conversions={conversions} />
         <MobileAffiliateLinkWidget />
 
         <Box h={20}></Box>

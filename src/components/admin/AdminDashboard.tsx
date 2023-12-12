@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Flex } from "@chakra-ui/react";
+import { Box, Flex, useBreakpointValue } from "@chakra-ui/react";
 import SideNavBar from "components/common/nav/SideNavBar";
 import TopNavBar from "components/common/nav/TopNavBar";
 import { useGlobalState } from "components/utils/GlobalState";
@@ -18,6 +18,7 @@ import CompensationGroupsPage from "./compensation_groups/CompensationGroupsPage
 import { Tab } from "components/common/nav/Tab";
 import AdminRecordConversionsPage from "./conversions/AdminRecordConversionsPage";
 import PayoutsPage from "./payouts/PayoutsPage";
+import MobileAdminDashboard from "./mobile/MobileAdminDashboard";
 
 const AdminDashboard = (props) => {
   // Assuming the SideNavBar has a fixed width for simplicity
@@ -75,6 +76,12 @@ const AdminDashboard = (props) => {
         }),
     },
   ];
+
+  const isMobile = useBreakpointValue({ base: true, sm: false });
+
+  if (isMobile) {
+    return <MobileAdminDashboard />;
+  }
 
   return (
     <Flex

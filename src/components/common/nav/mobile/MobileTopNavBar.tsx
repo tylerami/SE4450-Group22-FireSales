@@ -28,6 +28,7 @@ const MobileTopNavBar: React.FC<TopNavBarProps> = ({ pageName }) => {
   return (
     <Flex
       p={2}
+      bg="#FAFAFA"
       alignItems={"center"}
       justifyContent={"space-between"}
       boxShadow={"0px 4px 6px rgba(0, 0, 0, 0.1)"}

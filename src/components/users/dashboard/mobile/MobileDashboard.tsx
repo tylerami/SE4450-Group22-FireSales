@@ -44,8 +44,10 @@ const MobileDashboard = (props: Props) => {
     },
   ];
 
+  document.body.style.overflow = "hidden";
+
   return (
-    <Flex bg="#FAFAFA">
+    <Flex bg="#FAFAFA" overflow={"hidden"}>
       <MobileSideNavBar tabs={userTabs} />
 
       {/* Main content area - padding left equals the width of the SideNavBar */}
