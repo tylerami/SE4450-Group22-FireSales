@@ -22,9 +22,8 @@ import { ConversionService } from "services/interfaces/ConversionService";
 import { DependencyInjection } from "models/utils/DependencyInjection";
 import { UserContext } from "components/auth/UserProvider";
 import { User } from "models/User";
-import Logo from "components/common/Logo";
 
-const RegistrationContainer = ({ goToLogin = () => {} }) => {
+const MobileRegistrationContainer = ({ goToLogin = () => {} }) => {
   const navigate = useNavigate();
   const [errorMessage, setErrorMessage] = useState("");
   const [disabled, setDisabled] = useState(false);
@@ -185,8 +184,6 @@ const RegistrationContainer = ({ goToLogin = () => {} }) => {
       flexDirection={"column"}
       background={"white"}
     >
-      <Logo size="5em" />
-      <Box h={6} />
       <Heading size="lg">Sign up</Heading>
       <Box h={3} />
       <Flex>
@@ -330,14 +327,14 @@ const RegistrationContainer = ({ goToLogin = () => {} }) => {
           ></Input>
         </InputGroup>
       </Flex>
-      <Box h={6} />
-      <Flex align="center" mt={4}>
+      <Box h={2} />
+      <Flex align="center" mt={2}>
         <Checkbox
           isChecked={acceptedTerms}
           onChange={(e) => setAcceptedTerms(e.target.checked)}
           mr={4}
         />
-        <Text fontSize="sm">
+        <Text fontSize="2xs">
           By clicking Create an account, I agree that I have read and accepted
           the{" "}
           <Link href="https://example.com/terms" color="orange.500" isExternal>
@@ -397,4 +394,4 @@ const RegistrationContainer = ({ goToLogin = () => {} }) => {
   );
 };
 
-export default RegistrationContainer;
+export default MobileRegistrationContainer;

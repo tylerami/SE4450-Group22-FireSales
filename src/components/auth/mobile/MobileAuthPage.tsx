@@ -1,12 +1,11 @@
 import React from "react";
 import { useSearchParams } from "react-router-dom";
-import LoginContainer from "./login/LoginContainer";
-import RegistrationContainer from "./register/RegistrationContainer";
-import { Box, Flex, useBreakpointValue } from "@chakra-ui/react";
+import { Flex } from "@chakra-ui/react";
 import CollageBG from "assets/ht_collage.png";
-import MobileAuthPage from "./mobile/MobileAuthPage";
+import MobileRegistrationContainer from "./MobileRegistrationContainer";
+import MobileLoginContainer from "./MobileLoginContainer";
 
-const AuthPage = (props) => {
+const MobileAuthPage = (props) => {
   // getting and setting URL params
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -21,12 +20,6 @@ const AuthPage = (props) => {
     console.log("goToRegister");
     setSearchParams({ action: "register" });
   };
-
-  const isMobile = useBreakpointValue({ base: true, sm: false });
-
-  if (isMobile) {
-    return <MobileAuthPage />;
-  }
 
   return (
     <div style={{ position: "relative", height: "100%", width: "100%" }}>
@@ -44,24 +37,24 @@ const AuthPage = (props) => {
         }}
       />
       <Flex
-        p={10}
+        p={6}
         height="100%"
         width="100%"
+        maxWidth={"100%"}
         alignItems={"center"}
         justifyContent={"start"}
-        flexDirection={"column"}
+        flexDirection={"row"}
         overflow="auto"
         style={{ position: "relative", zIndex: 2 }} // Ensure this is above the background
       >
-        <Box minHeight={6}></Box>
         {action === "register" ? (
-          <RegistrationContainer goToLogin={goToLogin}></RegistrationContainer>
+          <MobileRegistrationContainer goToLogin={goToLogin} />
         ) : (
-          <LoginContainer goToRegister={goToRegister}></LoginContainer>
+          <MobileLoginContainer goToRegister={goToRegister} />
         )}
       </Flex>
     </div>
   );
 };
 
-export default AuthPage;
+export default MobileAuthPage;

@@ -1,55 +1,41 @@
-import React, { useContext } from "react";
-import {
-  Box,
-  Flex,
-  Heading,
-  Spinner,
-  useBreakpointValue,
-} from "@chakra-ui/react";
-import TopNavBar from "components/common/nav/TopNavBar";
-import UserDashboardPage from "./dashboard/UserDashboardPage";
-import { useGlobalState } from "components/utils/GlobalState";
-import ConversionsPage from "./conversions/ConversionsPage";
-import UserSettingsPage from "./settings/UserSettingsPage";
-import { AiOutlineDashboard } from "react-icons/ai";
-import { MdSettings, MdTrendingUp } from "react-icons/md";
-import { RiLogoutBoxRLine } from "react-icons/ri";
+import { Box, Flex, Heading, Spinner } from "@chakra-ui/react";
 import { Tab } from "components/common/nav/Tab";
-import SideNavBar from "components/common/nav/SideNavBar";
+import MobileSideNavBar from "components/common/nav/mobile/MobileSideNavBar";
+import React, { useContext } from "react";
+import { AiOutlineDashboard } from "react-icons/ai";
+import { MdTrendingUp } from "react-icons/md";
+import { RiLogoutBoxRLine } from "react-icons/ri";
 import { useNavigate } from "react-router-dom";
-import { UserContext } from "components/auth/UserProvider";
-import MobileDashboard from "./dashboard/mobile/MobileDashboard";
 import { authService } from "services/implementations/AuthFirebaseService";
+import MobileDashboardPage from "./MobileDashboardPage";
+import MobileConversionsPage from "components/users/conversions/mobile/MobileConversionsPage";
+import { useGlobalState } from "components/utils/GlobalState";
+import { UserContext } from "components/auth/UserProvider";
+import MobileTopNavBar from "components/common/nav/mobile/MobileTopNavBar";
 
 type Props = {};
 
-const UserDashboard = (props: Props) => {
-  const sideNavWidth = "14em"; // or 224px, or any other unit
+const MobileDashboard = (props: Props) => {
+  const navigate = useNavigate();
 
   const { activeTabIndex, setActiveTabIndex } = useGlobalState();
 
   const { currentUser } = useContext(UserContext);
 
-  const navigate = useNavigate();
+  const sideNavWidth = "15%";
 
   const userTabs: Tab[] = [
     {
       name: "Dashboard",
       icon: AiOutlineDashboard,
-      content: <UserDashboardPage />,
+      content: <MobileDashboardPage />,
       onClick: () => setActiveTabIndex(0),
     },
     {
       name: "Conversions",
       icon: MdTrendingUp,
-      content: <ConversionsPage />,
+      content: <MobileConversionsPage />,
       onClick: () => setActiveTabIndex(1),
-    },
-    {
-      name: "Settings",
-      icon: MdSettings,
-      content: <UserSettingsPage />,
-      onClick: () => setActiveTabIndex(2),
     },
     {
       name: "Sign Out",
@@ -58,29 +44,9 @@ const UserDashboard = (props: Props) => {
     },
   ];
 
-  const isMobile = useBreakpointValue({ base: true, sm: false });
-  if (isMobile) {
-    return <MobileDashboard />;
-  }
-
   return (
-    <Flex
-      h="100vh" // Full viewport height
-      w="100vw" // Full viewport width
-      bg="#FAFAFA"
-      overflowX="hidden" // No horizontal scroll
-    >
-      {/* Side Navigation - fixed width and full height */}
-      <Box
-        position="fixed"
-        left={0}
-        top={0}
-        h="100vh"
-        w={sideNavWidth}
-        overflowY="auto" // Scrollable vertically if content overflows
-      >
-        <SideNavBar tabs={userTabs} />
-      </Box>
+    <Flex bg="#FAFAFA">
+      <MobileSideNavBar tabs={userTabs} />
 
       {/* Main content area - padding left equals the width of the SideNavBar */}
       <Flex
@@ -92,8 +58,10 @@ const UserDashboard = (props: Props) => {
       >
         {/* Top Navigation Bar - spans the width minus the sidebar */}
         <Box w="full">
-          <TopNavBar pageName={userTabs[activeTabIndex].name} />
+          <MobileTopNavBar pageName={userTabs[activeTabIndex].name} />
         </Box>
+
+        <Box h={"4em"} />
 
         {/* Main page content */}
         {currentUser ? (
@@ -125,4 +93,4 @@ const UserDashboard = (props: Props) => {
   );
 };
 
-export default UserDashboard;
+export default MobileDashboard;

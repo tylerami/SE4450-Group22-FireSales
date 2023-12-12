@@ -6,6 +6,7 @@ import {
   signInWithPopup,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
+  signOut,
 } from "firebase/auth";
 import { UserService } from "services/interfaces/UserService";
 import { AuthService } from "services/interfaces/AuthService";
@@ -141,6 +142,13 @@ export class AuthFirebaseService implements AuthService {
       }
       callback(user);
     });
+  }
+
+  public async signOut(callback: (() => void) | null = null): Promise<void> {
+    await signOut(auth);
+    if (callback) {
+      callback();
+    }
   }
 
   private async handleGoogleUserRegistration(
