@@ -46,26 +46,6 @@ const MobileTopNavBar: React.FC<TopNavBarProps> = ({ pageName }) => {
         {pageName}
       </Heading>
 
-      {currentUser?.isAdmin() && (
-        <React.Fragment>
-          <Button
-            onClick={() => {
-              setActiveTabIndex(0);
-              navigate("/admin");
-            }}
-          >
-            Admin Dashboard
-          </Button>
-          <Button
-            onClick={() => {
-              setActiveTabIndex(0);
-              navigate("/");
-            }}
-          >
-            User Dashboard
-          </Button>
-        </React.Fragment>
-      )}
       {/* Right-aligned Profile section */}
       <Flex ml={8}>
         <Box mx={4} textAlign="right">
