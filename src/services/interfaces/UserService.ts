@@ -10,4 +10,9 @@ export interface UserService {
   get(userId: string): Promise<User | null>;
   update(user: User): Promise<User>;
   getAll({ includeAdmins }?: { includeAdmins: boolean }): Promise<User[]>;
+  query({
+    compensationGroupIds,
+  }: {
+    compensationGroupIds: string[];
+  }): Promise<User[]>;
 }

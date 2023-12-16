@@ -231,6 +231,17 @@ const SalesTeamListWidget = ({
       );
     }
 
+    // move users to before codes:
+    filteredUsersAndCodes.sort((a, b) => {
+      if (a.user && b.assignmentCode) {
+        return -1;
+      } else if (a.assignmentCode && b.user) {
+        return 1;
+      } else {
+        return 0;
+      }
+    });
+
     return filteredUsersAndCodes;
   };
 

@@ -11,6 +11,7 @@ import {
   query,
   setDoc,
   updateDoc,
+  where,
 } from "firebase/firestore";
 import { ADMIN_COMP_GROUP_ID } from "models/CompensationGroup";
 
@@ -117,6 +118,28 @@ export class UserFirebaseService implements UserService {
         user = this.removeAdminCompGroup(user);
       }
     }
+
+    return users;
+  }
+
+  async query({
+    compensationGroupIds,
+  }: {
+    compensationGroupIds: string[];
+  }): Promise<User[]> {
+    let userQuery = query(this.usersCollection());
+
+    if (compensationGroupIds.length > 0) {
+      userQuery = query(
+        this.usersCollection(),
+        where("compensationGroupId", "in", compensationGroupIds)
+      );
+    }
+
+    const userQuerySnapshot = await getDocs(userQuery);
+    let users = userQuerySnapshot.docs.map((doc) =>
+      User.fromFirestoreDoc(doc.data())
+    );
 
     return users;
   }

@@ -6,6 +6,7 @@ import { UserContext } from "components/auth/UserProvider";
 import { Conversion } from "@models/Conversion";
 import { ConversionService } from "services/interfaces/ConversionService";
 import { DependencyInjection } from "models/utils/DependencyInjection";
+import UserAnnouncementsWidget from "./announcements/UserAnnouncementsWidget";
 
 type Props = {};
 
@@ -51,6 +52,7 @@ const UserDashboardPage = (props: Props) => {
 
       {/* Column: Performance chart and table */}
       <Flex width={"100%"} direction="column" gap={6} alignItems={"center"}>
+        <UserAnnouncementsWidget />
         <AffiliateLinkWidget></AffiliateLinkWidget>
         <UserPerformanceWidget conversions={conversions} />
 

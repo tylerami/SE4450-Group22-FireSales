@@ -6,6 +6,7 @@ import { Conversion } from "models/Conversion";
 import { ConversionService } from "services/interfaces/ConversionService";
 import { DependencyInjection } from "models/utils/DependencyInjection";
 import MobileUserPerformanceWidget from "./performance/MobilePerformanceWidget";
+import MobileAnnouncementsWidget from "./announcements/MobileAnnouncementsWidget";
 
 type Props = {};
 
@@ -51,6 +52,7 @@ const MobileDashboardPage = (props: Props) => {
 
       {/* Column: Performance chart and table */}
       <Flex width={"100%"} direction="column" gap={6} alignItems={"center"}>
+        <MobileAnnouncementsWidget />
         <MobileUserPerformanceWidget conversions={conversions} />
         <MobileAffiliateLinkWidget />
 

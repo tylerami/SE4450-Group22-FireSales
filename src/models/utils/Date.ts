@@ -11,6 +11,24 @@ export function formatDateString(date: Date | undefined) {
   }`;
 }
 
+export function formatDateStringWithTime(date: Date | undefined) {
+  if (!date) {
+    return "";
+  }
+
+  const year = date.getFullYear();
+  const month = date.getMonth() + 1;
+  const day = date.getDate();
+  const hours = date.getHours() % 12;
+  const minutes = date.getMinutes();
+  const ampm = date.getHours() < 12 ? "AM" : "PM";
+  return `${year}-${month < 10 ? `0${month}` : month}-${
+    day < 10 ? `0${day}` : day
+  } ${hours < 10 ? `0${hours}` : hours}:${
+    minutes < 10 ? `0${minutes}` : minutes
+  } ${ampm}`;
+}
+
 export function parseDateString(
   dateStr: string,
   format: "yyyy-mm-dd" | "yyyy-dd-mm"

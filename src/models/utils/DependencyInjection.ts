@@ -5,22 +5,31 @@ import { MockCustomerService } from "__mocks__/services/CustomerService.mock";
 import { MockPayoutService } from "__mocks__/services/PayoutService.mock";
 import { MockUserService } from "__mocks__/services/UserService.mock";
 import { firestore, storage } from "config/firebase";
+import AnnouncementFirebaseService from "services/implementations/AnnouncementFirebaseService";
 import { ClientFirebaseService } from "services/implementations/ClientFirebaseService";
 import { CompensationGroupFirebaseService } from "services/implementations/CompensationGroupFirebaseService";
 import { ConversionFirebaseService } from "services/implementations/ConversionFirebaseService";
 import { CustomerFirebaseService } from "services/implementations/CustomerFirebaseService";
+import EmailTwilioService from "services/implementations/EmailTwilioService";
+import FeatureFlagFirebaseService from "services/implementations/FeatureFlagFirebaseService";
 import ImageFirebaseService from "services/implementations/ImageFirebaseService";
 import { PayoutFirebaseService } from "services/implementations/PayoutFirebaseService";
 import { UserFirebaseService } from "services/implementations/UserFirebaseService";
+import AnnouncementService from "services/interfaces/AnnouncementService";
 import { ClientService } from "services/interfaces/ClientService";
 import { CompensationGroupService } from "services/interfaces/CompensationGroupService";
 import { ConversionService } from "services/interfaces/ConversionService";
 import { CustomerService } from "services/interfaces/CustomerService";
+import EmailService from "services/interfaces/EmailService";
+import FeatureFlagService from "services/interfaces/FeatureFlagService";
 import { ImageService } from "services/interfaces/ImageService";
 import { PayoutService } from "services/interfaces/PayoutService";
 import { UserService } from "services/interfaces/UserService";
 
 const USE_MOCKS = false;
+
+export const featureFlagService: FeatureFlagService =
+  new FeatureFlagFirebaseService(firestore);
 
 const mockDependencies: Record<string, any> = {
   ClientService: new MockClientService(),
@@ -46,8 +55,11 @@ const dependencies: Record<string, any> = {
   CompensationGroupService: new CompensationGroupFirebaseService(firestore),
   CustomerService: new CustomerFirebaseService(firestore),
   PayoutService: new PayoutFirebaseService(firestore),
+  AnnouncementService: new AnnouncementFirebaseService(firestore),
   // Firebase image service already implemented
   ImageService: new ImageFirebaseService(storage),
+  // Sendgrid email service already implemented
+  EmailService: new EmailTwilioService(featureFlagService),
 };
 
 // Use singleton pattern to inject dependencies
@@ -117,4 +129,8 @@ export class DependencyInjection {
 
   public static payoutService = (): PayoutService =>
     this.getInstance().resolve<PayoutService>("PayoutService");
+  public static announcementService = (): AnnouncementService =>
+    this.getInstance().resolve<AnnouncementService>("AnnouncementService");
+  public static emailService = (): EmailService =>
+    this.getInstance().resolve<EmailService>("EmailService");
 }

@@ -3,7 +3,7 @@ import { Box, Flex, useBreakpointValue } from "@chakra-ui/react";
 import SideNavBar from "components/common/nav/SideNavBar";
 import TopNavBar from "components/common/nav/TopNavBar";
 import { useGlobalState } from "components/utils/GlobalState";
-import { MdMonetizationOn } from "react-icons/md";
+import { MdMonetizationOn, MdSpeakerPhone } from "react-icons/md";
 import { BiAnalyse } from "react-icons/bi";
 import { IoMdPeople } from "react-icons/io";
 import { FaMoneyBillWave, FaReceipt, FaRegHandshake } from "react-icons/fa";
@@ -19,6 +19,7 @@ import { Tab } from "components/common/nav/Tab";
 import AdminRecordConversionsPage from "./conversions/AdminRecordConversionsPage";
 import PayoutsPage from "./payouts/PayoutsPage";
 import MobileAdminDashboard from "./mobile/MobileAdminDashboard";
+import AdminAnnouncementsPage from "./announcements/AdminAnnouncementsPage";
 
 const AdminDashboard = (props) => {
   // Assuming the SideNavBar has a fixed width for simplicity
@@ -66,6 +67,12 @@ const AdminDashboard = (props) => {
       icon: FaMoneyBillWave,
       content: <PayoutsPage />,
       onClick: () => setActiveTabIndex(5),
+    },
+    {
+      name: "Announcements",
+      icon: MdSpeakerPhone,
+      content: <AdminAnnouncementsPage />,
+      onClick: () => setActiveTabIndex(6),
     },
     {
       name: "Sign Out",
