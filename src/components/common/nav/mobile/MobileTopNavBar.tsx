@@ -29,8 +29,7 @@ const MobileTopNavBar: React.FC<TopNavBarProps> = ({ pageName }) => {
       position={"fixed"}
       left={0}
       pl="15%"
-      minHeight={"4em"}
-      maxHeight={"4em"}
+      height={16}
       minWidth={"100vw"}
     >
       {/* Left-aligned Page Name */}

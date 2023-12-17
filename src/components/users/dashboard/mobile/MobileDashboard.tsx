@@ -63,11 +63,10 @@ const MobileDashboard = (props: Props) => {
           <MobileTopNavBar pageName={userTabs[activeTabIndex].name} />
         </Box>
 
-        <Box h={"4em"} />
-
         {/* Main page content */}
         {currentUser ? (
           <Flex
+            mt={16}
             direction="column"
             alignItems={"center"}
             overflowY="auto" // Scrollable vertically if content overflows
