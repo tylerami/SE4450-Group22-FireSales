@@ -2,12 +2,14 @@ import { Button, Heading, Spinner } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 import { Flex } from "@chakra-ui/react";
 import { DependencyInjection } from "models/utils/DependencyInjection";
-import CompensationGroupEditor from "./CompensationGroupEditor";
+import CompensationGroupEditor from "./editor/CompensationGroupEditor";
 import { CompensationGroup } from "models/CompensationGroup";
 import { CompensationGroupService } from "services/interfaces/CompensationGroupService";
-import CompensationGroupDetailsTile from "./CompensationGroupDetailsTile";
+import CompensationGroupDetailsTile from "./display/CompensationGroupDetailsTile";
 import { UserService } from "services/interfaces/UserService";
 import { ConversionService } from "services/interfaces/ConversionService";
+import { ClientService } from "services/interfaces/ClientService";
+import { Client } from "models/Client";
 
 type Props = {};
 
@@ -19,6 +21,7 @@ const CompensationGroupWidget = (props: Props) => {
 
   const [updateTrigger, setUpdateTrigger] = useState<number>(0);
   const [compGroups, setCompGroups] = useState<CompensationGroup[]>([]);
+  const [clients, setClients] = useState<Client[]>([]);
 
   const compGroupService: CompensationGroupService =
     DependencyInjection.compensationGroupService();
@@ -28,14 +31,28 @@ const CompensationGroupWidget = (props: Props) => {
   const conversionService: ConversionService =
     DependencyInjection.conversionService();
 
+  const clientsService: ClientService = DependencyInjection.clientService();
+
   useEffect(() => {
     const fetchCompGroups = async () => {
       const compGroups = await compGroupService.getAll();
       setCompGroups(compGroups);
     };
 
+    const fetchClients = async () => {
+      const clients = await clientsService.getAll();
+      setClients(clients);
+    };
+
     fetchCompGroups();
-  }, [compGroupService, conversionService, updateTrigger, userService]);
+    fetchClients();
+  }, [
+    clientsService,
+    compGroupService,
+    conversionService,
+    updateTrigger,
+    userService,
+  ]);
 
   const exit = () => {
     setCreateMode(false);
@@ -68,6 +85,7 @@ const CompensationGroupWidget = (props: Props) => {
             compGroups.map((compGroup: CompensationGroup, i: number) => (
               <CompensationGroupDetailsTile
                 key={i}
+                clients={clients}
                 compGroup={compGroup}
                 selectCompGroup={setEditingGroup}
               />

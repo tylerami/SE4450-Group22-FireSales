@@ -234,7 +234,7 @@ const MobileRecordConversionTile = ({
               rightIcon={<ChevronDownIcon />}
             >
               {affiliateLink
-                ? affiliateLink.description()
+                ? affiliateLink.description
                 : "Select Affiliate Link"}
             </MenuButton>
             <MenuList>
@@ -247,7 +247,7 @@ const MobileRecordConversionTile = ({
                     handleSave({ affiliateLink: link });
                   }}
                 >
-                  {link.description()}
+                  {link.description}
                 </MenuItem>
               ))}
             </MenuList>

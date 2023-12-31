@@ -16,7 +16,10 @@ import { DependencyInjection } from "models/utils/DependencyInjection";
 import { ConversionService } from "services/interfaces/ConversionService";
 import { PayoutService } from "services/interfaces/PayoutService";
 import { Payout } from "models/Payout";
-import { CompensationGroup } from "models/CompensationGroup";
+import {
+  ADMIN_COMP_GROUP_ID,
+  CompensationGroup,
+} from "models/CompensationGroup";
 import { CompensationGroupService } from "services/interfaces/CompensationGroupService";
 import UserPerformanceWidget from "./performance/UserPerformanceWidget";
 import AdminConversionHistoryWidget from "./conversions/AdminConversionHistoryWidget";
@@ -177,6 +180,7 @@ const AdminSalesTeamPage = (props: Props) => {
 
     const updatedUser: User = new User({
       ...selectedUser,
+      compensationGroupId: ADMIN_COMP_GROUP_ID,
       roles: selectedUser.isAdmin()
         ? [Role.salesperson]
         : [Role.salesperson, Role.admin],
@@ -197,23 +201,24 @@ const AdminSalesTeamPage = (props: Props) => {
               aria-label="icon-button"
               icon={<ChevronLeftIcon />}
             />
-            <Heading mx={6} size="xl" fontWeight={400} color="#ED7D31">
+            <Heading mx={6} size="lg" fontWeight={400} color="#ED7D31">
               {selectedUser.getFullName()}
             </Heading>
             {selectedUser.isAdmin() && (
               <Button
+                size="sm"
                 isActive={false}
                 _hover={{
                   cursor: "default",
                 }}
               >
-                {" "}
-                ADMIN{" "}
+                ADMIN
               </Button>
             )}
             <Spacer />
             <Button
               colorScheme={!selectedUser.isAdmin() ? "red" : "blackAlpha"}
+              size="sm"
               onClick={toggleAdmin}
             >
               {selectedUser.isAdmin() ? "Remove Admin" : "Make Admin"}

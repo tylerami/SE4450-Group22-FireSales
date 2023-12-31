@@ -5,36 +5,23 @@ import {
   Switch,
   Input,
   InputGroup,
-  InputLeftElement,
   Spacer,
 } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
-import {
-  Table,
-  Thead,
-  Tbody,
-  Tr,
-  Th,
-  Td,
-  Box,
-  Text,
-  Icon,
-  Flex,
-} from "@chakra-ui/react";
+import { Box, Text, Flex } from "@chakra-ui/react";
 import { CloseIcon } from "@chakra-ui/icons";
-import { FaDollarSign } from "react-icons/fa";
 import { ClientService } from "services/interfaces/ClientService";
 import { DependencyInjection } from "models/utils/DependencyInjection";
 import { Client, getAllAffiliateDeals } from "models/Client";
 import useSuccessNotification from "components/utils/SuccessNotification";
-import {
-  ReferralLinkType,
-  getReferralLinkTypeLabel,
-} from "models/enums/ReferralLinkType";
+import { ReferralLinkType } from "models/enums/ReferralLinkType";
 import { CompensationGroup } from "models/CompensationGroup";
 import { AffiliateLink } from "models/AffiliateLink";
 import { CompensationGroupService } from "services/interfaces/CompensationGroupService";
 import { AffiliateDeal } from "models/AffiliateDeal";
+import CompGroupEditorAffiliateLinksTable from "./CompGroupEditorAffiliateLinksTable";
+import CompGroupEditorRetentionBonusesTable from "./CompGroupEditorRetentionBonusesTable";
+import RetentionIncentive from "models/RetentionIncentive";
 
 type Props = {
   exisitingGroup?: CompensationGroup | null;
@@ -55,6 +42,20 @@ const CompensationGroupEditor = ({ exisitingGroup, exit }: Props) => {
   const [affiliateLinks, setAffiliateLinks] = useState<
     Partial<AffiliateLink>[]
   >([]);
+
+  const initialIncentivesByClientId = (): Record<
+    string,
+    RetentionIncentive
+  > => {
+    const incentives: Record<string, RetentionIncentive> = {};
+    for (const incentive of exisitingGroup?.retentionIncentives ?? []) {
+      incentives[incentive.clientId] = incentive;
+    }
+    return incentives;
+  };
+
+  const [retentonIncentivesByClientId, setRetentionIncentivesByClientId] =
+    useState<Record<string, RetentionIncentive>>(initialIncentivesByClientId());
 
   const [errorText, setErrorText] = useState<string | null>(null);
 
@@ -109,15 +110,6 @@ const CompensationGroupEditor = ({ exisitingGroup, exit }: Props) => {
     fetchClients();
   }, [clientService, exisitingGroup]);
 
-  const setLinkProperty = (
-    index: number,
-    modify: (link: Partial<AffiliateLink>) => Partial<AffiliateLink>
-  ) => {
-    const newLinks = [...affiliateLinks];
-    newLinks[index] = modify(newLinks[index]);
-    setAffiliateLinks(newLinks);
-  };
-
   const editMode = exisitingGroup !== null;
 
   const showSuccess = useSuccessNotification();
@@ -163,10 +155,17 @@ const CompensationGroupEditor = ({ exisitingGroup, exit }: Props) => {
         .filter((link) => link.enabled ?? false)
         .map(affiliateLinkFromPartial);
 
+      const retentionIncentives: RetentionIncentive[] = Object.values(
+        retentonIncentivesByClientId
+      ).filter(
+        (incentive) => incentive.amount > 0 && incentive.monthlyLimit > 0
+      );
+
       const group: CompensationGroup = new CompensationGroup({
         id: groupId,
         enabled: enabled,
         affiliateLinks: enabledLinks,
+        retentionIncentives: retentionIncentives,
       });
       let result = await compGroupService.set(group);
 
@@ -179,13 +178,6 @@ const CompensationGroupEditor = ({ exisitingGroup, exit }: Props) => {
       return;
     }
   };
-
-  const columnHeaders: string[] = [
-    "Sportsbook / Type",
-    "Enabled",
-    "Commission",
-    "Min. Bet Size",
-  ];
 
   return (
     <Flex direction={"column"} w="100%">
@@ -230,81 +222,22 @@ const CompensationGroupEditor = ({ exisitingGroup, exit }: Props) => {
         Sportsbooks
       </Text>
       <Box h={4}></Box>
-      <Table size="sm" variant="simple" alignSelf={"center"} width={"100%"}>
-        <Thead>
-          <Tr>
-            {columnHeaders.map((header, index) => (
-              <Th key={index} textAlign={"center"}>
-                {header}
-              </Th>
-            ))}
-          </Tr>
-        </Thead>
-        <Tbody>
-          {Object.values(affiliateLinks).map((link, index) => (
-            <Tr key={index}>
-              <Td maxW={"5em"} textAlign={"center"}>
-                {`${link.clientName} / ${getReferralLinkTypeLabel(link.type!)}`}
-              </Td>
-              <Td textAlign="center">
-                <Switch
-                  isChecked={link.enabled}
-                  onChange={(e) =>
-                    setLinkProperty(index, (link) => ({
-                      ...link,
-                      enabled: e.target.checked,
-                    }))
-                  }
-                ></Switch>
-              </Td>
-              <Td textAlign={"center"}>
-                <InputGroup width="8em" margin="auto">
-                  <InputLeftElement>
-                    <Icon as={FaDollarSign} color="gray" />
-                  </InputLeftElement>
-                  <Input
-                    pl={8}
-                    type="number"
-                    isDisabled={!link.enabled}
-                    placeholder="Commission"
-                    value={link.commission ?? ""}
-                    onChange={(e) => {
-                      const numericValue = Number(e.target.value);
-                      setLinkProperty(index, (link) => ({
-                        ...link,
-                        commission:
-                          numericValue === 0 ? undefined : numericValue,
-                      }));
-                    }}
-                  />
-                </InputGroup>
-              </Td>
-              <Td textAlign={"center"}>
-                <InputGroup width="8em" margin="auto">
-                  <InputLeftElement>
-                    <Icon as={FaDollarSign} color="gray" />
-                  </InputLeftElement>
-                  <Input
-                    pl={8}
-                    type="number"
-                    isDisabled={!link.enabled}
-                    placeholder="Min. bet size"
-                    value={link.minBetSize ?? ""}
-                    onChange={(e) => {
-                      const numericValue = Number(e.target.value);
-                      setLinkProperty(index, (link) => ({
-                        ...link,
-                        minBetSize:
-                          numericValue === 0 ? undefined : numericValue,
-                      }));
-                    }}
-                  />
-                </InputGroup>
-              </Td>
-            </Tr>
-          ))}
-        </Tbody>
-      </Table>
+
+      <CompGroupEditorAffiliateLinksTable
+        affiliateLinks={affiliateLinks}
+        setAffiliateLinks={setAffiliateLinks}
+      />
+
+      <Box h={4}></Box>
+      <Text fontSize={"1.2em"} fontWeight={700}>
+        Retention Incentives
+      </Text>
+      <Box h={4}></Box>
+      <CompGroupEditorRetentionBonusesTable
+        clients={clients}
+        retentionIncentivesByClientId={retentonIncentivesByClientId}
+        setRetentionIncentivesByClientId={setRetentionIncentivesByClientId}
+      />
 
       <Box h={6}></Box>
 

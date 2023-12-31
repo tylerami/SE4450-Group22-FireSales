@@ -61,3 +61,8 @@ export function parseDateString(
   // Create and return the date object
   return new Date(year, month, day);
 }
+
+export function firstDayOfCurrentMonth() {
+  const date = new Date();
+  return new Date(date.getFullYear(), date.getMonth(), 1);
+}

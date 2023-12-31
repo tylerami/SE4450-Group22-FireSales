@@ -13,7 +13,6 @@ import {
   updateDoc,
   where,
 } from "firebase/firestore";
-import { ADMIN_COMP_GROUP_ID } from "models/CompensationGroup";
 
 /**
  * Implementation of the UserService interface using Firebase Firestore.
@@ -108,17 +107,6 @@ export class UserFirebaseService implements UserService {
       users = users.filter((user) => !user.isAdmin());
     }
 
-    for (let user of users) {
-      if (user.isAdmin() && user.compensationGroupId !== ADMIN_COMP_GROUP_ID) {
-        user = this.fixAdminCompGroup(user);
-      } else if (
-        !user.isAdmin() &&
-        user.compensationGroupId === ADMIN_COMP_GROUP_ID
-      ) {
-        user = this.removeAdminCompGroup(user);
-      }
-    }
-
     return users;
   }
 
@@ -142,25 +130,6 @@ export class UserFirebaseService implements UserService {
     );
 
     return users;
-  }
-
-  private removeAdminCompGroup(user: User) {
-    user = new User({
-      ...user,
-      compensationGroupId: null,
-    });
-    this.update(user);
-    return user;
-  }
-
-  private fixAdminCompGroup(user: User) {
-    user = new User({
-      ...user,
-      compensationGroupId: ADMIN_COMP_GROUP_ID,
-    });
-    console.log("fixing admin comp group", user);
-    this.update(user);
-    return user;
   }
 
   private hotTakesAccountsCollection(): CollectionReference {

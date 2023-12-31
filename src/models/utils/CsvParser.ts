@@ -6,6 +6,7 @@ import { AffiliateDeal } from "models/AffiliateDeal";
 import { AffiliateLink } from "models/AffiliateLink";
 import { Customer } from "models/Customer";
 import { Conversion } from "models/Conversion";
+import { ConversionType } from "models/enums/ConversionType";
 
 type RawCsvRowData = {
   dateString: string;
@@ -125,6 +126,7 @@ export const mapCsvRowToConversion = ({
   console.log("creating conversion with assignment code", assignmentCode);
 
   const conversion: Conversion = new Conversion({
+    type: ConversionType.freeBet,
     dateOccurred,
     assignmentCode,
     affiliateLink,

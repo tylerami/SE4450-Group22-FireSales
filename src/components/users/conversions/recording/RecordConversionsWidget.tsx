@@ -15,6 +15,7 @@ import { DependencyInjection } from "models/utils/DependencyInjection";
 import { CompensationGroup } from "models/CompensationGroup";
 import { UserContext } from "components/auth/UserProvider";
 import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
+import { Conversion } from "models/Conversion";
 
 const ENABLE_BULK_MODE = false;
 
@@ -22,6 +23,7 @@ type Props = {
   minimizeRecordConversion: boolean;
   setMinimizeRecordConversions: (minimizeRecordConversion: boolean) => void;
   refresh: () => void;
+  conversions: Conversion[];
 };
 
 enum RecordMode {
@@ -30,6 +32,7 @@ enum RecordMode {
 }
 
 const RecordConversionsWidget = ({
+  conversions,
   minimizeRecordConversion,
   setMinimizeRecordConversions,
   refresh,
@@ -105,6 +108,7 @@ const RecordConversionsWidget = ({
           {compensationGroup ? (
             recordMode === RecordMode.manual ? (
               <ManualRecordConversionsWidgetContent
+                conversions={conversions}
                 compensationGroup={compensationGroup}
                 refresh={refresh}
               />

@@ -63,7 +63,7 @@ const MobileConversionBrowserPanel = ({
     },
     {
       label: "Affilate Link",
-      getValue: (conv: Conversion) => conv.affiliateLink.description(),
+      getValue: (conv: Conversion) => conv.affiliateLink.description,
     },
     {
       label: "Bet size",

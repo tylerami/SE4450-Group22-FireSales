@@ -2,7 +2,7 @@ import React, { useState, useCallback } from "react";
 import { Box, Button, Flex } from "@chakra-ui/react";
 import RecordConversionTile from "./ManualRecordConversionTile";
 import { AddIcon } from "@chakra-ui/icons";
-import { ConversionAttachmentGroup } from "models/Conversion";
+import { Conversion, ConversionAttachmentGroup } from "models/Conversion";
 import { CompensationGroup } from "models/CompensationGroup";
 import { ConversionService } from "services/interfaces/ConversionService";
 import { DependencyInjection } from "models/utils/DependencyInjection";
@@ -11,9 +11,11 @@ import useSuccessNotification from "components/utils/SuccessNotification";
 import useErrorNotification from "components/utils/ErrorNotification";
 
 const ManualRecordConversionsWidgetContent = ({
+  conversions,
   compensationGroup,
   refresh,
 }: {
+  conversions: Conversion[];
   compensationGroup: CompensationGroup;
   refresh: () => void;
 }) => {
@@ -149,6 +151,7 @@ const ManualRecordConversionsWidgetContent = ({
       {Array.from({ length: rowCount }, (_, i) => (
         <Box key={`${i}-box`}>
           <RecordConversionTile
+            conversions={conversions}
             compensationGroup={compensationGroup}
             errorText={errorsByRow[i]}
             rowIndex={i + 1}

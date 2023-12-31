@@ -1,4 +1,4 @@
-import { Button, Heading, Spinner } from "@chakra-ui/react";
+import { Button, Heading, Spacer, Spinner } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 import { Flex } from "@chakra-ui/react";
 import { Client } from "models/Client";
@@ -50,10 +50,18 @@ const ClientsSettingsWidget = (props: Props) => {
         <ClientSettingsEditor existingClient={editingClient} exit={exit} />
       ) : (
         <React.Fragment>
-          <Flex justifyContent={"start"}>
+          <Flex w="full" justifyContent={"start"}>
             <Heading as="h1" fontSize={"1.2em"} fontWeight={700}>
               Client Settings
             </Heading>{" "}
+            <Spacer />
+            <Button
+              colorScheme="blue"
+              onClick={() => setCreateMode(true)}
+              size={"sm"}
+            >
+              Create New Client
+            </Button>
           </Flex>
 
           {!clients ? (

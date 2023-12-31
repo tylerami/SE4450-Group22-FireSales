@@ -1,4 +1,4 @@
-import { Table, Thead, Tr, Tbody, Td, Th } from "@chakra-ui/react";
+import { Table, Thead, Tr, Tbody, Td, Th, Heading } from "@chakra-ui/react";
 import React from "react";
 
 import { getReferralLinkTypeLabel } from "models/enums/ReferralLinkType";
@@ -32,36 +32,40 @@ const CompGroupAffiliateDealsTable = ({
       getValue: (link) => formatMoney(link.cpa),
     },
     {
-      label: "Enabled",
-      getValue: (link) => (link.enabled ? "Yes" : "No"),
+      label: "Bet Matches",
+      getValue: (link) => (link.betMatchEnabled ? "Yes" : "No"),
     },
   ];
 
   affiliateLinks.sort((a, b) => a.clientName.localeCompare(b.clientName));
+  affiliateLinks = affiliateLinks.filter((link) => link.enabled);
 
   return (
-    <Table size="sm" variant="simple" alignSelf={"center"} width={"100%"}>
-      <Thead>
-        <Tr>
-          {tableColumns.map((column, index) => (
-            <Th key={index} textAlign="center">
-              {column.label}
-            </Th>
-          ))}
-        </Tr>
-      </Thead>
-      <Tbody>
-        {affiliateLinks.map((link: AffiliateLink, i: number) => (
-          <Tr key={i}>
-            {tableColumns.map((column, i) => (
-              <Td key={i} textAlign={"center"}>
-                {column.getValue(link)}
-              </Td>
+    <React.Fragment>
+      <Heading size="xs">Affiliate Links</Heading>
+      <Table size="sm" variant="simple" alignSelf={"center"} width={"100%"}>
+        <Thead>
+          <Tr>
+            {tableColumns.map((column, index) => (
+              <Th key={index} textAlign="center">
+                {column.label}
+              </Th>
             ))}
           </Tr>
-        ))}
-      </Tbody>
-    </Table>
+        </Thead>
+        <Tbody>
+          {affiliateLinks.map((link: AffiliateLink, i: number) => (
+            <Tr key={i}>
+              {tableColumns.map((column, i) => (
+                <Td key={i} textAlign={"center"}>
+                  {column.getValue(link)}
+                </Td>
+              ))}
+            </Tr>
+          ))}
+        </Tbody>
+      </Table>
+    </React.Fragment>
   );
 };
 

@@ -11,6 +11,7 @@ import {
   getIntervalStart,
 } from "./enums/Timeframe";
 import { Timestamp, DocumentData } from "firebase/firestore";
+import { ConversionType } from "./enums/ConversionType";
 
 export type ConversionAttachmentGroup = {
   conversion: Conversion;
@@ -18,7 +19,7 @@ export type ConversionAttachmentGroup = {
 };
 
 export class Conversion {
-  id: string;
+  type: ConversionType;
   dateOccurred: Date;
   loggedAt: Date;
   userId: string | null;
@@ -37,12 +38,11 @@ export class Conversion {
     assignmentCode = null,
     userId = null,
     // The following are mandatory
+    type = ConversionType.freeBet,
     dateOccurred,
     customer,
     amount,
     affiliateLink,
-    // The following are optional
-    id,
     loggedAt = new Date(),
     status = ConversionStatus.pending,
     compensationGroupId = null,
@@ -50,7 +50,7 @@ export class Conversion {
     currency = Currency.CAD,
     messages = [],
   }: {
-    id?: string;
+    type?: ConversionType;
     dateOccurred: Date;
     loggedAt?: Date;
     userId?: string | null;
@@ -69,14 +69,7 @@ export class Conversion {
         "userId and assignmentCode cannot both be null in Conversion constructor"
       );
     }
-    this.id =
-      id ??
-      getConversionId({
-        dateOccurred,
-        clientId: affiliateLink.clientId,
-        userIdOrAssignmentCode: userId ?? assignmentCode!,
-        customerId: customer.id,
-      });
+    this.type = type;
     this.dateOccurred = dateOccurred;
     this.loggedAt = loggedAt;
     this.userId = userId;
@@ -89,6 +82,20 @@ export class Conversion {
     this.attachmentUrls = attachmentUrls;
     this.currency = currency;
     this.messages = messages;
+  }
+
+  public get id(): string {
+    if (this.userId === null && this.assignmentCode === null) {
+      throw new Error(
+        "userId and assignmentCode cannot both be null in Conversion constructor"
+      );
+    }
+    const assignmentCodeOrUserId: string = this.assignmentCode || this.userId!;
+    const dateOccuredString: string = formatDateString(this.dateOccurred);
+    const clientId: string = this.affiliateLink.clientId;
+    const customerId: string = this.customer.id;
+
+    return `${dateOccuredString}_${assignmentCodeOrUserId}_${clientId}_${customerId}`;
   }
 
   public isUnassigned = (): boolean => {
@@ -153,7 +160,6 @@ export class Conversion {
 
   public toFirestoreDoc(): DocumentData {
     return {
-      id: this.id,
       dateOccurred: this.dateOccurred
         ? Timestamp.fromDate(this.dateOccurred)
         : null,
@@ -173,7 +179,7 @@ export class Conversion {
 
   public static fromFirestoreDoc(doc: DocumentData): Conversion {
     return new Conversion({
-      id: doc.id,
+      type: doc.type as ConversionType,
       dateOccurred: doc.dateOccurred ? doc.dateOccurred.toDate() : new Date(),
       loggedAt: doc.loggedAt ? doc.loggedAt.toDate() : new Date(),
       userId: doc.userId,
@@ -248,6 +254,22 @@ export function averageCpa(conversions: Array<Conversion>): number {
     return total + conversion.affiliateLink.cpa;
   }, 0);
   return total / conversions.length;
+}
+
+export function conversionsWithLink(
+  conversions: Array<Conversion>,
+  link: AffiliateLink
+): Array<Conversion> {
+  return conversions.filter(
+    (conversion) => conversion.affiliateLink.id === link.id
+  );
+}
+
+export function conversionsWithType(
+  conversions: Array<Conversion>,
+  type: ConversionType
+): Array<Conversion> {
+  return conversions.filter((conversion) => conversion.type === type);
 }
 
 export function totalRevenue(conversions: Array<Conversion>): number {
@@ -364,20 +386,4 @@ export function setConversionStatus(
         status,
       })
   );
-}
-
-export function getConversionId({
-  dateOccurred,
-  clientId,
-  userIdOrAssignmentCode,
-  customerId,
-}: {
-  dateOccurred: Date;
-  clientId: string;
-  userIdOrAssignmentCode: string;
-  customerId: string;
-}): string {
-  return `${formatDateString(
-    dateOccurred
-  )}_${userIdOrAssignmentCode}_${clientId}_${customerId}`;
 }

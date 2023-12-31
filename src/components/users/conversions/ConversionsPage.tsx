@@ -47,6 +47,7 @@ const ConversionsPage = (props: Props) => {
             <React.Fragment>
               <RecordConversionsWidget
                 refresh={refresh}
+                conversions={conversions}
                 minimizeRecordConversion={minimizeRecordConversion}
                 setMinimizeRecordConversions={setMinimizeRecordConversions}
               />

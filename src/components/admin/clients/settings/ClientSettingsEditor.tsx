@@ -5,35 +5,19 @@ import {
   Switch,
   Input,
   InputGroup,
-  InputLeftElement,
   Spacer,
-  Select,
 } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
-import {
-  Table,
-  Thead,
-  Tbody,
-  Tr,
-  Th,
-  Td,
-  Image,
-  Box,
-  Text,
-  Icon,
-  Flex,
-} from "@chakra-ui/react";
+import { Image, Box, Text, Flex } from "@chakra-ui/react";
 import { CloseIcon } from "@chakra-ui/icons";
-import { FaDollarSign, FaPlus, FaTrash } from "react-icons/fa";
+import { FaPlus, FaTrash } from "react-icons/fa";
 import { ClientService } from "services/interfaces/ClientService";
 import { DependencyInjection } from "models/utils/DependencyInjection";
 import { Client } from "models/Client";
 import useSuccessNotification from "components/utils/SuccessNotification";
-import {
-  ReferralLinkType,
-  getReferralLinkTypeLabel,
-} from "models/enums/ReferralLinkType";
+import { ReferralLinkType } from "models/enums/ReferralLinkType";
 import { AffiliateDeal } from "models/AffiliateDeal";
+import ClientAffiliateDealsTable from "./ClientAffiliateDealsTable";
 
 type Props = {
   existingClient?: Client | null;
@@ -88,12 +72,9 @@ const ClientSettingsEditor = ({ existingClient, exit }: Props) => {
     fetchLogo();
   }, [clientService, existingClient]);
 
-  const setDealProperty = (
-    index: number,
-    modify: (deal: Partial<AffiliateDeal>) => Partial<AffiliateDeal>
-  ) => {
+  const setDeal = (index: number, deal: Partial<AffiliateDeal>) => {
     const newDeals = [...affiliateDeals];
-    newDeals[index] = modify(newDeals[index]);
+    newDeals[index] = deal;
     setAffiliateDeals(newDeals);
   };
 
@@ -178,12 +159,6 @@ const ClientSettingsEditor = ({ existingClient, exit }: Props) => {
     }
     setLoading(false);
   };
-
-  const referralLinkTypes: (ReferralLinkType | null)[] = [
-    null,
-    ReferralLinkType.sports,
-    ReferralLinkType.casino,
-  ];
 
   return (
     <Flex direction={"column"} w="100%">
@@ -304,144 +279,12 @@ const ClientSettingsEditor = ({ existingClient, exit }: Props) => {
       </Flex>
 
       <Box h={4}></Box>
-      <Table size="sm" variant="simple" alignSelf={"center"} width={"100%"}>
-        <Thead>
-          <Tr>
-            <Th textAlign="center">Enabled</Th>
-            <Th textAlign="center">Link Type</Th>
-            <Th textAlign="center">Link</Th>
-            <Th textAlign="center">CPA</Th>
-            <Th textAlign="center">Target Avg. Bet</Th>
-            <Th textAlign="center">Target Monthly Conv.</Th>
-          </Tr>
-        </Thead>
-        <Tbody>
-          {affiliateDeals.map((deal, index) => (
-            <Tr key={index}>
-              <Td textAlign="center">
-                <Switch
-                  isChecked={affiliateDeals[index].enabled}
-                  onChange={(e) => {
-                    setDealProperty(index, (deal) => ({
-                      ...deal,
-                      enabled: e.target.checked,
-                    }));
-                  }}
-                ></Switch>
-              </Td>
-              <Td textAlign={"center"}>
-                <Select
-                  size="sm"
-                  value={deal.type ?? undefined}
-                  onChange={(e) => {
-                    const newLinkType: ReferralLinkType | undefined =
-                      ReferralLinkType[
-                        e.target.value as keyof typeof ReferralLinkType
-                      ];
-                    console.log("New link type", newLinkType);
-                    setDealProperty(index, (deal) => ({
-                      ...deal,
-                      type: newLinkType ?? null,
-                    }));
-                  }}
-                >
-                  {referralLinkTypes.map((linkType) => (
-                    <option key={linkType} value={linkType ?? undefined}>
-                      {getReferralLinkTypeLabel(linkType)}
-                    </option>
-                  ))}
-                </Select>
-              </Td>
 
-              <Td textAlign={"center"}>
-                <Input
-                  size={"sm"}
-                  isDisabled={!affiliateDeals[index].enabled ?? true}
-                  placeholder="Link"
-                  value={affiliateDeals[index].link ?? ""}
-                  onChange={(e) => {
-                    setDealProperty(index, (deal) => ({
-                      ...deal,
-                      link: e.target.value,
-                    }));
-                  }}
-                />
-              </Td>
-              <Td textAlign={"center"}>
-                <InputGroup width="8em" margin="auto">
-                  <InputLeftElement>
-                    <Icon as={FaDollarSign} color="gray" />
-                  </InputLeftElement>
-                  <Input
-                    pl={8}
-                    size={"sm"}
-                    type="number"
-                    isDisabled={!affiliateDeals[index].enabled ?? true}
-                    placeholder="CPA"
-                    value={affiliateDeals[index].cpa ?? ""}
-                    onChange={(e) => {
-                      const numericValue = Number(e.target.value);
-                      setDealProperty(index, (deal) => ({
-                        ...deal,
-                        cpa: numericValue === 0 ? undefined : numericValue,
-                      }));
-                    }}
-                  />
-                </InputGroup>
-              </Td>
-
-              <Td textAlign={"center"}>
-                <InputGroup width="8em" margin="auto">
-                  <InputLeftElement>
-                    <Icon as={FaDollarSign} color="gray" />
-                  </InputLeftElement>
-                  <Input
-                    pl={8}
-                    size={"sm"}
-                    type="number"
-                    isDisabled={!affiliateDeals[index].enabled ?? true}
-                    placeholder="Avg. Bet Size"
-                    value={affiliateDeals[index].targetBetSize ?? ""}
-                    onChange={(e) => {
-                      const numericValue = Number(e.target.value);
-                      setDealProperty(index, (deal) => ({
-                        ...deal,
-                        targetBetSize:
-                          numericValue === 0 ? undefined : numericValue,
-                      }));
-                    }}
-                  />
-                </InputGroup>
-              </Td>
-              <Td textAlign={"center"}>
-                <Input
-                  width="6em"
-                  type="number"
-                  size={"sm"}
-                  isDisabled={!affiliateDeals[index].enabled ?? true}
-                  placeholder="# Conv."
-                  value={affiliateDeals[index].targetMonthlyConversions ?? ""}
-                  onChange={(e) => {
-                    const numericValue = Number(e.target.value);
-                    setDealProperty(index, (deal) => ({
-                      ...deal,
-                      targetMonthlyConversions:
-                        numericValue === 0 ? undefined : numericValue,
-                    }));
-                  }}
-                />
-              </Td>
-              <Td textAlign={"center"}>
-                <IconButton
-                  aria-label="Close"
-                  icon={<FaTrash />}
-                  onClick={() => removeDeal(index)}
-                />
-              </Td>
-            </Tr>
-          ))}
-        </Tbody>
-      </Table>
+      <ClientAffiliateDealsTable
+        affiliateDeals={affiliateDeals}
+        setDeal={setDeal}
+        removeDeal={removeDeal}
+      />
 
       <Box h={6}></Box>
 

@@ -1,18 +1,22 @@
-import { Flex, Heading, Text, Spacer } from "@chakra-ui/react";
+import { Flex, Heading, Text, Spacer, Box } from "@chakra-ui/react";
 import React from "react";
 
 import { Button } from "@chakra-ui/react";
 import { CompensationGroup } from "models/CompensationGroup";
 import CompGroupAffiliateDealsTable from "./CompGroupAffiliateDealsTable";
+import CompGroupRetentionIncentivesTable from "./CompGroupRetentionIncentivesTable";
+import { Client } from "models/Client";
 
 type Props = {
   compGroup: CompensationGroup;
   selectCompGroup: (compGroup: CompensationGroup) => void;
+  clients: Client[];
 };
 
 const CompensationGroupDetailsTile = ({
   compGroup,
   selectCompGroup,
+  clients,
 }: Props) => {
   return (
     <Flex
@@ -36,10 +40,15 @@ const CompensationGroupDetailsTile = ({
 
         <Button onClick={(_) => selectCompGroup(compGroup)}>Edit</Button>
       </Flex>
-      <Heading size="xs">Affiliate Links</Heading>
 
       <CompGroupAffiliateDealsTable
         affiliateLinks={Object.values(compGroup.affiliateLinks)}
+      />
+
+      <Box h={1} />
+      <CompGroupRetentionIncentivesTable
+        retentionIncentives={compGroup.retentionIncentives}
+        clients={clients}
       />
     </Flex>
   );

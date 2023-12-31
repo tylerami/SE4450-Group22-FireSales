@@ -223,7 +223,7 @@ const AdminRecordConversionTile = ({
               rightIcon={<ChevronDownIcon />}
             >
               {affiliateLink
-                ? affiliateLink.description()
+                ? affiliateLink.description
                 : "Select Affiliate Link"}
             </MenuButton>
             <MenuList>
@@ -236,7 +236,7 @@ const AdminRecordConversionTile = ({
                     handleSave({ affiliateLink: link });
                   }}
                 >
-                  {link.description()}
+                  {link.description}
                 </MenuItem>
               ))}
             </MenuList>
