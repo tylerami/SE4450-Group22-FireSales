@@ -265,6 +265,15 @@ export function conversionsWithLink(
   );
 }
 
+export function conversionsWithClient(
+  conversions: Array<Conversion>,
+  clientId: string
+): Array<Conversion> {
+  return conversions.filter(
+    (conversion) => conversion.affiliateLink.clientId === clientId
+  );
+}
+
 export function conversionsWithType(
   conversions: Array<Conversion>,
   type: ConversionType

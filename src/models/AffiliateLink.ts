@@ -36,7 +36,6 @@ export class AffiliateLink {
     clientName: string;
     type: ReferralLinkType | null;
     betMatchEnabled?: boolean;
-
     link: string;
     enabled?: boolean;
     createdAt?: Date;

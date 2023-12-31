@@ -155,10 +155,19 @@ const CompensationGroupEditor = ({ exisitingGroup, exit }: Props) => {
         .filter((link) => link.enabled ?? false)
         .map(affiliateLinkFromPartial);
 
+      const linkExistsForClient = (clientId: string): boolean => {
+        return (
+          enabledLinks.findIndex((link) => link.clientId === clientId) !== -1
+        );
+      };
+
       const retentionIncentives: RetentionIncentive[] = Object.values(
         retentonIncentivesByClientId
       ).filter(
-        (incentive) => incentive.amount > 0 && incentive.monthlyLimit > 0
+        (incentive) =>
+          incentive.amount > 0 &&
+          incentive.monthlyLimit > 0 &&
+          linkExistsForClient(incentive.clientId)
       );
 
       const group: CompensationGroup = new CompensationGroup({
@@ -178,6 +187,12 @@ const CompensationGroupEditor = ({ exisitingGroup, exit }: Props) => {
       return;
     }
   };
+
+  const enabledLinkClients = clients.filter((client) => {
+    return affiliateLinks.some(
+      (link) => link.enabled && link.clientId === client.id
+    );
+  });
 
   return (
     <Flex direction={"column"} w="100%">
@@ -234,7 +249,7 @@ const CompensationGroupEditor = ({ exisitingGroup, exit }: Props) => {
       </Text>
       <Box h={4}></Box>
       <CompGroupEditorRetentionBonusesTable
-        clients={clients}
+        clients={enabledLinkClients}
         retentionIncentivesByClientId={retentonIncentivesByClientId}
         setRetentionIncentivesByClientId={setRetentionIncentivesByClientId}
       />

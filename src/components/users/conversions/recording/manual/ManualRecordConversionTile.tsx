@@ -114,7 +114,7 @@ const RecordConversionTile = ({
       }
       setSaleAmount(incentiveAmount.toString());
       setConvTypeDropDownSubtext(
-        `${monthlyLimit - incentivesUsedThisMonth} / ${monthlyLimit}`
+        `${monthlyLimit - incentivesUsedThisMonth} / ${monthlyLimit} Available`
       );
     }
     setConversionType(convType);
@@ -132,10 +132,11 @@ const RecordConversionTile = ({
 
   const saleAmountValid = (amountString: string = saleAmount): boolean => {
     if (affiliateLink == null) return true;
+    if (conversionType === ConversionType.retentionIncentive) return true;
     return (
       amountString.trim() !== "" &&
       affiliateLink != null &&
-      Number(amountString) > affiliateLink?.minBetSize
+      Number(amountString) >= affiliateLink?.minBetSize
     );
   };
 

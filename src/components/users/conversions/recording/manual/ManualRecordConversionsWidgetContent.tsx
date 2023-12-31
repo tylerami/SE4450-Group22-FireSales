@@ -1,14 +1,20 @@
 import React, { useState, useCallback } from "react";
-import { Box, Button, Flex } from "@chakra-ui/react";
+import { Box, Button, Flex, Text } from "@chakra-ui/react";
 import RecordConversionTile from "./ManualRecordConversionTile";
 import { AddIcon } from "@chakra-ui/icons";
-import { Conversion, ConversionAttachmentGroup } from "models/Conversion";
+import {
+  Conversion,
+  ConversionAttachmentGroup,
+  filterConversionsByDateInterval,
+} from "models/Conversion";
 import { CompensationGroup } from "models/CompensationGroup";
 import { ConversionService } from "services/interfaces/ConversionService";
 import { DependencyInjection } from "models/utils/DependencyInjection";
 import { RiSubtractLine } from "react-icons/ri";
 import useSuccessNotification from "components/utils/SuccessNotification";
 import useErrorNotification from "components/utils/ErrorNotification";
+import { ConversionType } from "models/enums/ConversionType";
+import { firstDayOfCurrentMonth } from "models/utils/Date";
 
 const ManualRecordConversionsWidgetContent = ({
   conversions,
@@ -51,10 +57,39 @@ const ManualRecordConversionsWidgetContent = ({
   );
 
   // ERROR HANDLING
+
+  const [globalErrorText, setGlobalErrorText] = useState<string>("");
+
   // This is a map of row numbers to error messages
   const [errorsByRow, setErrorsByRow] = useState<
     Record<number, string | undefined>
   >({});
+
+  const retentionIncentivesExceedMonthlyLimit = () => {
+    for (const incentive of compensationGroup.retentionIncentives) {
+      const usedIncentivesThisMonth: number = filterConversionsByDateInterval(
+        conversions
+          .filter((conv) => conv.type === ConversionType.retentionIncentive)
+          .filter((conv) => conv.affiliateLink.clientId === incentive.clientId),
+        {
+          fromDate: firstDayOfCurrentMonth(),
+        }
+      ).length;
+
+      const newIncentives = Object.values(conversionsGroups)
+        .map((group) => group?.conversion)
+        .filter((conv) => conv !== undefined)
+        .filter((conv) => conv!.affiliateLink.clientId === incentive.clientId)
+        .filter(
+          (conv) => conv!.type === ConversionType.retentionIncentive
+        ).length;
+
+      if (usedIncentivesThisMonth + newIncentives > incentive.monthlyLimit) {
+        return true;
+      }
+    }
+    return false;
+  };
 
   const checkAllConversionsValid = (): boolean => {
     let foundError = false;
@@ -66,6 +101,13 @@ const ManualRecordConversionsWidgetContent = ({
       } else {
         setRowError(i, undefined);
       }
+    }
+
+    if (retentionIncentivesExceedMonthlyLimit()) {
+      setGlobalErrorText(
+        "Ensure that retention incentives do not exceed any monthly limits."
+      );
+      foundError = true;
     }
 
     return !foundError;
@@ -184,6 +226,9 @@ const ManualRecordConversionsWidgetContent = ({
       >
         {"Record Conversions"}
       </Button>
+      <Text alignSelf={"center"} fontSize="sm" color="red">
+        {globalErrorText}
+      </Text>
     </React.Fragment>
   );
 };
