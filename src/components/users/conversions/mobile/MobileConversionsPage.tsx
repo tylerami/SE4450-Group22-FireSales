@@ -6,9 +6,12 @@ import { ConversionService } from "services/interfaces/ConversionService";
 import { DependencyInjection } from "models/utils/DependencyInjection";
 import { Conversion } from "models/Conversion";
 import MobileRecordConversionsWidget from "./recording/MobileRecordConversionsWidget";
+import { CompensationGroupService } from "services/interfaces/CompensationGroupService";
+import { CompensationGroup } from "models/CompensationGroup";
 
 type Props = {};
 
+// todo: eliminate component duplication as much as possible --> horrible for code maintenance
 const MobileConversionsPage = (props: Props) => {
   const { currentUser } = useContext(UserContext);
 
@@ -18,6 +21,25 @@ const MobileConversionsPage = (props: Props) => {
   const [conversions, setConversions] = useState<Conversion[]>([]);
   const [updateTrigger, setUpdateTrigger] = useState<boolean>(false);
   const refresh = () => setUpdateTrigger(!updateTrigger);
+
+  const compGroupService: CompensationGroupService =
+    DependencyInjection.compensationGroupService();
+
+  const [compensationGroup, setCompensationGroup] =
+    useState<CompensationGroup | null>(null);
+
+  useEffect(() => {
+    const fetchCompensationGroup = async () => {
+      const compGroupId = currentUser?.compensationGroupId;
+      if (!compGroupId) {
+        return;
+      }
+      const compGroup = await compGroupService.get(compGroupId);
+      setCompensationGroup(compGroup);
+    };
+
+    fetchCompensationGroup();
+  }, [compGroupService, currentUser?.compensationGroupId]);
 
   useEffect(() => {
     const fetchConversions = async () => {
@@ -32,27 +54,17 @@ const MobileConversionsPage = (props: Props) => {
     fetchConversions();
   }, [conversionService, currentUser, updateTrigger]);
 
-  const [isConversionSelected, setIsConversionSelected] =
-    useState<boolean>(false);
-
   return (
     <Flex w="100%" alignItems={"center"} direction={"column"} px={2}>
       <Box minH={8}></Box>
       {currentUser?.compensationGroupId ? (
         <React.Fragment>
-          {!isConversionSelected && (
-            <React.Fragment>
-              <MobileRecordConversionsWidget
-                refresh={refresh}
-                conversions={conversions}
-              />
-              <Box minH={8}></Box>
-            </React.Fragment>
-          )}
-          {/* <MobileConversionHistoryWidget
+          <MobileRecordConversionsWidget
+            refresh={refresh}
             conversions={conversions}
-            setIsConversionSelected={setIsConversionSelected}
-          /> */}
+            compensationGroup={compensationGroup}
+          />
+          <Box minH={8}></Box>
         </React.Fragment>
       ) : (
         <React.Fragment>

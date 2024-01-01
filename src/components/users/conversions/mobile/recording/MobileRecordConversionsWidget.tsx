@@ -1,47 +1,84 @@
-import React, { useState, useContext, useEffect, useCallback } from "react";
-import { Box, Button, Heading, Spacer, Spinner } from "@chakra-ui/react";
+import React, { useState, useCallback } from "react";
+import { Box, Button, Heading, Spacer, Spinner, Text } from "@chakra-ui/react";
 import { Flex } from "@chakra-ui/react";
-import { CompensationGroupService } from "services/interfaces/CompensationGroupService";
 import { DependencyInjection } from "models/utils/DependencyInjection";
 import { CompensationGroup } from "models/CompensationGroup";
-import { UserContext } from "components/auth/UserProvider";
 import { AddIcon } from "@chakra-ui/icons";
 import useSuccessNotification from "components/utils/SuccessNotification";
 import { ConversionService } from "services/interfaces/ConversionService";
-import { Conversion, ConversionAttachmentGroup } from "models/Conversion";
+import {
+  Conversion,
+  ConversionAttachmentGroup,
+  conversionsWithLink,
+  filterConversionsByDateInterval,
+} from "models/Conversion";
 import useErrorNotification from "components/utils/ErrorNotification";
 import MobileRecordConversionTile from "./MobileRecordConversionsTile";
 import { RiSubtractLine } from "react-icons/ri";
+import { ConversionType } from "models/enums/ConversionType";
+import { firstDayOfCurrentMonth } from "models/utils/Date";
 
 type Props = {
   refresh: () => void;
   conversions: Conversion[];
+  compensationGroup: CompensationGroup | null;
 };
 
 const MobileRecordConversionsWidget = ({
   refresh,
   conversions: existingConversions,
+  compensationGroup,
 }: Props) => {
-  const compGroupService: CompensationGroupService =
-    DependencyInjection.compensationGroupService();
+  const [globalErrorText, setGlobalErrorText] = useState<string>("");
 
-  const [compensationGroup, setCompensationGroup] =
-    useState<CompensationGroup | null>(null);
+  const retentionIncentivesExceedMonthlyLimit = () => {
+    for (const incentive of compensationGroup?.retentionIncentives ?? []) {
+      const usedIncentivesThisMonth: number = filterConversionsByDateInterval(
+        existingConversions
+          .filter((conv) => conv.type === ConversionType.retentionIncentive)
+          .filter((conv) => conv.affiliateLink.clientId === incentive.clientId),
+        {
+          fromDate: firstDayOfCurrentMonth(),
+        }
+      ).length;
 
-  const { currentUser } = useContext(UserContext);
+      const newIncentives = Object.values(conversionsGroups)
+        .map((group) => group?.conversion)
+        .filter((conv) => conv !== undefined)
+        .filter((conv) => conv!.affiliateLink.clientId === incentive.clientId)
+        .filter(
+          (conv) => conv!.type === ConversionType.retentionIncentive
+        ).length;
 
-  useEffect(() => {
-    const fetchCompensationGroup = async () => {
-      const compGroupId = currentUser?.compensationGroupId;
-      if (!compGroupId) {
-        return;
+      if (usedIncentivesThisMonth + newIncentives > incentive.monthlyLimit) {
+        return true;
       }
-      const compGroup = await compGroupService.get(compGroupId);
-      setCompensationGroup(compGroup);
-    };
+    }
+    return false;
+  };
 
-    fetchCompensationGroup();
-  }, [compGroupService, currentUser?.compensationGroupId]);
+  const affiliateLinkConversionsExceedMonthlyLimit = () => {
+    for (const link of compensationGroup?.affiliateLinks ?? []) {
+      if (!link.monthlyLimit) {
+        continue;
+      }
+      const usedConversionsThisMonth: number = filterConversionsByDateInterval(
+        conversionsWithLink(existingConversions, link),
+        {
+          fromDate: firstDayOfCurrentMonth(),
+        }
+      ).length;
+
+      const newConversions = Object.values(conversionsGroups)
+        .map((group) => group?.conversion)
+        .filter((conv) => conv !== undefined)
+        .filter((conv) => conv!.affiliateLink.id === link.id).length;
+
+      if (usedConversionsThisMonth + newConversions > link.monthlyLimit) {
+        return true;
+      }
+    }
+  };
 
   // SERVICES
   const conversionService: ConversionService =
@@ -90,6 +127,20 @@ const MobileRecordConversionsWidget = ({
       } else {
         setRowError(i, undefined);
       }
+    }
+
+    if (retentionIncentivesExceedMonthlyLimit()) {
+      setGlobalErrorText(
+        "Ensure that retention incentives do not exceed any monthly limits."
+      );
+      foundError = true;
+    }
+
+    if (affiliateLinkConversionsExceedMonthlyLimit()) {
+      setGlobalErrorText(
+        "Ensure that conversions do not exceed any monthly limits."
+      );
+      foundError = true;
     }
 
     return !foundError;
@@ -231,6 +282,9 @@ const MobileRecordConversionsWidget = ({
             >
               {"Record Conversions"}
             </Button>
+            <Text alignSelf={"center"} fontSize="sm" color="red">
+              {globalErrorText}
+            </Text>
           </React.Fragment>
         ) : (
           <Flex

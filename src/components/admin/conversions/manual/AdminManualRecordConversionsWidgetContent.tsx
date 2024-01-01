@@ -1,21 +1,30 @@
 import React, { useState, useCallback } from "react";
-import { Box, Button, Flex, Heading } from "@chakra-ui/react";
+import { Box, Button, Flex, Text } from "@chakra-ui/react";
+import AdminRecordConversionTile from "./AdminManualRecordConversionTile";
 import { AddIcon } from "@chakra-ui/icons";
-import { ConversionAttachmentGroup } from "models/Conversion";
+import {
+  Conversion,
+  ConversionAttachmentGroup,
+  conversionsWithLink,
+  filterConversionsByDateInterval,
+} from "models/Conversion";
 import { CompensationGroup } from "models/CompensationGroup";
 import { ConversionService } from "services/interfaces/ConversionService";
 import { DependencyInjection } from "models/utils/DependencyInjection";
 import { RiSubtractLine } from "react-icons/ri";
 import useSuccessNotification from "components/utils/SuccessNotification";
 import useErrorNotification from "components/utils/ErrorNotification";
-import AdminRecordConversionTile from "./AdminManualRecordConversionTile";
+import { ConversionType } from "models/enums/ConversionType";
+import { firstDayOfCurrentMonth } from "models/utils/Date";
 
-const AdminManualRecordConversionsWidget = ({
+const AdminManualRecordConversionsWidgetContent = ({
+  conversions: existingConversions,
   compensationGroup,
-  refresh = () => {},
+  refresh,
 }: {
+  conversions: Conversion[];
   compensationGroup: CompensationGroup;
-  refresh?: () => void;
+  refresh: () => void;
 }) => {
   // SERVICES
   const conversionService: ConversionService =
@@ -49,10 +58,62 @@ const AdminManualRecordConversionsWidget = ({
   );
 
   // ERROR HANDLING
+
+  const [globalErrorText, setGlobalErrorText] = useState<string>("");
+
   // This is a map of row numbers to error messages
   const [errorsByRow, setErrorsByRow] = useState<
     Record<number, string | undefined>
   >({});
+
+  const retentionIncentivesExceedMonthlyLimit = () => {
+    for (const incentive of compensationGroup.retentionIncentives) {
+      const usedIncentivesThisMonth: number = filterConversionsByDateInterval(
+        existingConversions
+          .filter((conv) => conv.type === ConversionType.retentionIncentive)
+          .filter((conv) => conv.affiliateLink.clientId === incentive.clientId),
+        {
+          fromDate: firstDayOfCurrentMonth(),
+        }
+      ).length;
+
+      const newIncentives = Object.values(conversionsGroups)
+        .map((group) => group?.conversion)
+        .filter((conv) => conv !== undefined)
+        .filter((conv) => conv!.affiliateLink.clientId === incentive.clientId)
+        .filter(
+          (conv) => conv!.type === ConversionType.retentionIncentive
+        ).length;
+
+      if (usedIncentivesThisMonth + newIncentives > incentive.monthlyLimit) {
+        return true;
+      }
+    }
+    return false;
+  };
+
+  const affiliateLinkConversionsExceedMonthlyLimit = () => {
+    for (const link of compensationGroup.affiliateLinks) {
+      if (!link.monthlyLimit) {
+        continue;
+      }
+      const usedConversionsThisMonth: number = filterConversionsByDateInterval(
+        conversionsWithLink(existingConversions, link),
+        {
+          fromDate: firstDayOfCurrentMonth(),
+        }
+      ).length;
+
+      const newConversions = Object.values(conversionsGroups)
+        .map((group) => group?.conversion)
+        .filter((conv) => conv !== undefined)
+        .filter((conv) => conv!.affiliateLink.id === link.id).length;
+
+      if (usedConversionsThisMonth + newConversions > link.monthlyLimit) {
+        return true;
+      }
+    }
+  };
 
   const checkAllConversionsValid = (): boolean => {
     let foundError = false;
@@ -64,6 +125,20 @@ const AdminManualRecordConversionsWidget = ({
       } else {
         setRowError(i, undefined);
       }
+    }
+
+    if (retentionIncentivesExceedMonthlyLimit()) {
+      setGlobalErrorText(
+        "Ensure that retention incentives do not exceed any monthly limits."
+      );
+      foundError = true;
+    }
+
+    if (affiliateLinkConversionsExceedMonthlyLimit()) {
+      setGlobalErrorText(
+        "Ensure that conversions do not exceed any monthly limits."
+      );
+      foundError = true;
     }
 
     return !foundError;
@@ -142,32 +217,14 @@ const AdminManualRecordConversionsWidget = ({
 
   const showSuccess = useSuccessNotification();
 
-  const buttonDisabled = (): boolean => {
-    for (let i = 0; i < rowCount; i++) {
-      if (conversionsGroups[i] === undefined) {
-        return true;
-      }
-    }
-    return false;
-  };
-
   return (
-    <Flex
-      p={26}
-      borderRadius={"20px"}
-      width={"95%"}
-      flexDirection={"column"}
-      boxShadow={"3px 4px 12px rgba(0, 0, 0, 0.2)"}
-      gap={2}
-    >
-      <Heading as="h1" fontSize={"1.2em"} fontWeight={700}>
-        Record Admin Conversions
-      </Heading>
+    <React.Fragment>
       <Box h={2} />
 
       {Array.from({ length: rowCount }, (_, i) => (
         <Box key={`${i}-box`}>
           <AdminRecordConversionTile
+            conversions={existingConversions}
             compensationGroup={compensationGroup}
             errorText={errorsByRow[i]}
             rowIndex={i + 1}
@@ -193,7 +250,6 @@ const AdminManualRecordConversionsWidget = ({
       </Flex>
       <Box />
       <Button
-        isDisabled={buttonDisabled()}
         isLoading={loading}
         size="lg"
         colorScheme="orange"
@@ -201,8 +257,11 @@ const AdminManualRecordConversionsWidget = ({
       >
         {"Record Conversions"}
       </Button>
-    </Flex>
+      <Text alignSelf={"center"} fontSize="sm" color="red">
+        {globalErrorText}
+      </Text>
+    </React.Fragment>
   );
 };
 
-export default AdminManualRecordConversionsWidget;
+export default AdminManualRecordConversionsWidgetContent;
