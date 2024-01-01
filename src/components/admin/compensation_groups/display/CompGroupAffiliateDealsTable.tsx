@@ -4,10 +4,13 @@ import React from "react";
 import { getReferralLinkTypeLabel } from "models/enums/ReferralLinkType";
 import { formatMoney } from "models/utils/Money";
 import { AffiliateLink } from "models/AffiliateLink";
+import { Conversion } from "models/Conversion";
 
 const CompGroupAffiliateDealsTable = ({
+  conversions,
   affiliateLinks,
 }: {
+  conversions: Conversion[];
   affiliateLinks: AffiliateLink[];
 }) => {
   const tableColumns: {

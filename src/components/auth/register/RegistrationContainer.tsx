@@ -23,6 +23,7 @@ import { DependencyInjection } from "models/utils/DependencyInjection";
 import { UserContext } from "components/auth/UserProvider";
 import { User } from "models/User";
 import Logo from "components/common/Logo";
+import { CompensationGroupService } from "services/interfaces/CompensationGroupService";
 
 const RegistrationContainer = ({ goToLogin = () => {} }) => {
   const navigate = useNavigate();
@@ -41,6 +42,11 @@ const RegistrationContainer = ({ goToLogin = () => {} }) => {
 
   const conversionService: ConversionService =
     DependencyInjection.conversionService();
+
+  const compGroupService: CompensationGroupService =
+    DependencyInjection.compensationGroupService();
+
+  const userService = DependencyInjection.userService();
 
   const { setActiveTabIndex } = useGlobalState();
 
@@ -161,10 +167,24 @@ const RegistrationContainer = ({ goToLogin = () => {} }) => {
   };
 
   const handleRegistrationCodeUsed = async (user: User) => {
-    return await conversionService.assignConversionsWithCode({
-      assignmentCode: registrationCode.trim(),
+    const assignmentCode = registrationCode.trim();
+
+    await conversionService.assignConversionsWithCode({
+      assignmentCode,
       userId: user.uid,
     });
+
+    const compGroupId: string | null =
+      await compGroupService.getAssignmentCodeCompGroupId(assignmentCode);
+
+    if (compGroupId) {
+      await userService.update(
+        new User({
+          ...user,
+          compensationGroupId: compGroupId,
+        })
+      );
+    }
   };
 
   const handleShowPassword = () => {

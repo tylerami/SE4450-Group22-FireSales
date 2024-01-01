@@ -6,10 +6,12 @@ import {
   Timestamp,
   collection,
   doc,
+  getDoc,
   getDocs,
   orderBy,
   query,
   setDoc,
+  updateDoc,
   where,
 } from "firebase/firestore";
 
@@ -27,6 +29,43 @@ export class CompensationGroupFirebaseService
    */
   constructor(db: Firestore) {
     this.db = db;
+  }
+
+  async getAllAssignmentCodeCompGroupIds(): Promise<
+    Record<string, string | null>
+  > {
+    const collection = this.assignmentCodesCollection();
+    const queryRef = query(collection);
+
+    const docSnap = await getDocs(queryRef);
+    if (docSnap.empty) {
+      return {};
+    }
+
+    const result: Record<string, string | null> = {};
+    docSnap.docs.forEach((doc) => {
+      result[doc.id] = doc.data().compensationGroupId ?? null;
+    });
+    return result;
+  }
+
+  async getAssignmentCodeCompGroupId(code: string): Promise<string | null> {
+    const collection = this.assignmentCodesCollection();
+    const docRef = doc(collection, code);
+
+    const docSnap = await getDoc(docRef);
+    if (!docSnap.exists()) {
+      return null;
+    }
+    return docSnap.data()?.compensationGroupId ?? null;
+  }
+  async setAssignmentCodeCompGroupId(
+    code: string,
+    compGroupId: string | null
+  ): Promise<void> {
+    const collection = this.assignmentCodesCollection();
+    const docRef = doc(collection, code);
+    await updateDoc(docRef, { compensationGroupId: compGroupId });
   }
 
   /**
@@ -121,5 +160,9 @@ export class CompensationGroupFirebaseService
    */
   private compensationGroupsCollection(): CollectionReference {
     return collection(this.db, "compensationGroups");
+  }
+
+  private assignmentCodesCollection(): CollectionReference {
+    return collection(this.db, "conversionAssignmentCodes");
   }
 }

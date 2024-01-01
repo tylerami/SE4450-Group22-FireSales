@@ -441,6 +441,7 @@ const SalesTeamListWidget = ({
         filteredConversions={getFilteredConversions()}
         selectUser={setSelectedUser}
         filteredPayouts={getFilteredPayouts()}
+        compensationGroups={compGroups}
       />
 
       {filteredUsersAndCodes.length > 0 ? (

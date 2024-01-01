@@ -66,3 +66,30 @@ export function firstDayOfCurrentMonth() {
   const date = new Date();
   return new Date(date.getFullYear(), date.getMonth(), 1);
 }
+
+export function getCurrentMonthAbbreviation(): string {
+  const monthAbbreviations = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
+  const currentMonthIndex = new Date().getMonth();
+  return monthAbbreviations[currentMonthIndex];
+}
+
+export function getCurrentMonthWithYear(): string {
+  return `${getCurrentMonthAbbreviation()} '${getCurrentYearTwoDigits()}`;
+}
+
+export function getCurrentYearTwoDigits(): string {
+  return new Date().getFullYear().toString().slice(-2);
+}

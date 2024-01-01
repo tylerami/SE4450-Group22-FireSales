@@ -4,14 +4,37 @@ import React from "react";
 import { formatMoney } from "models/utils/Money";
 import { Client } from "models/Client";
 import RetentionIncentive from "models/RetentionIncentive";
+import {
+  Conversion,
+  conversionsWithType,
+  filterConversionsByDateInterval,
+} from "models/Conversion";
+import {
+  firstDayOfCurrentMonth,
+  getCurrentMonthWithYear as getCurrentMonthWithYearAbbreviation,
+} from "models/utils/Date";
+import { ConversionType } from "models/enums/ConversionType";
+import { User } from "models/User";
 
 const CompGroupRetentionIncentivesTable = ({
   retentionIncentives,
   clients,
+  conversions,
+  users,
 }: {
   retentionIncentives: RetentionIncentive[];
   clients: Client[];
+  conversions: Conversion[];
+  users: User[];
 }) => {
+  const currentMonthDistributedIncentives: Conversion[] =
+    filterConversionsByDateInterval(
+      conversionsWithType(conversions, ConversionType.retentionIncentive),
+      {
+        fromDate: firstDayOfCurrentMonth(),
+      }
+    );
+
   const getClientName = (clientId: string): string => {
     return clients.find((client) => client.id === clientId)?.name || "";
   };
@@ -28,10 +51,24 @@ const CompGroupRetentionIncentivesTable = ({
       label: "Amount",
       getValue: (incentive) => formatMoney(incentive.amount),
     },
-    // todo: need a view for utilization of retention incentives
     {
       label: "Monthly Limit / User",
       getValue: (incentive) => incentive.monthlyLimit.toString(),
+    },
+    {
+      label: "Max. Spend / Month",
+      getValue: (incentive) =>
+        formatMoney(incentive.monthlyLimit * users.length * incentive.amount),
+    },
+    {
+      label: `${getCurrentMonthWithYearAbbreviation()} Spend`,
+      getValue: (incentive) =>
+        currentMonthDistributedIncentives
+          .filter(
+            (conversion) =>
+              conversion.affiliateLink.clientId === incentive.clientId
+          )
+          .length.toString(),
     },
   ];
 

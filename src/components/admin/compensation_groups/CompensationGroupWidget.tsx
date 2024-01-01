@@ -1,4 +1,13 @@
-import { Button, Heading, Spinner } from "@chakra-ui/react";
+import {
+  Button,
+  Heading,
+  Icon,
+  Input,
+  InputGroup,
+  InputLeftElement,
+  Spacer,
+  Spinner,
+} from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 import { Flex } from "@chakra-ui/react";
 import { DependencyInjection } from "models/utils/DependencyInjection";
@@ -10,6 +19,9 @@ import { UserService } from "services/interfaces/UserService";
 import { ConversionService } from "services/interfaces/ConversionService";
 import { ClientService } from "services/interfaces/ClientService";
 import { Client } from "models/Client";
+import { Conversion } from "models/Conversion";
+import { User } from "models/User";
+import { FiSearch } from "react-icons/fi";
 
 type Props = {};
 
@@ -23,6 +35,8 @@ const CompensationGroupWidget = (props: Props) => {
   const [compGroups, setCompGroups] = useState<CompensationGroup[]>([]);
   const [clients, setClients] = useState<Client[]>([]);
 
+  const [usersSearch, setUserSearch] = useState<string>("");
+
   const compGroupService: CompensationGroupService =
     DependencyInjection.compensationGroupService();
 
@@ -30,6 +44,9 @@ const CompensationGroupWidget = (props: Props) => {
 
   const conversionService: ConversionService =
     DependencyInjection.conversionService();
+
+  const [conversions, setConversions] = useState<Conversion[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
 
   const clientsService: ClientService = DependencyInjection.clientService();
 
@@ -44,6 +61,18 @@ const CompensationGroupWidget = (props: Props) => {
       setClients(clients);
     };
 
+    const fetchConversions = async () => {
+      const conversions = await conversionService.query({});
+      setConversions(conversions);
+    };
+
+    const fetchUsers = async () => {
+      const users = await userService.getAll();
+      setUsers(users);
+    };
+
+    fetchUsers();
+    fetchConversions();
     fetchCompGroups();
     fetchClients();
   }, [
@@ -59,6 +88,37 @@ const CompensationGroupWidget = (props: Props) => {
     setEditingGroup(null);
     setUpdateTrigger(updateTrigger + 1);
   };
+
+  function getFilteredCompGroups() {
+    if (usersSearch.trim() === "") {
+      return compGroups;
+    }
+
+    const filteredUsers: User[] = users.filter((user) =>
+      user.getFullName().toLowerCase().includes(usersSearch.toLowerCase())
+    );
+
+    const userSearchMatches: Record<string, number> = {};
+
+    for (const user of filteredUsers) {
+      if (user.compensationGroupId! in userSearchMatches) {
+        userSearchMatches[user.compensationGroupId!] = 0;
+      }
+      userSearchMatches[user.compensationGroupId!] += 1;
+    }
+
+    const filteredCompGroups = compGroups.filter(
+      (compGroup) => compGroup.id in userSearchMatches
+    );
+
+    filteredCompGroups.sort((a, b) => {
+      return userSearchMatches[b.id] - userSearchMatches[a.id];
+    });
+
+    return filteredCompGroups;
+  }
+
+  const filteredCompGroups = getFilteredCompGroups();
 
   return (
     <Flex
@@ -77,19 +137,47 @@ const CompensationGroupWidget = (props: Props) => {
             <Heading as="h1" fontSize={"1.2em"} fontWeight={700}>
               Compensation Groups
             </Heading>{" "}
+            <Spacer />
+            <Button
+              colorScheme="blue"
+              size="sm"
+              onClick={() => setCreateMode(true)}
+            >
+              Create New Group
+            </Button>
           </Flex>
 
-          {!compGroups ? (
-            <Spinner />
+          <InputGroup w="full" maxW="50%">
+            <InputLeftElement>
+              <Icon _hover={{ color: "#434343" }} as={FiSearch} />
+            </InputLeftElement>
+            <Input
+              focusBorderColor="#ED7D31"
+              variant="filled"
+              placeholder="Search by user..."
+              onChange={(e) => setUserSearch(e.target.value)}
+            />
+          </InputGroup>
+
+          {filteredCompGroups.length === 0 ? (
+            <Spinner my={20} size="xl" alignSelf="center" />
           ) : (
-            compGroups.map((compGroup: CompensationGroup, i: number) => (
-              <CompensationGroupDetailsTile
-                key={i}
-                clients={clients}
-                compGroup={compGroup}
-                selectCompGroup={setEditingGroup}
-              />
-            ))
+            filteredCompGroups.map(
+              (compGroup: CompensationGroup, i: number) => (
+                <CompensationGroupDetailsTile
+                  key={i}
+                  conversions={conversions.filter(
+                    (conv) => conv.compensationGroupId === compGroup.id
+                  )}
+                  users={users.filter(
+                    (user) => user.compensationGroupId === compGroup.id
+                  )}
+                  clients={clients}
+                  compGroup={compGroup}
+                  selectCompGroup={setEditingGroup}
+                />
+              )
+            )
           )}
 
           <Button

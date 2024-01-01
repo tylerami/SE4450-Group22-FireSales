@@ -3,6 +3,18 @@ import { generateSampleCompensationGroups } from "__mocks__/models/CompensationG
 import { CompensationGroupService } from "services/interfaces/CompensationGroupService";
 
 export class MockCompensationGroupService implements CompensationGroupService {
+  getAllAssignmentCodeCompGroupIds(): Promise<Record<string, string | null>> {
+    throw new Error("Method not implemented.");
+  }
+  getAssignmentCodeCompGroupId(code: string): Promise<string | null> {
+    throw new Error("Method not implemented.");
+  }
+  setAssignmentCodeCompGroupId(
+    code: string,
+    compGroupId: string
+  ): Promise<void> {
+    throw new Error("Method not implemented.");
+  }
   set(compensationGroup: CompensationGroup): Promise<CompensationGroup> {
     throw new Error("Method not implemented.");
   }
