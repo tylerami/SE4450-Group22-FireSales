@@ -232,8 +232,9 @@ const SalesTeamListTable = ({
                   "Select a group..."}
               </MenuButton>
               <MenuList>
-                {[null, ...compensationGroups].map((compGroup) => (
+                {[null, ...compensationGroups].map((compGroup, index) => (
                   <MenuItem
+                    key={index}
                     onClick={(e) =>
                       setAssignmentCodeCompGroupId(
                         selectedAssignmentCode!,

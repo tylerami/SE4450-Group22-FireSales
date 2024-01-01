@@ -56,6 +56,7 @@ const ConversionsPage = (props: Props) => {
             </React.Fragment>
           )}
           <ConversionHistoryWidget
+            refresh={refresh}
             conversions={conversions}
             setIsConversionSelected={setIsConversionSelected}
           />

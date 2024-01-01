@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
 import { Flex } from "@chakra-ui/react";
 import { Conversion } from "models/Conversion";
-import { ConversionService } from "services/interfaces/ConversionService";
 import { DependencyInjection } from "models/utils/DependencyInjection";
 import { UserContext } from "components/auth/UserProvider";
 import SelectedConversionContent from "./SelectedConversionContent";
@@ -14,11 +13,13 @@ import { Client } from "models/Client";
 type Props = {
   setIsConversionSelected: (isConversionSelected: boolean) => void;
   conversions: Conversion[];
+  refresh: () => void;
 };
 
 const ConversionHistoryWidget = ({
   conversions,
   setIsConversionSelected,
+  refresh,
 }: Props) => {
   const compGroupService: CompensationGroupService =
     DependencyInjection.compensationGroupService();
@@ -29,9 +30,6 @@ const ConversionHistoryWidget = ({
     useState<Conversion | null>(null);
   const [compGroup, setCompGroup] = useState<CompensationGroup | null>(null);
   const [clients, setClients] = useState<Client[]>([]);
-
-  const [updateTrigger, setUpdateTrigger] = useState<boolean>(false);
-  const refresh = () => setUpdateTrigger(!updateTrigger);
 
   const { currentUser } = useContext(UserContext);
 
@@ -54,7 +52,7 @@ const ConversionHistoryWidget = ({
 
     fetchCompGroup();
     fetchClients();
-  }, [clientService, compGroupService, currentUser, updateTrigger]);
+  }, [clientService, compGroupService, currentUser]);
 
   const selectConversion = (conversion: Conversion) => {
     setSelectedConversion(conversion);

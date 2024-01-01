@@ -1,8 +1,21 @@
 import React, { useState } from "react";
-import { Button, Flex, Heading, IconButton, Spacer } from "@chakra-ui/react";
+import {
+  Button,
+  Flex,
+  Heading,
+  IconButton,
+  Image,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalHeader,
+  ModalOverlay,
+  Spacer,
+  Stack,
+  useDisclosure,
+} from "@chakra-ui/react";
 import { Conversion } from "models/Conversion";
 import { CloseIcon } from "@chakra-ui/icons";
-import ImageComponent from "components/utils/ImageComponent";
 import ConversionMessageWidget from "components/common/conversions/ConversionMessagesWidget";
 import { ConversionService } from "services/interfaces/ConversionService";
 import { DependencyInjection } from "models/utils/DependencyInjection";
@@ -54,8 +67,39 @@ const SelectedConversionContent = ({ selectedConversion, exit }: Props) => {
     }
   };
 
+  const [selectedImageUrl, setSelectedImageUrl] = useState("");
+  const {
+    isOpen: isImageModalOpen,
+    onOpen: onImageModalOpen,
+    onClose: onImageModalClose,
+  } = useDisclosure();
+
+  const handleImageClick = (url: string) => {
+    setSelectedImageUrl(url);
+    onImageModalOpen();
+  };
+
+  const ImageModal = () => (
+    <Modal isOpen={isImageModalOpen} onClose={onImageModalClose} size="6xl">
+      <ModalOverlay />
+      <ModalContent>
+        <ModalHeader>
+          <IconButton
+            onClick={onImageModalClose}
+            icon={<CloseIcon />}
+            aria-label={""}
+          />
+        </ModalHeader>
+        <ModalBody>
+          <Image src={selectedImageUrl} maxW="100%" />
+        </ModalBody>
+      </ModalContent>
+    </Modal>
+  );
+
   return (
     <React.Fragment>
+      <ImageModal />
       <Flex justifyContent={"start"} alignItems={"center"} gap={6}>
         <IconButton
           onClick={() => {
@@ -100,9 +144,20 @@ const SelectedConversionContent = ({ selectedConversion, exit }: Props) => {
           justifyContent={"space-evenly"}
           alignItems={"center"}
           w="100%"
+          maxWidth="100%"
         >
           {conversion.attachmentUrls.map((url, index) => (
-            <ImageComponent key={index} imageUrl={url} />
+            <Stack>
+              <Image
+                onClick={() => {
+                  handleImageClick(url);
+                }}
+                cursor={"pointer"}
+                maxH="20em"
+                src={url}
+                key={index}
+              />
+            </Stack>
           ))}
         </Flex>
       ) : (

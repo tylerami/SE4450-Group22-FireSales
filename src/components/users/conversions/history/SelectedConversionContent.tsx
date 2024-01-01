@@ -37,7 +37,7 @@ const SelectedConversionContent = ({ selectedConversion, exit }: Props) => {
 
   const [conversion, setConversion] = useState<Conversion>(selectedConversion);
 
-  const [attachments, setAttachments] = useState<File[]>([]);
+  const [newAttachments, setAttachments] = useState<File[]>([]);
 
   const showSuccess = useSuccessNotification();
 
@@ -49,7 +49,7 @@ const SelectedConversionContent = ({ selectedConversion, exit }: Props) => {
   };
 
   const handleAttachmentsButton = () => {
-    if (attachments.length > 0) {
+    if (newAttachments.length > 0) {
       setAttachments([]);
     } else {
       triggerFileUpload();
@@ -66,12 +66,16 @@ const SelectedConversionContent = ({ selectedConversion, exit }: Props) => {
   const imageService = DependencyInjection.imageService();
 
   const saveNewAttachments = async () => {
-    const updatedConversion = await imageService.uploadConversionAttachments(
-      conversion,
-      attachments
-    );
+    const updatedConversion: Conversion =
+      await imageService.uploadConversionAttachments(
+        conversion,
+        newAttachments
+      );
+
+    console.log(updatedConversion);
 
     const result = await conversionService.update(updatedConversion);
+    console.log(result);
 
     if (result) {
       setConversion(updatedConversion);
@@ -205,7 +209,7 @@ const SelectedConversionContent = ({ selectedConversion, exit }: Props) => {
           </Stack>
         ))}
 
-        {attachments.map((file, index) => (
+        {newAttachments.map((file, index) => (
           <Stack key={index}>
             <Image
               onClick={() => {
@@ -224,7 +228,7 @@ const SelectedConversionContent = ({ selectedConversion, exit }: Props) => {
       </Flex>
 
       <InputGroup gap={4} width={"100%"}>
-        {attachments.length > 0 && (
+        {newAttachments.length > 0 && (
           <Button
             colorScheme={"green"}
             size="md"
@@ -235,7 +239,7 @@ const SelectedConversionContent = ({ selectedConversion, exit }: Props) => {
           </Button>
         )}
         <Button
-          colorScheme={attachments.length > 0 ? "red" : "gray"}
+          colorScheme={newAttachments.length > 0 ? "red" : "gray"}
           size="md"
           w="100%"
           onClick={handleAttachmentsButton}
@@ -248,7 +252,7 @@ const SelectedConversionContent = ({ selectedConversion, exit }: Props) => {
             onChange={handleFilesChange}
             id={`file-upload`}
           />
-          {attachments.length <= 0 ? " Upload Files" : "Remove Files"}
+          {newAttachments.length <= 0 ? " Upload Files" : "Remove Files"}
         </Button>
       </InputGroup>
 
