@@ -39,6 +39,7 @@ import ClientsPerformanceChart from "./ClientsPerformanceChart";
 import { AffiliateDeal } from "models/AffiliateDeal";
 import PerformanceMetricBox from "components/common/PerformanceMetricBox";
 import Filter, { FilterDefinition } from "components/utils/Filter";
+import { ConversionType } from "models/enums/ConversionType";
 
 type Props = {};
 
@@ -103,9 +104,12 @@ const ClientsPerformanceWidget = (props: Props) => {
 
   useEffect(() => {
     const fetchConversions = async () => {
-      const conversions = await conversionService.query({
-        includeUnasigned: true,
+      let conversions = await conversionService.query({
+        includeUnassigned: true,
       });
+      conversions = conversions.filter(
+        (conv) => conv.type !== ConversionType.retentionIncentive
+      );
       setConversions(conversions);
     };
 

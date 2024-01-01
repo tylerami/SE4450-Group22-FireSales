@@ -138,21 +138,17 @@ const CompGroupEditorRetentionBonusesTable = ({
               </InputGroup>
             </Td>
             <Td textAlign={"center"}>
-              <InputGroup width="8em" margin="auto">
-                <InputLeftElement>
-                  <Icon as={FaDollarSign} color="gray" />
-                </InputLeftElement>
-                <Input
-                  pl={8}
-                  type="number"
-                  isDisabled={isClientDisabled(client.id)}
-                  placeholder="Limit"
-                  value={getRetentionIncentiveLimit(client.id)}
-                  onChange={(e) =>
-                    setRetentionIncentiveLimit(client.id, e.target.value)
-                  }
-                />
-              </InputGroup>
+              <Input
+                width="6em"
+                margin="auto"
+                type="number"
+                isDisabled={isClientDisabled(client.id)}
+                placeholder="Limit"
+                value={getRetentionIncentiveLimit(client.id)}
+                onChange={(e) =>
+                  setRetentionIncentiveLimit(client.id, e.target.value)
+                }
+              />
             </Td>
           </Tr>
         ))}

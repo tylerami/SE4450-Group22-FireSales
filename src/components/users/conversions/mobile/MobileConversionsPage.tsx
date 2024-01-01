@@ -23,10 +23,10 @@ const MobileConversionsPage = (props: Props) => {
     const fetchConversions = async () => {
       if (!currentUser) return;
 
-      const conversions = await conversionService.query({
+      let convs = await conversionService.query({
         userId: currentUser.uid,
       });
-      setConversions(conversions);
+      setConversions(convs);
     };
 
     fetchConversions();
@@ -42,7 +42,10 @@ const MobileConversionsPage = (props: Props) => {
         <React.Fragment>
           {!isConversionSelected && (
             <React.Fragment>
-              <MobileRecordConversionsWidget refresh={refresh} />
+              <MobileRecordConversionsWidget
+                refresh={refresh}
+                conversions={conversions}
+              />
               <Box minH={8}></Box>
             </React.Fragment>
           )}

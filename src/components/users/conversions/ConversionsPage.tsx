@@ -23,9 +23,10 @@ const ConversionsPage = (props: Props) => {
     const fetchConversions = async () => {
       if (!currentUser) return;
 
-      const conversions = await conversionService.query({
+      let conversions = await conversionService.query({
         userId: currentUser.uid,
       });
+
       setConversions(conversions);
     };
 

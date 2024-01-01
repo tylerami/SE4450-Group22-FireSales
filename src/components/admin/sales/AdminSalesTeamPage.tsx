@@ -28,6 +28,7 @@ import { DayOfTheWeek } from "models/enums/Timeframe";
 import { PayoutPreferrences } from "models/PayoutPreferrences";
 import useSuccessNotification from "components/utils/SuccessNotification";
 import { Role } from "models/enums/Role";
+import { ConversionType } from "models/enums/ConversionType";
 
 type Props = {};
 
@@ -62,9 +63,12 @@ const AdminSalesTeamPage = (props: Props) => {
     };
 
     const fetchConversions = async () => {
-      const conversions = await conversionService.query({
-        includeUnasigned: true,
+      let conversions = await conversionService.query({
+        includeUnassigned: true,
       });
+      conversions = conversions.filter(
+        (conv) => conv.type !== ConversionType.retentionIncentive
+      );
       setConversions(conversions);
     };
 

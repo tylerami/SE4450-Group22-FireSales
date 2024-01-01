@@ -19,7 +19,7 @@ export interface ConversionService {
     maxCommission,
     compensationGroupId,
     referralLinkType,
-    includeUnasigned,
+    includeUnassigned,
   }: {
     userId?: string;
     clientId?: string;
@@ -31,7 +31,7 @@ export interface ConversionService {
     maxCommission?: number;
     compensationGroupId?: string;
     referralLinkType?: string;
-    includeUnasigned?: boolean;
+    includeUnassigned?: boolean;
   }): Promise<Conversion[]>;
 
   assignConversionsWithCode({

@@ -8,16 +8,20 @@ import { UserContext } from "components/auth/UserProvider";
 import { AddIcon } from "@chakra-ui/icons";
 import useSuccessNotification from "components/utils/SuccessNotification";
 import { ConversionService } from "services/interfaces/ConversionService";
-import { ConversionAttachmentGroup } from "models/Conversion";
+import { Conversion, ConversionAttachmentGroup } from "models/Conversion";
 import useErrorNotification from "components/utils/ErrorNotification";
-import MobileRecordConversionTile from "./MobileRecordConversionsWidgetTile";
+import MobileRecordConversionTile from "./MobileRecordConversionsTile";
 import { RiSubtractLine } from "react-icons/ri";
 
 type Props = {
   refresh: () => void;
+  conversions: Conversion[];
 };
 
-const RecordConversionsWidget = ({ refresh }: Props) => {
+const MobileRecordConversionsWidget = ({
+  refresh,
+  conversions: existingConversions,
+}: Props) => {
   const compGroupService: CompensationGroupService =
     DependencyInjection.compensationGroupService();
 
@@ -190,6 +194,7 @@ const RecordConversionsWidget = ({ refresh }: Props) => {
             {Array.from({ length: rowCount }, (_, i) => (
               <Box key={`${i}-box`}>
                 <MobileRecordConversionTile
+                  conversions={existingConversions}
                   compensationGroup={compensationGroup}
                   errorText={errorsByRow[i]}
                   rowIndex={i + 1}
@@ -242,4 +247,4 @@ const RecordConversionsWidget = ({ refresh }: Props) => {
   );
 };
 
-export default RecordConversionsWidget;
+export default MobileRecordConversionsWidget;

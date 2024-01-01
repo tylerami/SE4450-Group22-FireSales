@@ -33,6 +33,7 @@ import { PayoutPreferrences } from "models/PayoutPreferrences";
 import { formatMoney } from "models/utils/Money";
 import { ChevronLeftIcon, ChevronRightIcon } from "@chakra-ui/icons";
 import { formatDateString } from "models/utils/Date";
+import { ConversionType } from "models/enums/ConversionType";
 
 type Props = {};
 
@@ -79,9 +80,12 @@ const PayoutsWidget = (props: Props) => {
     };
 
     const fetchConversions = async () => {
-      const conversions: Conversion[] = await conversionService.query({
-        includeUnasigned: true,
+      let conversions: Conversion[] = await conversionService.query({
+        includeUnassigned: true,
       });
+      conversions = conversions.filter(
+        (conv) => conv.type !== ConversionType.retentionIncentive
+      );
       setConversions(conversions);
     };
 

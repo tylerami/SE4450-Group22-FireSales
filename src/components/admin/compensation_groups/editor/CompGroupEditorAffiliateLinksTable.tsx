@@ -53,6 +53,9 @@ const CompGroupEditorAffiliateLinksTable = ({
     "Commission",
     "Min. Bet Size",
     "Bet Matches",
+    "Monthly Limit",
+    // todo: implement "amount reimbursed" = "full bet" / "half bet" / "none"
+    // "Amount reimbursed",
   ];
 
   return (
@@ -133,6 +136,23 @@ const CompGroupEditorAffiliateLinksTable = ({
                   })
                 }
               ></Switch>
+            </Td>
+
+            <Td textAlign={"center"}>
+              <Input
+                width="6em"
+                margin="auto"
+                type="number"
+                isDisabled={!link.enabled}
+                placeholder="Limit"
+                value={link.monthlyLimit ?? ""}
+                onChange={(e) => {
+                  const numericValue = Number(e.target.value);
+                  setAffiliateLinkProperties(index, {
+                    monthlyLimit: numericValue === 0 ? undefined : numericValue,
+                  });
+                }}
+              />
             </Td>
           </Tr>
         ))}

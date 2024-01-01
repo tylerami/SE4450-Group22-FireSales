@@ -11,7 +11,7 @@ import {
   getIntervalStart,
 } from "./enums/Timeframe";
 import { Timestamp, DocumentData } from "firebase/firestore";
-import { ConversionType } from "./enums/ConversionType";
+import { ConversionType, getConversionTypeLabel } from "./enums/ConversionType";
 
 export type ConversionAttachmentGroup = {
   conversion: Conversion;
@@ -153,9 +153,16 @@ export class Conversion {
   public description(): string {
     return `${formatDateString(this.dateOccurred)} / ${
       this.affiliateLink.clientId
-    } / ${this.customer.id} / $${this.amount} bet / $${
-      this.affiliateLink.commission
-    } commission `;
+    } / ${this.customer.fullName} / $${this.amount} / ${getConversionTypeLabel(
+      this.type
+    )} / $${this.affiliateLink.commission} commission `;
+  }
+
+  public costOfConversion(): number {
+    if (this.type === ConversionType.betMatch) {
+      return this.amount / 2 + this.affiliateLink.commission;
+    }
+    return this.amount + this.affiliateLink.commission;
   }
 
   public toFirestoreDoc(): DocumentData {
@@ -295,14 +302,14 @@ export function averageCostOfConversion(
   }
 
   const total = conversions.reduce((total, conversion) => {
-    return total + conversion.amount + conversion.affiliateLink.commission;
+    return total + conversion.costOfConversion();
   }, 0);
   return total / conversions.length;
 }
 
 export function totalCostOfConversions(conversions: Array<Conversion>): number {
   return conversions.reduce((total, conversion) => {
-    return total + conversion.amount + conversion.affiliateLink.commission;
+    return total + conversion.costOfConversion();
   }, 0);
 }
 
@@ -313,6 +320,12 @@ export function allClientIds(conversions: Array<Conversion>): string[] {
   return [...new Set(clientIds)];
 }
 
+export function totalGrossProfit(conversions: Array<Conversion>): number {
+  return conversions.reduce((total, conversion) => {
+    return total + conversion.affiliateLink.cpa - conversion.costOfConversion();
+  }, 0);
+}
+
 export function averageUnitContribution(
   conversions: Array<Conversion>
 ): number {
@@ -320,26 +333,7 @@ export function averageUnitContribution(
     return 0;
   }
 
-  const total = conversions.reduce((total, conversion) => {
-    return (
-      total +
-      conversion.affiliateLink.cpa -
-      conversion.amount -
-      conversion.affiliateLink.commission
-    );
-  }, 0);
-  return total / conversions.length;
-}
-
-export function totalGrossProfit(conversions: Array<Conversion>): number {
-  return conversions.reduce((total, conversion) => {
-    return (
-      total +
-      conversion.affiliateLink.cpa -
-      conversion.amount -
-      conversion.affiliateLink.commission
-    );
-  }, 0);
+  return totalGrossProfit(conversions) / conversions.length;
 }
 
 export function segmentConversionsByTimeframe(

@@ -35,6 +35,10 @@ const CompGroupAffiliateDealsTable = ({
       label: "Bet Matches",
       getValue: (link) => (link.betMatchEnabled ? "Yes" : "No"),
     },
+    {
+      label: "Monthly Limit",
+      getValue: (link) => link.monthlyLimit?.toString() ?? "None",
+    },
   ];
 
   affiliateLinks.sort((a, b) => a.clientName.localeCompare(b.clientName));

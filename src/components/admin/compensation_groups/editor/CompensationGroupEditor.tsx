@@ -80,6 +80,8 @@ const CompensationGroupEditor = ({ exisitingGroup, exit }: Props) => {
         enabled: existingLink?.enabled ?? false,
         minBetSize: existingLink?.minBetSize ?? undefined,
         commission: existingLink?.commission ?? undefined,
+        monthlyLimit: existingLink?.monthlyLimit ?? undefined,
+        betMatchEnabled: existingLink?.betMatchEnabled ?? false,
       };
     };
 
@@ -141,6 +143,8 @@ const CompensationGroupEditor = ({ exisitingGroup, exit }: Props) => {
       enabled: link.enabled!,
       minBetSize: link.minBetSize!,
       commission: link.commission!,
+      monthlyLimit: link.monthlyLimit,
+      betMatchEnabled: link.betMatchEnabled,
       clientId: deal.clientId,
       clientName: deal.clientName,
       type: deal.type,

@@ -18,6 +18,7 @@ import { ChevronDownIcon } from "@chakra-ui/icons";
 import {
   Conversion,
   ConversionAttachmentGroup,
+  conversionsWithLink,
   conversionsWithType,
   filterConversionsByDateInterval,
 } from "models///Conversion";
@@ -68,14 +69,36 @@ const RecordConversionTile = ({
     null
   );
 
-  const handleSelectAffiliateLink = (affiliateLink: AffiliateLink) => {
+  const handleSelectAffiliateLink = (affiliateLink: AffiliateLink | null) => {
+    // todo: all this monthly limit label shit needs refactoring
+
     setAffiliateLink(affiliateLink);
+
+    setConversionType(ConversionType.freeBet);
+    setConvTypeDropDownSubtext("");
+
+    if (affiliateLink == null) return;
     setConversionTypeOptions(
       compensationGroup.conversionTypesForClient(affiliateLink.clientId)
     );
+
+    if (affiliateLink?.monthlyLimit) {
+      const previousConversionsThisMonth: number =
+        filterConversionsByDateInterval(
+          conversionsWithLink(existingConversions, affiliateLink),
+          {
+            fromDate: firstDayOfCurrentMonth(),
+          }
+        ).length;
+
+      setAffiliateLinkDropDownSubtext(
+        `Used ${previousConversionsThisMonth} / ${affiliateLink.monthlyLimit} (Resets monthly)`
+      );
+    }
   };
 
-  console.log(compensationGroup);
+  const [affiliateLinkDropDownSubtext, setAffiliateLinkDropDownSubtext] =
+    useState<string>("");
 
   // Conversion type settings
   const [conversionTypeOptions, setConversionTypeOptions] = useState<
@@ -103,6 +126,7 @@ const RecordConversionTile = ({
   };
 
   const handleSetConversionType = (convType: ConversionType) => {
+    // todo: all this monthly limit label shit needs refactoring
     if (convType === ConversionType.retentionIncentive) {
       const incentiveAmount = retentionIncentiveAmount();
       const monthlyLimit = retentionIncentiveMonthlyLimit();
@@ -114,9 +138,14 @@ const RecordConversionTile = ({
       }
       setSaleAmount(incentiveAmount.toString());
       setConvTypeDropDownSubtext(
-        `${monthlyLimit - incentivesUsedThisMonth} / ${monthlyLimit} Available`
+        `${incentivesUsedThisMonth} / ${monthlyLimit} (Resets monthly)`
       );
+      setAffiliateLinkDropDownSubtext("");
+    } else {
+      setConvTypeDropDownSubtext("");
+      handleSelectAffiliateLink(affiliateLink);
     }
+
     setConversionType(convType);
   };
 
@@ -242,6 +271,7 @@ const RecordConversionTile = ({
     const conversion: Conversion = new Conversion({
       dateOccurred,
       affiliateLink,
+      type: conversionType,
       customer,
       amount: Number(newSaleAmount),
       compensationGroupId: compensationGroup.id,
@@ -335,32 +365,37 @@ const RecordConversionTile = ({
             }}
           />
 
-          <Menu>
-            <MenuButton
-              fontSize="sm"
-              width={"45%"}
-              as={Button}
-              rightIcon={<ChevronDownIcon />}
-            >
-              {affiliateLink
-                ? affiliateLink.description
-                : "Select Affiliate Link"}
-            </MenuButton>
-            <MenuList>
-              {compensationGroup.affiliateLinks.map((link, index) => (
-                <MenuItem
-                  fontSize="sm"
-                  key={index}
-                  onClick={() => {
-                    handleSelectAffiliateLink(link);
-                    handleSave({ affiliateLink: link });
-                  }}
-                >
-                  {link.description}
-                </MenuItem>
-              ))}
-            </MenuList>
-          </Menu>
+          <Flex alignItems={"center"} direction={"column"} width={"45%"}>
+            <Menu>
+              <MenuButton
+                fontSize="sm"
+                width={"100%"}
+                as={Button}
+                rightIcon={<ChevronDownIcon />}
+              >
+                {affiliateLink
+                  ? affiliateLink.description
+                  : "Select Affiliate Link"}
+              </MenuButton>
+              <MenuList>
+                {compensationGroup.affiliateLinks.map((link, index) => (
+                  <MenuItem
+                    fontSize="sm"
+                    key={index}
+                    onClick={() => {
+                      handleSelectAffiliateLink(link);
+                      handleSave({ affiliateLink: link });
+                    }}
+                  >
+                    {link.description}
+                  </MenuItem>
+                ))}
+              </MenuList>
+            </Menu>
+            <Text fontSize={"sm"} textAlign={"center"} color="red" ml={2}>
+              {affiliateLinkDropDownSubtext}
+            </Text>
+          </Flex>
         </Flex>
         {/* SECOND ROW */}
         <Flex

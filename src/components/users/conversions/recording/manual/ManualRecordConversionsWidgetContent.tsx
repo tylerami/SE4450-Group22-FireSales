@@ -5,6 +5,7 @@ import { AddIcon } from "@chakra-ui/icons";
 import {
   Conversion,
   ConversionAttachmentGroup,
+  conversionsWithLink,
   filterConversionsByDateInterval,
 } from "models/Conversion";
 import { CompensationGroup } from "models/CompensationGroup";
@@ -17,7 +18,7 @@ import { ConversionType } from "models/enums/ConversionType";
 import { firstDayOfCurrentMonth } from "models/utils/Date";
 
 const ManualRecordConversionsWidgetContent = ({
-  conversions,
+  conversions: existingConversions,
   compensationGroup,
   refresh,
 }: {
@@ -68,7 +69,7 @@ const ManualRecordConversionsWidgetContent = ({
   const retentionIncentivesExceedMonthlyLimit = () => {
     for (const incentive of compensationGroup.retentionIncentives) {
       const usedIncentivesThisMonth: number = filterConversionsByDateInterval(
-        conversions
+        existingConversions
           .filter((conv) => conv.type === ConversionType.retentionIncentive)
           .filter((conv) => conv.affiliateLink.clientId === incentive.clientId),
         {
@@ -91,6 +92,29 @@ const ManualRecordConversionsWidgetContent = ({
     return false;
   };
 
+  const affiliateLinkConversionsExceedMonthlyLimit = () => {
+    for (const link of compensationGroup.affiliateLinks) {
+      if (!link.monthlyLimit) {
+        continue;
+      }
+      const usedConversionsThisMonth: number = filterConversionsByDateInterval(
+        conversionsWithLink(existingConversions, link),
+        {
+          fromDate: firstDayOfCurrentMonth(),
+        }
+      ).length;
+
+      const newConversions = Object.values(conversionsGroups)
+        .map((group) => group?.conversion)
+        .filter((conv) => conv !== undefined)
+        .filter((conv) => conv!.affiliateLink.id === link.id).length;
+
+      if (usedConversionsThisMonth + newConversions > link.monthlyLimit) {
+        return true;
+      }
+    }
+  };
+
   const checkAllConversionsValid = (): boolean => {
     let foundError = false;
 
@@ -106,6 +130,13 @@ const ManualRecordConversionsWidgetContent = ({
     if (retentionIncentivesExceedMonthlyLimit()) {
       setGlobalErrorText(
         "Ensure that retention incentives do not exceed any monthly limits."
+      );
+      foundError = true;
+    }
+
+    if (affiliateLinkConversionsExceedMonthlyLimit()) {
+      setGlobalErrorText(
+        "Ensure that conversions do not exceed any monthly limits."
       );
       foundError = true;
     }
@@ -193,7 +224,7 @@ const ManualRecordConversionsWidgetContent = ({
       {Array.from({ length: rowCount }, (_, i) => (
         <Box key={`${i}-box`}>
           <RecordConversionTile
-            conversions={conversions}
+            conversions={existingConversions}
             compensationGroup={compensationGroup}
             errorText={errorsByRow[i]}
             rowIndex={i + 1}

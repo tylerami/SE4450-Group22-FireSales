@@ -23,14 +23,13 @@ export class AffiliateLink {
     clientName,
     type,
     betMatchEnabled = false,
-
     link,
     enabled = true,
     createdAt = new Date(),
     commission,
     minBetSize,
     cpa,
-    monthlyLimit = null,
+    monthlyLimit,
   }: {
     clientId: string;
     clientName: string;
@@ -48,14 +47,13 @@ export class AffiliateLink {
     this.clientName = clientName;
     this.type = type;
     this.betMatchEnabled = betMatchEnabled;
-
     this.link = link;
     this.enabled = enabled;
     this.createdAt = createdAt;
     this.commission = commission;
     this.minBetSize = minBetSize;
     this.cpa = cpa;
-    this.monthlyLimit = monthlyLimit;
+    this.monthlyLimit = monthlyLimit ?? null;
   }
 
   public get id(): string {
@@ -87,6 +85,7 @@ export class AffiliateLink {
       commission: this.commission,
       minBetSize: this.minBetSize,
       cpa: this.cpa,
+      monthlyLimit: this.monthlyLimit,
     };
   }
 
@@ -102,6 +101,7 @@ export class AffiliateLink {
       commission: doc.commission,
       minBetSize: doc.minBetSize,
       cpa: doc.cpa,
+      monthlyLimit: doc.monthlyLimit,
     });
   }
 }
