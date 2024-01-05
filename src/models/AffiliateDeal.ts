@@ -9,11 +9,11 @@ export class AffiliateDeal {
   link: string;
   enabled: boolean;
   createdAt: Date;
-  updatedAt?: Date;
+  updatedAt: Date | null;
   cpa: number;
   currency: Currency;
-  targetBetSize?: number;
-  targetMonthlyConversions?: number;
+  targetBetSize: number | null;
+  targetMonthlyConversions: number | null;
 
   constructor({
     clientId,
@@ -46,11 +46,11 @@ export class AffiliateDeal {
     this.link = link;
     this.enabled = enabled;
     this.createdAt = createdAt;
-    this.updatedAt = updatedAt;
+    this.updatedAt = updatedAt ?? null;
     this.cpa = cpa;
     this.currency = currency;
-    this.targetBetSize = targetBetSize;
-    this.targetMonthlyConversions = targetMonthlyConversions;
+    this.targetBetSize = targetBetSize ?? null;
+    this.targetMonthlyConversions = targetMonthlyConversions ?? null;
   }
 
   toFirestoreDoc(): DocumentData {
@@ -115,11 +115,11 @@ export class AffiliateDeal {
       link: partial.link,
       enabled: partial.enabled,
       createdAt: partial.createdAt,
-      updatedAt: partial.updatedAt,
+      updatedAt: partial.updatedAt ?? undefined,
       cpa: partial.cpa,
       currency: partial.currency,
-      targetBetSize: partial.targetBetSize,
-      targetMonthlyConversions: partial.targetMonthlyConversions,
+      targetBetSize: partial.targetBetSize ?? undefined,
+      targetMonthlyConversions: partial.targetMonthlyConversions ?? undefined,
     });
   }
 }
