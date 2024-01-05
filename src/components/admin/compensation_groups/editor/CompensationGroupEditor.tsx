@@ -154,6 +154,11 @@ const CompensationGroupEditor = ({ exisitingGroup, exit }: Props) => {
   };
 
   const saveOrCreateNew = async () => {
+    if (groupId.trim() === "") {
+      setErrorText("Group ID is required");
+      return;
+    }
+
     try {
       const enabledLinks: AffiliateLink[] = affiliateLinks
         .filter((link) => link.enabled ?? false)
@@ -176,6 +181,7 @@ const CompensationGroupEditor = ({ exisitingGroup, exit }: Props) => {
 
       const group: CompensationGroup = new CompensationGroup({
         id: groupId,
+        timestamp: new Date(),
         enabled: enabled,
         affiliateLinks: enabledLinks,
         retentionIncentives: retentionIncentives,

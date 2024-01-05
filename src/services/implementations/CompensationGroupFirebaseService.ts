@@ -13,6 +13,7 @@ import {
   setDoc,
   updateDoc,
   where,
+  writeBatch,
 } from "firebase/firestore";
 
 /**
@@ -128,6 +129,34 @@ export class CompensationGroupFirebaseService
     return CompensationGroup.fromFirestoreDoc(docSnap.docs[0].data());
   }
 
+  async delete(compGroup: CompensationGroup): Promise<boolean> {
+    const usersQueryRef = query(
+      this.salesUsersCollection(),
+      where("compensationGroupId", "==", compGroup.id)
+    );
+
+    const docSnap = await getDocs(usersQueryRef);
+
+    if (!docSnap.empty) {
+      return false;
+    }
+
+    const compGroupsQueryRef = query(
+      this.compensationGroupsCollection(),
+      where("id", "==", compGroup.id)
+    );
+
+    const compGroupsQuerySnap = await getDocs(compGroupsQueryRef);
+
+    const batch = writeBatch(this.db);
+
+    for (const doc of compGroupsQuerySnap.docs) {
+      batch.delete(doc.ref);
+    }
+    await batch.commit();
+    return true;
+  }
+
   /**
    * Retrieves all compensation groups from Firestore.
    * @returns An array of all compensation groups.
@@ -164,5 +193,9 @@ export class CompensationGroupFirebaseService
 
   private assignmentCodesCollection(): CollectionReference {
     return collection(this.db, "conversionAssignmentCodes");
+  }
+
+  private salesUsersCollection(): CollectionReference {
+    return collection(this.db, "salesUsers");
   }
 }

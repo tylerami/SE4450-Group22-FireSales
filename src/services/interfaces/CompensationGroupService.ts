@@ -6,6 +6,8 @@ export interface CompensationGroupService {
   set(compensationGroup: CompensationGroup): Promise<CompensationGroup>;
   getAll(): Promise<CompensationGroup[]>;
 
+  delete(compGroup: CompensationGroup): Promise<boolean>;
+
   getAssignmentCodeCompGroupId(code: string): Promise<string | null>;
   setAssignmentCodeCompGroupId(
     code: string,

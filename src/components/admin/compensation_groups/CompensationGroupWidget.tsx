@@ -118,6 +118,11 @@ const CompensationGroupWidget = (props: Props) => {
     return filteredCompGroups;
   }
 
+  const deleteCompGroup = async (compGroup: CompensationGroup) => {
+    await compGroupService.delete(compGroup);
+    setUpdateTrigger(updateTrigger + 1);
+  };
+
   const filteredCompGroups = getFilteredCompGroups();
 
   return (
@@ -175,6 +180,7 @@ const CompensationGroupWidget = (props: Props) => {
                   clients={clients}
                   compGroup={compGroup}
                   selectCompGroup={setEditingGroup}
+                  deleteCompGroup={deleteCompGroup}
                 />
               )
             )

@@ -18,14 +18,14 @@ export class CompensationGroup {
     id,
     affiliateLinks = [],
     retentionIncentives = [],
-    timestamp = new Date(),
+    timestamp,
     enabled = true,
     currency = Currency.CAD,
   }: {
     id: string;
     affiliateLinks?: AffiliateLink[];
     retentionIncentives?: RetentionIncentive[];
-    timestamp?: Date;
+    timestamp: Date;
     enabled: boolean;
     currency?: Currency;
   }) {
@@ -66,9 +66,6 @@ export class CompensationGroup {
       link.conversionTypes.forEach((type) => conversionTypes.add(type));
     }
 
-    console.log("retentionIncentives", retentionIncentives);
-    console.log(this.retentionIncentives);
-
     if (retentionIncentives.length > 0) {
       conversionTypes.add(ConversionType.retentionIncentive);
     }
@@ -89,7 +86,7 @@ export class CompensationGroup {
       id: this.id,
       affiliateLinks: affiliateLinksForFirestore,
       retentionIncentives: retentionIncentivesForFirestore,
-      timestamp: this.timestamp ? Timestamp.fromDate(this.timestamp) : null,
+      timestamp: Timestamp.fromDate(this.timestamp),
       enabled: this.enabled,
       currency: this.currency,
     };
@@ -109,7 +106,7 @@ export class CompensationGroup {
       id: doc.id,
       affiliateLinks: affiliateLinksFromFirestore,
       retentionIncentives: retentionIncentivesFromFirestore,
-      timestamp: doc.createdAt ? doc.createdAt.toDate() : new Date(),
+      timestamp: doc.timestamp.toDate(),
       enabled: doc.enabled,
       currency: doc.currency as Currency,
     });

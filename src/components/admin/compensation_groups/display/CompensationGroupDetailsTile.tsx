@@ -8,10 +8,13 @@ import CompGroupRetentionIncentivesTable from "./CompGroupRetentionIncentivesTab
 import { Client } from "models/Client";
 import { Conversion } from "models/Conversion";
 import { User } from "models/User";
+import useConfirmationModal from "components/utils/ConfirmationModal";
+import useSuccessNotification from "components/utils/SuccessNotification";
 
 type Props = {
   compGroup: CompensationGroup;
   selectCompGroup: (compGroup: CompensationGroup) => void;
+  deleteCompGroup: (compGroup: CompensationGroup) => void;
   clients: Client[];
   conversions: Conversion[];
   users: User[];
@@ -20,6 +23,7 @@ type Props = {
 const CompensationGroupDetailsTile = ({
   compGroup,
   selectCompGroup,
+  deleteCompGroup,
   clients,
   conversions,
   users,
@@ -28,6 +32,22 @@ const CompensationGroupDetailsTile = ({
 
   const [usersCollapsed, setUsersCollapsed] = React.useState<boolean>(true);
   const usersOverflowing: boolean = users.length > collapsedUsersLength;
+
+  const { openModal, ConfirmationModal } = useConfirmationModal();
+
+  const showSuccess = useSuccessNotification();
+
+  const handleDeleteButtonClick = () => {
+    openModal({
+      modalText: `Are you sure you want to delete the compensation group "${compGroup.id}"?`,
+      onConfirm: () => {
+        deleteCompGroup(compGroup);
+        showSuccess({
+          message: `Successfully deleted compensation group "${compGroup.id}"`,
+        });
+      },
+    });
+  };
 
   return (
     <Flex
@@ -40,7 +60,8 @@ const CompensationGroupDetailsTile = ({
       w="100%"
       direction={"column"}
     >
-      <Flex w="100%" gap={10} alignItems={"center"}>
+      <ConfirmationModal />
+      <Flex w="100%" gap={6} alignItems={"center"}>
         <GroupProperty label={"Group ID"} value={compGroup.id} />
 
         <Spacer />
@@ -50,7 +71,12 @@ const CompensationGroupDetailsTile = ({
           </Text>
         )}
 
-        <Button onClick={(_) => selectCompGroup(compGroup)}>Edit</Button>
+        <Button w={40} onClick={(_) => selectCompGroup(compGroup)}>
+          Edit
+        </Button>
+        <Button onClick={handleDeleteButtonClick} colorScheme="red">
+          Delete
+        </Button>
       </Flex>
 
       {users.length > 0 && (
@@ -66,8 +92,12 @@ const CompensationGroupDetailsTile = ({
             </Button>
           )}
 
-          <Text maxW={"80%"} fontSize="sm">
-            {[...users, ...users, ...users, ...users, ...users, ...users]
+          <Text
+            fontWeight={"bold"}
+            fontSize="sm"
+          >{`Users (${users.length}):`}</Text>
+          <Text mx={2} maxW={"80%"} fontSize="sm">
+            {users
               .slice(0, usersCollapsed ? 5 : undefined)
               .map((user) => user.getFullName())
               .join(", ") + (usersOverflowing ? "..." : "")}
