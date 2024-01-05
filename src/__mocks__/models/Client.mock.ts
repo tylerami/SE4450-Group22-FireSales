@@ -10,6 +10,7 @@ export function generateSampleClients(count: number): Client[] {
     const clientId = ids[i % ids.length];
     const clientName = names[i % names.length];
     return new Client({
+      timestamp: new Date(),
       id: ids[i % ids.length],
       name: names[i % names.length],
       affiliateDeals: [

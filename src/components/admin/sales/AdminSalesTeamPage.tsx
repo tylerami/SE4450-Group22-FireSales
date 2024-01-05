@@ -131,7 +131,7 @@ const AdminSalesTeamPage = (props: Props) => {
     if (!selectedUser) return;
 
     setSelectedCompGroup(compGroup);
-    selectedUser.compensationGroupId = compGroup?.id ?? null;
+    selectedUser.updateCompGroup(compGroup);
     await userService.update(selectedUser);
     showSuccess({
       message: `Compensation group updated to ${

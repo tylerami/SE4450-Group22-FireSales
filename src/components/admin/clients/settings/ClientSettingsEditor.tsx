@@ -140,6 +140,7 @@ const ClientSettingsEditor = ({ existingClient, exit }: Props) => {
       .filter((deal) => deal !== null) as AffiliateDeal[];
 
     let client: Client = new Client({
+      timestamp: new Date(),
       id: clientId,
       name: displayName,
       affiliateDeals: deals,

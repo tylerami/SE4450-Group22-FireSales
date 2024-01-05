@@ -15,6 +15,7 @@ import {
   where,
   writeBatch,
 } from "firebase/firestore";
+import { User } from "models/User";
 
 /**
  * Service implementation for managing compensation groups in Firebase.
@@ -30,6 +31,45 @@ export class CompensationGroupFirebaseService
    */
   constructor(db: Firestore) {
     this.db = db;
+  }
+  async getHistory(user: User): Promise<CompensationGroup[]> {
+    // Splitting the array into chunks of 9 elements each
+    const chunkSize = 9;
+    const compGroupIdsChunks: string[][] = [];
+
+    const pastCompGroupIds: string[] = Array.from(user.pastCompGroupIds);
+
+    for (let i = 0; i < pastCompGroupIds.length; i += chunkSize) {
+      const chunk: string[] = pastCompGroupIds.slice(i, i + chunkSize);
+      compGroupIdsChunks.push(chunk);
+    }
+
+    // Array to hold all results
+    let allCompensationGroups: CompensationGroup[] = [];
+
+    // Performing queries for each chunk
+    for (const chunk of compGroupIdsChunks) {
+      const queryRef = query(
+        this.compensationGroupsCollection(),
+        where("id", "in", chunk),
+        orderBy("timestamp", "desc")
+      );
+
+      const compensationGroupQuerySnapshot = await getDocs(queryRef);
+      const compensationGroups = compensationGroupQuerySnapshot.docs.map(
+        (doc) => CompensationGroup.fromFirestoreDoc(doc.data())
+      );
+
+      // Combining the results
+      allCompensationGroups = allCompensationGroups.concat(compensationGroups);
+    }
+
+    // Sorting the combined results by timestamp
+    allCompensationGroups.sort(
+      (a, b) => b.timestamp.getTime() - a.timestamp.getTime()
+    );
+
+    return allCompensationGroups;
   }
 
   async getAllAssignmentCodeCompGroupIds(): Promise<

@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useContext, useEffect, useMemo } from "react";
 import {
   Button,
   Heading,
@@ -41,23 +41,28 @@ const RecordConversionsWidget = ({
     DependencyInjection.compensationGroupService();
 
   const [recordMode, setRecordMode] = useState<RecordMode>(RecordMode.manual);
-  const [compensationGroup, setCompensationGroup] =
-    useState<CompensationGroup | null>(null);
+  const [compGroupHistory, setCompGroupHistory] = useState<CompensationGroup[]>(
+    []
+  );
+
+  const latestCompGroup: CompensationGroup | null = useMemo(
+    () => (compGroupHistory.length > 0 ? compGroupHistory[0] : null),
+    [compGroupHistory]
+  );
 
   const { currentUser } = useContext(UserContext);
 
   useEffect(() => {
-    const fetchCompensationGroup = async () => {
-      const compGroupId = currentUser?.compensationGroupId;
-      if (!compGroupId) {
+    const fetchCompGroupHistory = async () => {
+      if (!currentUser) {
         return;
       }
-      const compGroup = await compGroupService.get(compGroupId);
-      setCompensationGroup(compGroup);
+      const compGroupHistory = await compGroupService.getHistory(currentUser);
+      setCompGroupHistory(compGroupHistory);
     };
 
-    fetchCompensationGroup();
-  }, [compGroupService, currentUser?.compensationGroupId]);
+    fetchCompGroupHistory();
+  }, [compGroupService, currentUser]);
 
   function handleSwitchChange() {
     if (recordMode === RecordMode.manual) {
@@ -105,16 +110,16 @@ const RecordConversionsWidget = ({
       </Flex>
       {!minimizeRecordConversion && (
         <React.Fragment>
-          {compensationGroup ? (
+          {compGroupHistory.length > 0 ? (
             recordMode === RecordMode.manual ? (
               <ManualRecordConversionsWidgetContent
                 conversions={conversions}
-                compensationGroup={compensationGroup}
+                compGroupHistory={compGroupHistory}
                 refresh={refresh}
               />
             ) : (
               <BulkRecordConversionsWidgetContent
-                compensationGroup={compensationGroup}
+                compensationGroup={latestCompGroup}
                 refresh={refresh}
               />
             )

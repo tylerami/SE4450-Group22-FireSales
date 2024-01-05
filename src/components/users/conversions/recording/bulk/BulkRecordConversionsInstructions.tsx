@@ -2,6 +2,10 @@ import React from "react";
 import { Heading } from "@chakra-ui/react";
 import { Table, Thead, Tbody, Tr, Th, Td, Box, Text } from "@chakra-ui/react";
 
+// ----------------------------------------------------------------------------
+// NOT IN USE
+// ----------------------------------------------------------------------------
+
 type Props = {};
 
 const BulkRecordConversionsInstructions = (props: Props) => {

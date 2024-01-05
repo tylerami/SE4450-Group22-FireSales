@@ -1,8 +1,12 @@
 import { CompensationGroup } from "models/CompensationGroup";
 import { generateSampleCompensationGroups } from "__mocks__/models/CompensationGroup.mock";
 import { CompensationGroupService } from "services/interfaces/CompensationGroupService";
+import { User } from "models/User";
 
 export class MockCompensationGroupService implements CompensationGroupService {
+  getHistory(user: User): Promise<CompensationGroup[]> {
+    throw new Error("Method not implemented.");
+  }
   delete(compGroup: CompensationGroup): Promise<boolean> {
     throw new Error("Method not implemented.");
   }

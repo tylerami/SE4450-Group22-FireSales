@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useMemo } from "react";
 import { Box, Button, Flex, Text } from "@chakra-ui/react";
 import RecordConversionTile from "./ManualRecordConversionTile";
 import { AddIcon } from "@chakra-ui/icons";
@@ -19,11 +19,11 @@ import { firstDayOfCurrentMonth } from "models/utils/Date";
 
 const ManualRecordConversionsWidgetContent = ({
   conversions: existingConversions,
-  compensationGroup,
+  compGroupHistory,
   refresh,
 }: {
   conversions: Conversion[];
-  compensationGroup: CompensationGroup;
+  compGroupHistory: CompensationGroup[];
   refresh: () => void;
 }) => {
   // SERVICES
@@ -66,8 +66,14 @@ const ManualRecordConversionsWidgetContent = ({
     Record<number, string | undefined>
   >({});
 
+  // Current compensation group
+  const latestCompGroup: CompensationGroup | null = useMemo(
+    () => (compGroupHistory.length > 0 ? compGroupHistory[0] : null),
+    [compGroupHistory]
+  );
+
   const retentionIncentivesExceedMonthlyLimit = () => {
-    for (const incentive of compensationGroup.retentionIncentives) {
+    for (const incentive of latestCompGroup?.retentionIncentives ?? []) {
       const usedIncentivesThisMonth: number = filterConversionsByDateInterval(
         existingConversions
           .filter((conv) => conv.type === ConversionType.retentionIncentive)
@@ -93,7 +99,7 @@ const ManualRecordConversionsWidgetContent = ({
   };
 
   const affiliateLinkConversionsExceedMonthlyLimit = () => {
-    for (const link of compensationGroup.affiliateLinks) {
+    for (const link of latestCompGroup?.affiliateLinks ?? []) {
       if (!link.monthlyLimit) {
         continue;
       }
@@ -225,7 +231,7 @@ const ManualRecordConversionsWidgetContent = ({
         <Box key={`${i}-box`}>
           <RecordConversionTile
             conversions={existingConversions}
-            compensationGroup={compensationGroup}
+            compGroupHistory={compGroupHistory}
             errorText={errorsByRow[i]}
             rowIndex={i + 1}
             setConversionGroup={(conversion) =>

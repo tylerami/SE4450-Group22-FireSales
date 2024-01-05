@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useMemo, useState } from "react";
 import {
   Flex,
   Input,
@@ -25,12 +25,19 @@ import {
 import { FaDollarSign } from "react-icons/fa";
 import { AffiliateLink } from "models/AffiliateLink";
 import { UserContext } from "components/auth/UserProvider";
-import { CompensationGroup } from "models/CompensationGroup";
+import {
+  CompensationGroup,
+  validVersionAtTime as compGroupAtTime,
+} from "models/CompensationGroup";
 import { Customer } from "models/Customer";
 import { CustomerService } from "services/interfaces/CustomerService";
 import { DependencyInjection } from "models/utils/DependencyInjection";
 import { formatMoney } from "models/utils/Money";
-import { firstDayOfCurrentMonth, parseDateString } from "models/utils/Date";
+import {
+  endOfDay,
+  firstDayOfCurrentMonth,
+  parseDateString,
+} from "models/utils/Date";
 import {
   ConversionType,
   getConversionTypeLabel,
@@ -38,7 +45,7 @@ import {
 
 type Props = {
   conversions: Conversion[];
-  compensationGroup: CompensationGroup;
+  compGroupHistory: CompensationGroup[];
   errorText?: string;
   setConversionGroup: (
     conversionGroup: ConversionAttachmentGroup | null
@@ -48,7 +55,7 @@ type Props = {
 
 const RecordConversionTile = ({
   conversions: existingConversions,
-  compensationGroup,
+  compGroupHistory,
   errorText,
   setConversionGroup,
   rowIndex,
@@ -64,6 +71,31 @@ const RecordConversionTile = ({
   const [saleAmount, setSaleAmount] = useState<string>("");
   const [attachments, setAttachments] = useState<File[]>([]);
 
+  const latestCompGroup: CompensationGroup | null = useMemo(
+    () => (compGroupHistory.length > 0 ? compGroupHistory[0] : null),
+    [compGroupHistory]
+  );
+
+  const [activeCompGroup, setActiveCompGroup] =
+    useState<CompensationGroup | null>(latestCompGroup);
+
+  const handleSetDateString = (dateString: string) => {
+    setDateString(dateString);
+    handleSave({ dateString });
+    let timestamp: Date | null = parseDateString(dateString, "yyyy-mm-dd");
+    if (timestamp == null) {
+      setActiveCompGroup(null);
+      return;
+    }
+    timestamp = endOfDay(timestamp);
+    const result: CompensationGroup | null = compGroupAtTime(
+      compGroupHistory,
+      timestamp
+    );
+
+    setActiveCompGroup(result);
+  };
+
   // Affiliate link settings
   const [affiliateLink, setAffiliateLink] = useState<AffiliateLink | null>(
     null
@@ -78,8 +110,9 @@ const RecordConversionTile = ({
     setConvTypeDropDownSubtext("");
 
     if (affiliateLink == null) return;
+    if (activeCompGroup == null) return;
     setConversionTypeOptions(
-      compensationGroup.conversionTypesForClient(affiliateLink.clientId)
+      activeCompGroup.conversionTypesForClient(affiliateLink.clientId)
     );
 
     if (affiliateLink?.monthlyLimit) {
@@ -175,16 +208,16 @@ const RecordConversionTile = ({
 
   const retentionIncentiveMonthlyLimit = (): number | undefined => {
     if (affiliateLink == null) return undefined;
-    return compensationGroup.retentionIncentiveForClient(
-      affiliateLink?.clientId
-    )?.monthlyLimit;
+    if (activeCompGroup == null) return undefined;
+    return activeCompGroup.retentionIncentiveForClient(affiliateLink?.clientId)
+      ?.monthlyLimit;
   };
 
   const retentionIncentiveAmount = (): number | undefined => {
     if (affiliateLink == null) return undefined;
-    return compensationGroup.retentionIncentiveForClient(
-      affiliateLink?.clientId
-    )?.amount;
+    if (activeCompGroup == null) return undefined;
+    return activeCompGroup.retentionIncentiveForClient(affiliateLink?.clientId)
+      ?.amount;
   };
 
   const conversionTypeIsValid = (
@@ -252,7 +285,8 @@ const RecordConversionTile = ({
       customerNameValid(newCustomerName) &&
       saleAmountValid(newSaleAmount) &&
       attachmentsValid(newAttachments) &&
-      conversionTypeIsValid(newConversionType);
+      conversionTypeIsValid(newConversionType) &&
+      activeCompGroup != null;
 
     if (!conversionIsValid) {
       setConversionGroup(null);
@@ -274,7 +308,7 @@ const RecordConversionTile = ({
       type: conversionType,
       customer,
       amount: Number(newSaleAmount),
-      compensationGroupId: compensationGroup.id,
+      compensationGroupId: activeCompGroup.id,
       userId: currentUser.uid,
     });
 
@@ -288,7 +322,7 @@ const RecordConversionTile = ({
   // STATE CHANGE HANDLERS
 
   // Affiliate links are sorted by client ID
-  const affiliateLinks: AffiliateLink[] = compensationGroup.affiliateLinks;
+  const affiliateLinks: AffiliateLink[] = latestCompGroup?.affiliateLinks ?? [];
   affiliateLinks.sort((a, b) => a.clientId.localeCompare(b.clientId));
 
   // Attachment handling
@@ -348,10 +382,7 @@ const RecordConversionTile = ({
             fontSize="sm"
             width={"30%"}
             value={dateString}
-            onChange={(e) => {
-              setDateString(e.target.value);
-              handleSave({ dateString: e.target.value });
-            }}
+            onChange={(e) => handleSetDateString(e.target.value)}
           />
 
           <Input
@@ -378,7 +409,7 @@ const RecordConversionTile = ({
                   : "Select Affiliate Link"}
               </MenuButton>
               <MenuList>
-                {compensationGroup.affiliateLinks.map((link, index) => (
+                {activeCompGroup?.affiliateLinks.map((link, index) => (
                   <MenuItem
                     fontSize="sm"
                     key={index}

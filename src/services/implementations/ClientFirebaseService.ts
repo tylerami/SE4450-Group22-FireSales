@@ -96,6 +96,25 @@ export class ClientFirebaseService implements ClientService {
   }
 
   /**
+   * Retrieves the history of a client from the Firestore database.
+   * @param clientId The ID of the client to retrieve the history for.
+   * @returns A Promise that resolves to an array of client objects.
+   */
+  async getHistory(clientId: string): Promise<Client[]> {
+    const queryRef = query(
+      this.clientsCollection(),
+      where("id", "==", clientId),
+      orderBy("timestamp", "desc")
+    );
+
+    const clientQuerySnapshot = await getDocs(queryRef);
+
+    return clientQuerySnapshot.docs.map((doc) =>
+      Client.fromFirestoreDoc(doc.data())
+    );
+  }
+
+  /**
    * Returns the Firestore collection reference for clients.
    * @returns The Firestore CollectionReference for clients.
    */

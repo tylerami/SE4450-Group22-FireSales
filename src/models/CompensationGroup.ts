@@ -112,3 +112,20 @@ export class CompensationGroup {
     });
   }
 }
+
+export function validVersionAtTime(
+  compGroupHistory: CompensationGroup[],
+  timestamp: Date
+): CompensationGroup | null {
+  compGroupHistory.sort(
+    (a, b) => b.timestamp.getTime() - a.timestamp.getTime()
+  );
+
+  for (const groupVersion of compGroupHistory) {
+    if (groupVersion.timestamp.getTime() <= timestamp.getTime()) {
+      return groupVersion;
+    }
+  }
+
+  return null;
+}

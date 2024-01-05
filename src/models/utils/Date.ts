@@ -93,3 +93,9 @@ export function getCurrentMonthWithYear(): string {
 export function getCurrentYearTwoDigits(): string {
   return new Date().getFullYear().toString().slice(-2);
 }
+
+export function endOfDay(date: Date): Date {
+  const end = new Date(date);
+  end.setHours(23, 59);
+  return end;
+}

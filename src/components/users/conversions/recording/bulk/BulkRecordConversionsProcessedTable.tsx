@@ -22,6 +22,10 @@ import {
 } from "@chakra-ui/icons";
 import { formatMoney } from "models/utils/Money";
 
+// ----------------------------------------------------------------------------
+// NOT IN USE
+// ----------------------------------------------------------------------------
+
 type Props = {
   conversionsByNumber: Record<number, Conversion> | null;
   attachments: File[];

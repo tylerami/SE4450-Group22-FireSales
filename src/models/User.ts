@@ -1,3 +1,4 @@
+import { CompensationGroup } from "./CompensationGroup";
 import { PayoutPreferrences } from "./PayoutPreferrences";
 import { Role } from "./enums/Role";
 import { Timestamp, DocumentData } from "firebase/firestore";
@@ -13,6 +14,7 @@ export class User {
   registeredAt: Date;
   compensationGroupId: string | null;
   payoutPreferrences?: PayoutPreferrences;
+  pastCompGroupIds: Set<string>;
 
   constructor({
     uid,
@@ -25,6 +27,7 @@ export class User {
     registeredAt,
     compensationGroupId = null,
     payoutPreferrences,
+    pastCompGroupIds,
   }: {
     uid: string;
     profilePictureSrc?: string | null;
@@ -36,6 +39,7 @@ export class User {
     registeredAt: Date;
     compensationGroupId?: string | null;
     payoutPreferrences?: PayoutPreferrences;
+    pastCompGroupIds?: Set<string>;
   }) {
     this.uid = uid;
     this.profilePictureSrc = profilePictureSrc;
@@ -47,6 +51,7 @@ export class User {
     this.compensationGroupId = compensationGroupId;
     this.payoutPreferrences = payoutPreferrences;
     this.registeredAt = registeredAt;
+    this.pastCompGroupIds = pastCompGroupIds ?? new Set<string>();
   }
 
   public static create({
@@ -81,6 +86,13 @@ export class User {
 
   public getFullName = () => `${this.firstName} ${this.lastName}`;
 
+  public updateCompGroup = (compGroup: CompensationGroup | null) => {
+    if (compGroup != null) {
+      this.pastCompGroupIds.add(compGroup.id);
+    }
+    this.compensationGroupId = compGroup?.id ?? null;
+  };
+
   public toFirestoreDoc = (): DocumentData => {
     return {
       uid: this.uid,
@@ -95,6 +107,7 @@ export class User {
         : null,
       compensationGroupId: this.compensationGroupId,
       payoutPreferrences: this.payoutPreferrences?.toFirestoreDoc() ?? null,
+      pastCompGroupIds: Array.from(this.pastCompGroupIds),
     };
   };
 
@@ -112,6 +125,7 @@ export class User {
       payoutPreferrences: doc.payoutPreferrences
         ? PayoutPreferrences.fromFirestoreDoc(doc.payoutPreferrences)
         : undefined,
+      pastCompGroupIds: new Set(doc.pastCompGroupIds ?? []),
     });
   };
 }

@@ -13,14 +13,14 @@ export class Client {
   constructor({
     id,
     name,
-    timestamp = new Date(),
+    timestamp,
     affiliateDeals,
     enabled = true,
     avgPaymentDays = null,
   }: {
     id: string;
     name: string;
-    timestamp?: Date;
+    timestamp: Date;
     affiliateDeals?: AffiliateDeal[];
     enabled?: boolean;
     avgPaymentDays?: number | null;
@@ -68,7 +68,7 @@ export class Client {
     return {
       id: this.id,
       name: this.name,
-      timestamp: this.timestamp ? Timestamp.fromDate(this.timestamp) : null,
+      timestamp: Timestamp.fromDate(this.timestamp),
       affiliateDeals: this.affiliateDeals.map((deal) => deal.toFirestoreDoc()),
       enabled: this.enabled,
       avgPaymentDays: this.avgPaymentDays,
@@ -79,7 +79,7 @@ export class Client {
     return new Client({
       id: doc.id,
       name: doc.name,
-      timestamp: doc.timestamp ? doc.timestamp.toDate() : new Date(),
+      timestamp: doc.timestamp.toDate(),
       affiliateDeals: doc.affiliateDeals.map((docDeal) =>
         AffiliateDeal.fromFirestoreDoc(docDeal)
       ),
@@ -97,4 +97,19 @@ export function getAllAffiliateDeals(clients: Client[]): AffiliateDeal[] {
   return clients.reduce((acc: AffiliateDeal[], client: Client) => {
     return [...acc, ...Object.values(client.affiliateDeals)];
   }, []);
+}
+
+export function validVersionAtTimestamp(
+  clientHistory: Client[],
+  timestamp: Date
+): Client | null {
+  clientHistory.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+
+  for (const clientVersion of clientHistory) {
+    if (clientVersion.timestamp.getTime() <= timestamp.getTime()) {
+      return clientVersion;
+    }
+  }
+
+  return null;
 }
