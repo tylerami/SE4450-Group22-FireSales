@@ -4,7 +4,6 @@ import {
   Flex,
   Heading,
   IconButton,
-  Select,
   Spacer,
   Table,
   Tbody,
@@ -18,22 +17,21 @@ import {
   Conversion,
   setConversionStatus,
   totalCostOfConversions,
-} from "models/Conversion";
-import { Payout } from "models/Payout";
-import { ConversionStatus } from "models/enums/ConversionStatus";
-import { User } from "models/User";
-import { DependencyInjection } from "models/utils/DependencyInjection";
+} from "src/models/Conversion";
+import { Payout } from "src/models/Payout";
+import { ConversionStatus } from "src/models/enums/ConversionStatus";
+import { User } from "src/models/User";
+import { DependencyInjection } from "src/models/utils/DependencyInjection";
 import React, { useEffect, useState } from "react";
 import { ConversionService } from "services/interfaces/ConversionService";
 import { PayoutService } from "services/interfaces/PayoutService";
 import { UserService } from "services/interfaces/UserService";
-import { DayOfTheWeek, getCurrentDayOfWeek } from "models/enums/Timeframe";
 import useSuccessNotification from "components/utils/SuccessNotification";
-import { PayoutPreferrences } from "models/PayoutPreferrences";
-import { formatMoney } from "models/utils/Money";
+import { formatMoney } from "src/models/utils/Money";
 import { ChevronLeftIcon, ChevronRightIcon } from "@chakra-ui/icons";
-import { formatDateString } from "models/utils/Date";
-import { ConversionType } from "models/enums/ConversionType";
+import { formatDateString } from "src/models/utils/Date";
+import { ConversionType } from "src/models/enums/ConversionType";
+import { PaymentMethod } from "src/models/enums/PaymentMethod";
 
 type Props = {};
 
@@ -54,19 +52,6 @@ const PayoutsWidget = (props: Props) => {
     DependencyInjection.conversionService();
 
   const showSuccess = useSuccessNotification();
-
-  const setPayoutDay = async (user: User, day: DayOfTheWeek | undefined) => {
-    const updatedUser: User = new User({
-      ...user,
-      payoutPreferrences: new PayoutPreferrences({
-        ...user.payoutPreferrences,
-        preferredPayoutDay: day ?? null,
-      }),
-    });
-    await userService.update(updatedUser);
-    console.log("asdsd ", updatedUser);
-    showSuccess({ message: `Payout day updated to ${day}.` });
-  };
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -108,6 +93,24 @@ const PayoutsWidget = (props: Props) => {
     const updates = await conversionService.updateBulk(
       setConversionStatus(conversionsToBePaid, ConversionStatus.approvedPaid)
     );
+    const user: User | undefined = users.find((user: User) => user.uid === uid);
+    if (!user) {
+    }
+
+    const newPayout: Payout = new Payout({
+      userId: uid,
+      amount: totalCostOfConversions(conversionsToBePaid),
+      conversionIds: conversionsToBePaid.map((conv) => conv.id),
+      dateOccurred: new Date(),
+      dateRecorded: new Date(),
+      paymentMethod:
+        user?.payoutPreferrences?.preferredMethod ?? PaymentMethod.etransfer,
+      paymentAddress:
+        user?.payoutPreferrences?.getPreferredAddress() || "Unknown",
+    });
+
+    await payoutService.create(newPayout);
+
     if (updates) {
       showSuccess({ message: "Conversions marked as paid!" });
       refresh();
@@ -120,21 +123,18 @@ const PayoutsWidget = (props: Props) => {
       totalCostOfConversions(userConversionsToBePaid(a.uid))
   );
 
-  const payoutDayUsers: User[] = users.filter((user: User) => {
-    return (
-      user.payoutPreferrences?.preferredPayoutDay === getCurrentDayOfWeek() &&
-      userConversionsToBePaid(user.uid).length > 0
-    );
-  });
+  const unpaidConversionUserIds = new Set<string>(
+    conversions
+      .filter((conv) => conv.status === ConversionStatus.approvedUnpaid)
+      .filter((conv) => conv.userId !== null)
+      .map((conv) => conv.userId) as string[]
+  );
 
-  const payoutDayNotSetUsers: User[] = users.filter((user: User) => {
-    return (
-      !user.payoutPreferrences?.preferredPayoutDay &&
-      userConversionsToBePaid(user.uid).length > 0
-    );
-  });
+  const unpaidConversionUsers: User[] = users.filter((user) =>
+    unpaidConversionUserIds.has(user.uid)
+  );
 
-  const amountDueToday: number = payoutDayUsers.reduce(
+  const amountDueToday: number = unpaidConversionUsers.reduce(
     (acc: number, user: User) => {
       const unpaidConversions = userConversionsToBePaid(user.uid);
       const unpaidAmount = totalCostOfConversions(unpaidConversions);
@@ -180,15 +180,14 @@ const PayoutsWidget = (props: Props) => {
       </Flex>
       <Box h={4} />
 
-      {payoutDayUsers.length === 0 && payoutDayNotSetUsers.length === 0 && (
+      {unpaidConversionUsers.length === 0 && (
         <Heading>No payouts due today!</Heading>
       )}
 
-      {payoutDayUsers.length > 0 && (
+      {unpaidConversionUsers.length > 0 && (
         <React.Fragment>
           <Text fontWeight={600}>
-            Payouts for {getCurrentDayOfWeek()} (Due today:{" "}
-            {formatMoney(amountDueToday)})
+            Payouts oustanding: {formatMoney(amountDueToday)}
           </Text>
           <Table size="sm" variant="simple" alignSelf={"center"} width={"100%"}>
             <Thead>
@@ -199,7 +198,7 @@ const PayoutsWidget = (props: Props) => {
               </Tr>
             </Thead>
             <Tbody>
-              {payoutDayUsers.map((user: User) => {
+              {unpaidConversionUsers.map((user: User) => {
                 const unpaidConversions = userConversionsToBePaid(user.uid);
                 const unpaidAmount = totalCostOfConversions(unpaidConversions);
                 return (
@@ -223,67 +222,6 @@ const PayoutsWidget = (props: Props) => {
         </React.Fragment>
       )}
 
-      {payoutDayNotSetUsers.length > 0 && (
-        <React.Fragment>
-          <Box h={4} />
-          <Text fontWeight={600}>Users without a payout day</Text>
-          <Table size="sm" variant="simple" alignSelf={"center"} width={"100%"}>
-            <Thead>
-              <Tr>
-                <Th textAlign={"center"}>User</Th>
-                <Th textAlign={"center"}>Unpaid Conversions</Th>
-                <Th textAlign={"center"}>Unpaid Amount</Th>
-                <Th textAlign={"center"}>Set Payout Day</Th>
-              </Tr>
-            </Thead>
-            <Tbody>
-              {payoutDayNotSetUsers.map((user: User) => {
-                const unpaidConversions = userConversionsToBePaid(user.uid);
-                const unpaidAmount = totalCostOfConversions(unpaidConversions);
-                return (
-                  <Tr key={user.uid}>
-                    <Td textAlign={"center"}>{user.getFullName()}</Td>
-                    <Td textAlign={"center"}>{unpaidConversions.length}</Td>
-                    <Td textAlign={"center"}>${unpaidAmount}</Td>
-                    <Td>
-                      <Select
-                        value={undefined}
-                        onChange={(e) =>
-                          setPayoutDay(
-                            user,
-                            e.currentTarget.value as DayOfTheWeek | undefined
-                          )
-                        }
-                      >
-                        {[undefined, ...Object.values(DayOfTheWeek)].map(
-                          (day: DayOfTheWeek | undefined) => {
-                            return (
-                              <option
-                                key={day?.toString() ?? "any"}
-                                value={day}
-                              >
-                                {day ?? "Select day..."}
-                              </option>
-                            );
-                          }
-                        )}
-                      </Select>
-                    </Td>
-                    <Td textAlign={"center"}>
-                      <Button
-                        colorScheme="green"
-                        onClick={() => markConversionsAsPaid(user.uid)}
-                      >
-                        Mark as Paid
-                      </Button>
-                    </Td>
-                  </Tr>
-                );
-              })}
-            </Tbody>
-          </Table>
-        </React.Fragment>
-      )}
       <Box h={4} />
       <Flex w="100%" alignItems={"center"}>
         <Text fontWeight={600}>Payout History</Text>

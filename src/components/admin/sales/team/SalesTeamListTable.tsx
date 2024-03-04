@@ -20,17 +20,17 @@ import {
 } from "@chakra-ui/react";
 import { FiUser } from "react-icons/fi";
 import { Icon } from "@chakra-ui/react";
-import { User } from "models/User";
+import { User } from "src/models/User";
 import {
   Conversion,
   averageBetSize,
   averageCommission,
   totalCommission,
   totalGrossProfit,
-} from "models/Conversion";
-import { Payout } from "models/Payout";
-import { formatMoney } from "models/utils/Money";
-import { ConversionStatus } from "models/enums/ConversionStatus";
+} from "src/models/Conversion";
+import { Payout } from "src/models/Payout";
+import { formatMoney } from "src/models/utils/Money";
+import { ConversionStatus } from "src/models/enums/ConversionStatus";
 import {
   Modal,
   ModalOverlay,
@@ -40,9 +40,9 @@ import {
   ModalCloseButton,
 } from "@chakra-ui/react";
 import { ChevronDownIcon } from "@chakra-ui/icons";
-import { CompensationGroup } from "models/CompensationGroup";
+import { CompensationGroup } from "src/models/CompensationGroup";
 import { CompensationGroupService } from "services/interfaces/CompensationGroupService";
-import { DependencyInjection } from "models/utils/DependencyInjection";
+import { DependencyInjection } from "src/models/utils/DependencyInjection";
 
 export type UserOrAssignmentCode = {
   user?: User;

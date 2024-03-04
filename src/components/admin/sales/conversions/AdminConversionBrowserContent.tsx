@@ -14,21 +14,24 @@ import {
 } from "@chakra-ui/react";
 import { IconButton } from "@chakra-ui/react";
 import { ChevronLeftIcon, ChevronRightIcon } from "@chakra-ui/icons";
-import { Conversion, filterConversionsByTimeframe } from "models/Conversion";
-import { Timeframe, getTimeframeLabel } from "models/enums/Timeframe";
-import { Client } from "models/Client";
+import {
+  Conversion,
+  filterConversionsByTimeframe,
+} from "src/models/Conversion";
+import { Timeframe, getTimeframeLabel } from "src/models/enums/Timeframe";
+import { Client } from "src/models/Client";
 import {
   ReferralLinkType,
   getReferralLinkTypeLabel,
-} from "models/enums/ReferralLinkType";
-import { CompensationGroup } from "models/CompensationGroup";
+} from "src/models/enums/ReferralLinkType";
+import { CompensationGroup } from "src/models/CompensationGroup";
 import Filter, { FilterDefinition } from "components/utils/Filter";
-import { formatMoney } from "models/utils/Money";
+import { formatMoney } from "src/models/utils/Money";
 import {
   ConversionStatus,
   getConversionStatusLabel,
-} from "models/enums/ConversionStatus";
-import { formatDateString } from "models/utils/Date";
+} from "src/models/enums/ConversionStatus";
+import { formatDateString } from "src/models/utils/Date";
 
 type Props = {
   conversions: Conversion[];

@@ -14,12 +14,12 @@ import {
   Stack,
   useDisclosure,
 } from "@chakra-ui/react";
-import { Conversion } from "models/Conversion";
+import { Conversion } from "src/models/Conversion";
 import { CloseIcon } from "@chakra-ui/icons";
 import ConversionMessageWidget from "components/common/conversions/ConversionMessagesWidget";
 import { ConversionService } from "services/interfaces/ConversionService";
-import { DependencyInjection } from "models/utils/DependencyInjection";
-import { ConversionStatus } from "models/enums/ConversionStatus";
+import { DependencyInjection } from "src/models/utils/DependencyInjection";
+import { ConversionStatus } from "src/models/enums/ConversionStatus";
 import useSuccessNotification from "components/utils/SuccessNotification";
 
 type Props = {

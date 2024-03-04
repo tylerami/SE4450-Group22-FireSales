@@ -1,24 +1,19 @@
 import { PaymentMethod } from "./enums/PaymentMethod";
-import { DayOfTheWeek } from "./enums/Timeframe";
 import { DocumentData } from "firebase/firestore";
 
 export class PayoutPreferrences {
   addressByMethod: { [key in PaymentMethod]?: string };
   preferredMethod: PaymentMethod;
-  preferredPayoutDay: DayOfTheWeek | null;
 
   constructor({
     addressByMethod = {},
     preferredMethod = PaymentMethod.etransfer,
-    preferredPayoutDay = null,
   }: {
     addressByMethod?: { [key in PaymentMethod]?: string };
     preferredMethod?: PaymentMethod;
-    preferredPayoutDay?: DayOfTheWeek | null;
   }) {
     this.addressByMethod = addressByMethod;
     this.preferredMethod = preferredMethod;
-    this.preferredPayoutDay = preferredPayoutDay;
   }
 
   public getPreferredAddress(): string | undefined {
@@ -37,7 +32,6 @@ export class PayoutPreferrences {
     return {
       addressByMethod: this.addressByMethod,
       preferredMethod: this.preferredMethod,
-      preferredPayoutDay: this.preferredPayoutDay,
     };
   }
 
@@ -45,7 +39,6 @@ export class PayoutPreferrences {
     return new PayoutPreferrences({
       addressByMethod: doc.addressByMethod,
       preferredMethod: doc.preferredMethod,
-      preferredPayoutDay: doc.preferredPayoutDay,
     });
   }
 }

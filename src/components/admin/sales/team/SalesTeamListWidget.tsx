@@ -13,25 +13,25 @@ import {
 import { FiSearch } from "react-icons/fi";
 import { Icon, IconButton } from "@chakra-ui/react";
 import { ChevronLeftIcon, ChevronRightIcon } from "@chakra-ui/icons";
-import { User } from "models/User";
+import { User } from "src/models/User";
 import {
   Conversion,
   averageCommission,
   filterConversionsByTimeframe,
   totalCommission,
   totalGrossProfit,
-} from "models/Conversion";
-import { Payout } from "models/Payout";
+} from "src/models/Conversion";
+import { Payout } from "src/models/Payout";
 import {
   Timeframe,
   getIntervalStart,
   getTimeframeLabel,
-} from "models/enums/Timeframe";
-import { Client } from "models/Client";
-import { ReferralLinkType } from "models/enums/ReferralLinkType";
-import { CompensationGroup } from "models/CompensationGroup";
+} from "src/models/enums/Timeframe";
+import { Client } from "src/models/Client";
+import { ReferralLinkType } from "src/models/enums/ReferralLinkType";
+import { CompensationGroup } from "src/models/CompensationGroup";
 import Filter, { FilterDefinition } from "components/utils/Filter";
-import { ConversionStatus } from "models/enums/ConversionStatus";
+import { ConversionStatus } from "src/models/enums/ConversionStatus";
 import SalesTeamListTable, { UserOrAssignmentCode } from "./SalesTeamListTable";
 import SalesTeamTotalsTable from "./SalesTeamTotalsTable";
 

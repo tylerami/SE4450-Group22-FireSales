@@ -15,10 +15,10 @@ import {
   totalCommission,
   totalGrossProfit,
   totalRevenue,
-} from "models/Conversion";
-import { Payout } from "models/Payout";
-import { formatMoney } from "models/utils/Money";
-import { ConversionStatus } from "models/enums/ConversionStatus";
+} from "src/models/Conversion";
+import { Payout } from "src/models/Payout";
+import { formatMoney } from "src/models/utils/Money";
+import { ConversionStatus } from "src/models/enums/ConversionStatus";
 
 type Props = {
   filteredConversions: Conversion[];

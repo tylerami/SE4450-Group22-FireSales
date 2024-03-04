@@ -8,27 +8,25 @@ import {
   IconButton,
   Spacer,
 } from "@chakra-ui/react";
-import { User } from "models//User";
+import { User } from "src/models/User";
 import { ChevronLeftIcon } from "@chakra-ui/icons";
-import { Conversion } from "models/Conversion";
+import { Conversion } from "src/models/Conversion";
 import { UserService } from "services/interfaces/UserService";
-import { DependencyInjection } from "models/utils/DependencyInjection";
+import { DependencyInjection } from "src/models/utils/DependencyInjection";
 import { ConversionService } from "services/interfaces/ConversionService";
 import { PayoutService } from "services/interfaces/PayoutService";
-import { Payout } from "models/Payout";
+import { Payout } from "src/models/Payout";
 import {
   ADMIN_COMP_GROUP_ID,
   CompensationGroup,
-} from "models/CompensationGroup";
+} from "src/models/CompensationGroup";
 import { CompensationGroupService } from "services/interfaces/CompensationGroupService";
 import UserPerformanceWidget from "./performance/UserPerformanceWidget";
 import AdminConversionHistoryWidget from "./conversions/AdminConversionHistoryWidget";
 import Filter, { FilterDefinition } from "components/utils/Filter";
-import { DayOfTheWeek } from "models/enums/Timeframe";
-import { PayoutPreferrences } from "models/PayoutPreferrences";
 import useSuccessNotification from "components/utils/SuccessNotification";
-import { Role } from "models/enums/Role";
-import { ConversionType } from "models/enums/ConversionType";
+import { Role } from "src/models/enums/Role";
+import { ConversionType } from "src/models/enums/ConversionType";
 
 type Props = {};
 
@@ -105,24 +103,7 @@ const AdminSalesTeamPage = (props: Props) => {
   const displayPerformanceWidget =
     !isConversionSelected && selectedUser !== null;
 
-  const [paymentDay, setPaymentDay] = useState<DayOfTheWeek | null>(null);
-
   const showSuccess = useSuccessNotification();
-
-  const setPayoutDay = async (day: DayOfTheWeek | null) => {
-    if (!selectedUser) return;
-
-    const updatedUser: User = new User({
-      ...selectedUser,
-      payoutPreferrences: new PayoutPreferrences({
-        ...selectedUser.payoutPreferrences,
-        preferredPayoutDay: day ?? null,
-      }),
-    });
-    await userService.update(updatedUser);
-    setPaymentDay(day);
-    showSuccess({ message: `Payout day updated to ${day}.` });
-  };
 
   const [selectedCompGroup, setSelectedCompGroup] =
     useState<CompensationGroup | null>(null);
@@ -149,24 +130,12 @@ const AdminSalesTeamPage = (props: Props) => {
     const compGroup: CompensationGroup | undefined = compensationGroups.find(
       (compGroup) => compGroup.id === user.compensationGroupId
     );
-    console.log(user.payoutPreferrences?.preferredPayoutDay);
-    setPaymentDay(user.payoutPreferrences?.preferredPayoutDay ?? null);
     setSelectedCompGroup(compGroup ?? null);
   };
 
   const deselectUser = () => {
     setSelectedUser(null);
     refresh();
-  };
-
-  const payoutDayFilterDef: FilterDefinition<DayOfTheWeek> = {
-    options: [null, ...Object.values(DayOfTheWeek)],
-    onChange: (day: DayOfTheWeek | null) => setPayoutDay(day),
-    label: (day: DayOfTheWeek | null) => {
-      if (!day) return "UNASSIGNED";
-      return day;
-    },
-    value: paymentDay,
   };
 
   const compGroupFilterDef: FilterDefinition<CompensationGroup> = {
@@ -227,12 +196,7 @@ const AdminSalesTeamPage = (props: Props) => {
             >
               {selectedUser.isAdmin() ? "Remove Admin" : "Make Admin"}
             </Button>
-            <React.Fragment>
-              <Heading mx={4} size="sm" fontWeight={400}>
-                Payout Day:
-              </Heading>
-              <Filter filter={payoutDayFilterDef} />
-            </React.Fragment>
+
             <React.Fragment>
               <Heading mx={4} size="sm" fontWeight={400}>
                 Compensation Group:
