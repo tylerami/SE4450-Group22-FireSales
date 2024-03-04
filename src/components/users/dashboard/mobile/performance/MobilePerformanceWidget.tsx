@@ -1,6 +1,6 @@
 import { Box, Flex, Heading, Text } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
-import { Timeframe, getTimeframeLabel } from "models/enums/Timeframe";
+import { Timeframe, getTimeframeLabel } from "src/models/enums/Timeframe";
 import {
   Conversion,
   allClientIds,
@@ -9,15 +9,15 @@ import {
   filterConversionsByTimeframe,
   totalCommission,
   totalUnpaidCommission,
-} from "models/Conversion";
+} from "src/models/Conversion";
 import { ConversionService } from "services/interfaces/ConversionService";
-import { DependencyInjection } from "models/utils/DependencyInjection";
-import { Client, getAllAffiliateDeals } from "models/Client";
-import { CompensationGroup } from "models/CompensationGroup";
+import { DependencyInjection } from "src/models/utils/DependencyInjection";
+import { Client, getAllAffiliateDeals } from "src/models/Client";
+import { CompensationGroup } from "src/models/CompensationGroup";
 import { ClientService } from "services/interfaces/ClientService";
-import { ReferralLinkType } from "models/enums/ReferralLinkType";
-import { formatMoney } from "models/utils/Money";
-import { AffiliateDeal } from "models/AffiliateDeal";
+import { ReferralLinkType } from "src/models/enums/ReferralLinkType";
+import { formatMoney } from "src/models/utils/Money";
+import { AffiliateDeal } from "src/models/AffiliateDeal";
 import Filter, { FilterDefinition } from "components/utils/Filter";
 import MobilePerformanceMetricBox from "./MobilePerformanceMetricBox";
 

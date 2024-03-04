@@ -11,16 +11,16 @@ import {
   Thead,
   Tr,
 } from "@chakra-ui/react";
-import { Conversion } from "models/Conversion";
-import { formatDateString } from "models/utils/Date";
-import { Payout } from "models/Payout";
-import { formatMoney } from "models/utils/Money";
+import { Conversion } from "src/models/Conversion";
+import { formatDateString } from "src/models/utils/Date";
+import { Payout } from "src/models/Payout";
+import { formatMoney } from "src/models/utils/Money";
 import { UserContext } from "components/auth/UserProvider";
 import { PayoutService } from "services/interfaces/PayoutService";
-import { DependencyInjection } from "models/utils/DependencyInjection";
-import { getPaymentMethodLabel } from "models/enums/PaymentMethod";
+import { DependencyInjection } from "src/models/utils/DependencyInjection";
+import { getPaymentMethodLabel } from "src/models/enums/PaymentMethod";
 import { ConversionService } from "services/interfaces/ConversionService";
-import { ConversionStatus } from "models/enums/ConversionStatus";
+import { ConversionStatus } from "src/models/enums/ConversionStatus";
 
 type Props = {};
 

@@ -1,4 +1,4 @@
-import { Customer } from "models/Customer";
+import { Customer } from "src/models/Customer";
 import { CustomerService } from "services/interfaces/CustomerService";
 import {
   CollectionReference,

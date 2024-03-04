@@ -6,8 +6,8 @@ import {
   Spacer,
   Text,
 } from "@chakra-ui/react";
-import Announcement from "models/Announcement";
-import { DependencyInjection } from "models/utils/DependencyInjection";
+import Announcement from "src/models/Announcement";
+import { DependencyInjection } from "src/models/utils/DependencyInjection";
 import React, { useEffect, useState } from "react";
 import AnnouncementService from "services/interfaces/AnnouncementService";
 import AnnouncementBuilder from "./AnnouncementBuilder";

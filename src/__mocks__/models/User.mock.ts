@@ -1,6 +1,6 @@
-import { Role } from "models/enums/Role";
-import { generateUserID } from "models/utils/Identification";
-import { User } from "models/User";
+import { Role } from "src/models/enums/Role";
+import { generateUserID } from "src/models/utils/Identification";
+import { User } from "src/models/User";
 
 export const sampleUser: User = User.create({
   uid: "user123",

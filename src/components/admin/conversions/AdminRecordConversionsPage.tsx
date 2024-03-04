@@ -4,12 +4,12 @@ import AdminRecordConversionsWidget from "./bulk/AdminRecordConversionsWidget";
 import {
   ADMIN_COMP_GROUP_ID,
   CompensationGroup,
-} from "models/CompensationGroup";
+} from "src/models/CompensationGroup";
 import { CompensationGroupService } from "services/interfaces/CompensationGroupService";
-import { DependencyInjection } from "models/utils/DependencyInjection";
+import { DependencyInjection } from "src/models/utils/DependencyInjection";
 import AdminManualRecordConversionsWidgetContent from "./manual/AdminManualRecordConversionsWidgetContent";
 import { ConversionService } from "services/interfaces/ConversionService";
-import { Conversion } from "models/Conversion";
+import { Conversion } from "src/models/Conversion";
 
 type Props = {};
 

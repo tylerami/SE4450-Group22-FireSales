@@ -3,9 +3,9 @@ import React, { useContext, useEffect, useState } from "react";
 import UserPerformanceWidget from "./performance/UserPerformanceWidget";
 import AffiliateLinkWidget from "./referrals/AffiliateLinkWidget";
 import { UserContext } from "components/auth/UserProvider";
-import { Conversion } from "@models/Conversion";
+import { Conversion } from "src/models/Conversion";
 import { ConversionService } from "services/interfaces/ConversionService";
-import { DependencyInjection } from "models/utils/DependencyInjection";
+import { DependencyInjection } from "src/models/utils/DependencyInjection";
 import UserAnnouncementsWidget from "./announcements/UserAnnouncementsWidget";
 
 type Props = {};

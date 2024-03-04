@@ -9,10 +9,10 @@ import {
   Textarea,
 } from "@chakra-ui/react";
 import { UserContext } from "components/auth/UserProvider";
-import Announcement from "models/Announcement";
-import { CompensationGroup } from "models/CompensationGroup";
-import { User } from "models/User";
-import { DependencyInjection } from "models/utils/DependencyInjection";
+import Announcement from "src/models/Announcement";
+import { CompensationGroup } from "src/models/CompensationGroup";
+import { User } from "src/models/User";
+import { DependencyInjection } from "src/models/utils/DependencyInjection";
 import React, { useContext, useEffect, useState } from "react";
 import { CompensationGroupService } from "services/interfaces/CompensationGroupService";
 import EmailService from "services/interfaces/EmailService";

@@ -13,14 +13,14 @@ import {
   Thead,
   Tr,
 } from "@chakra-ui/react";
-import { formatDateString } from "models/utils/Date";
+import { formatDateString } from "src/models/utils/Date";
 import {
   CheckCircleIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
 } from "@chakra-ui/icons";
-import { formatMoney } from "models/utils/Money";
-import { Conversion } from "models/Conversion";
+import { formatMoney } from "src/models/utils/Money";
+import { Conversion } from "src/models/Conversion";
 
 type Props = {
   conversionsByNumber: Record<number, Conversion> | null;

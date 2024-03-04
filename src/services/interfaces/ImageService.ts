@@ -1,6 +1,6 @@
 // make the interface more concrete, with only certain options for getting/setting images (categories)
 
-import { Conversion } from "models/Conversion";
+import { Conversion } from "src/models/Conversion";
 
 export interface ImageService {
   getImageUrl(path: string): Promise<string | null>;

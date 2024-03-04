@@ -2,12 +2,12 @@ import { Flex, Heading, Text, Spacer, Box } from "@chakra-ui/react";
 import React from "react";
 
 import { Button } from "@chakra-ui/react";
-import { CompensationGroup } from "models/CompensationGroup";
+import { CompensationGroup } from "src/models/CompensationGroup";
 import CompGroupAffiliateDealsTable from "./CompGroupAffiliateDealsTable";
 import CompGroupRetentionIncentivesTable from "./CompGroupRetentionIncentivesTable";
-import { Client } from "models/Client";
-import { Conversion } from "models/Conversion";
-import { User } from "models/User";
+import { Client } from "src/models/Client";
+import { Conversion } from "src/models/Conversion";
+import { User } from "src/models/User";
 import useConfirmationModal from "components/utils/ConfirmationModal";
 import useSuccessNotification from "components/utils/SuccessNotification";
 

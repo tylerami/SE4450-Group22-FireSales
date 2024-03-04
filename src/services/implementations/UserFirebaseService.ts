@@ -1,4 +1,4 @@
-import { User } from "models/User";
+import { User } from "src/models/User";
 import { UserService } from "services/interfaces/UserService";
 
 import {

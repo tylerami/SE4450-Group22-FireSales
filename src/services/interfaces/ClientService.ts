@@ -1,4 +1,4 @@
-import { Client } from "models/Client";
+import { Client } from "src/models/Client";
 
 export interface ClientService {
   set(client: Client | Partial<Client>): Promise<Client>;

@@ -11,7 +11,7 @@ import {
   setDoc,
   updateDoc,
 } from "firebase/firestore";
-import Announcement from "models/Announcement";
+import Announcement from "src/models/Announcement";
 import AnnouncementService from "services/interfaces/AnnouncementService";
 
 class AnnouncementFirebaseService implements AnnouncementService {

@@ -2,8 +2,8 @@ import { Switch, Input, InputGroup, InputLeftElement } from "@chakra-ui/react";
 import React from "react";
 import { Table, Thead, Tbody, Tr, Th, Td, Icon } from "@chakra-ui/react";
 import { FaDollarSign } from "react-icons/fa";
-import { Client } from "models/Client";
-import RetentionIncentive from "models/RetentionIncentive";
+import { Client } from "src/models/Client";
+import RetentionIncentive from "src/models/RetentionIncentive";
 
 type Props = {
   clients: Client[];

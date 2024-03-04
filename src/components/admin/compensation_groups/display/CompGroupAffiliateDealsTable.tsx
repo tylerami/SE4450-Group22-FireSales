@@ -1,10 +1,10 @@
 import { Table, Thead, Tr, Tbody, Td, Th, Heading } from "@chakra-ui/react";
 import React from "react";
 
-import { getReferralLinkTypeLabel } from "models/enums/ReferralLinkType";
-import { formatMoney } from "models/utils/Money";
-import { AffiliateLink } from "models/AffiliateLink";
-import { Conversion } from "models/Conversion";
+import { getReferralLinkTypeLabel } from "src/models/enums/ReferralLinkType";
+import { formatMoney } from "src/models/utils/Money";
+import { AffiliateLink } from "src/models/AffiliateLink";
+import { Conversion } from "src/models/Conversion";
 
 const CompGroupAffiliateDealsTable = ({
   conversions,

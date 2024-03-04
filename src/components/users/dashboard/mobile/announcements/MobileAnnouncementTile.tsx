@@ -1,6 +1,6 @@
 import { Flex, Heading, Text } from "@chakra-ui/react";
-import Announcement from "models/Announcement";
-import { formatDateStringWithTime } from "models/utils/Date";
+import Announcement from "src/models/Announcement";
+import { formatDateStringWithTime } from "src/models/utils/Date";
 
 const MobileAnnouncementTile = ({
   announcement,

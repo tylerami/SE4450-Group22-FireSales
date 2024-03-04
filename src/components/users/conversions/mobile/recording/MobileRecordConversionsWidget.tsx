@@ -1,8 +1,8 @@
 import React, { useState, useCallback } from "react";
 import { Box, Button, Heading, Spacer, Spinner, Text } from "@chakra-ui/react";
 import { Flex } from "@chakra-ui/react";
-import { DependencyInjection } from "models/utils/DependencyInjection";
-import { CompensationGroup } from "models/CompensationGroup";
+import { DependencyInjection } from "src/models/utils/DependencyInjection";
+import { CompensationGroup } from "src/models/CompensationGroup";
 import { AddIcon } from "@chakra-ui/icons";
 import useSuccessNotification from "components/utils/SuccessNotification";
 import { ConversionService } from "services/interfaces/ConversionService";
@@ -11,12 +11,12 @@ import {
   ConversionAttachmentGroup,
   conversionsWithLink,
   filterConversionsByDateInterval,
-} from "models/Conversion";
+} from "src/models/Conversion";
 import useErrorNotification from "components/utils/ErrorNotification";
 import MobileRecordConversionTile from "./MobileRecordConversionsTile";
 import { RiSubtractLine } from "react-icons/ri";
-import { ConversionType } from "models/enums/ConversionType";
-import { firstDayOfCurrentMonth } from "models/utils/Date";
+import { ConversionType } from "src/models/enums/ConversionType";
+import { firstDayOfCurrentMonth } from "src/models/utils/Date";
 
 type Props = {
   refresh: () => void;

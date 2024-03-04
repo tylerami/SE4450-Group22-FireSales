@@ -1,6 +1,6 @@
-import { Payout } from "models/Payout";
-import { Currency } from "models/enums/Currency";
-import { PaymentMethod } from "models/enums/PaymentMethod";
+import { Payout } from "src/models/Payout";
+import { Currency } from "src/models/enums/Currency";
+import { PaymentMethod } from "src/models/enums/PaymentMethod";
 
 const userIds = ["user1", "user2", "user3", "user4"];
 const paymentAddresses = ["address1", "address2", "address3", "address4"];

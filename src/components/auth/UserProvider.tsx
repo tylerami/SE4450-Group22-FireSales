@@ -1,7 +1,7 @@
 // UserProvider.tsx
 import React, { createContext, useEffect, useState } from "react";
 import { authService } from "services/implementations/AuthFirebaseService";
-import { User } from "models/User";
+import { User } from "src/models/User";
 
 interface UserContextProps {
   currentUser: User | null;

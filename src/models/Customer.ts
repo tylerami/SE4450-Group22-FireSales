@@ -1,4 +1,4 @@
-import { generateUserID } from "models/utils/Identification";
+import { generateUserID } from "src/models/utils/Identification";
 import { DocumentData } from "firebase/firestore";
 import { capitalizeEachWordFirstLetter } from "./utils/String";
 

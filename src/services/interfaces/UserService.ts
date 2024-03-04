@@ -1,4 +1,4 @@
-import { User } from "models/User";
+import { User } from "src/models/User";
 
 // Within the firestore implementation, these user documents will live in a collection called "salesUsers"
 export interface UserService {

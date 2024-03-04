@@ -1,4 +1,4 @@
-import { CompensationGroup } from "models/CompensationGroup";
+import { CompensationGroup } from "src/models/CompensationGroup";
 import { CompensationGroupService } from "services/interfaces/CompensationGroupService";
 import {
   CollectionReference,
@@ -15,7 +15,7 @@ import {
   where,
   writeBatch,
 } from "firebase/firestore";
-import { User } from "models/User";
+import { User } from "src/models/User";
 
 /**
  * Service implementation for managing compensation groups in Firebase.

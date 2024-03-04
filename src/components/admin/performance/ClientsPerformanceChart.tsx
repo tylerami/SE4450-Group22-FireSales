@@ -1,4 +1,4 @@
-import { Timeframe } from "models/enums/Timeframe";
+import { Timeframe } from "src/models/enums/Timeframe";
 import BarChart, { AxisSide, BarChartSegment } from "components/utils/BarChart";
 import React from "react";
 import {
@@ -7,7 +7,7 @@ import {
   segmentConversionsByTimeframe,
   totalCostOfConversions,
   totalRevenue,
-} from "models/Conversion";
+} from "src/models/Conversion";
 
 const ClientsPerformanceChart = ({
   conversions,

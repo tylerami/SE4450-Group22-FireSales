@@ -1,12 +1,12 @@
 import { parseDateString } from "./Date";
-import { ReferralLinkType } from "models/enums/ReferralLinkType";
+import { ReferralLinkType } from "src/models/enums/ReferralLinkType";
 import { findClosestMatch } from "./String";
-import { Client } from "models/Client";
-import { AffiliateDeal } from "models/AffiliateDeal";
-import { AffiliateLink } from "models/AffiliateLink";
-import { Customer } from "models/Customer";
-import { Conversion } from "models/Conversion";
-import { ConversionType } from "models/enums/ConversionType";
+import { Client } from "src/models/Client";
+import { AffiliateDeal } from "src/models/AffiliateDeal";
+import { AffiliateLink } from "src/models/AffiliateLink";
+import { Customer } from "src/models/Customer";
+import { Conversion } from "src/models/Conversion";
+import { ConversionType } from "src/models/enums/ConversionType";
 
 type RawCsvRowData = {
   dateString: string;

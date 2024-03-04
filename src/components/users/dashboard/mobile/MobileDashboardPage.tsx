@@ -2,9 +2,9 @@ import { Box, Center, Flex, Heading, Spinner } from "@chakra-ui/react";
 import React, { useContext, useEffect, useState } from "react";
 import { UserContext } from "components/auth/UserProvider";
 import MobileAffiliateLinkWidget from "./affiliate_links/MobileAffiliateLinkWidget";
-import { Conversion } from "models/Conversion";
+import { Conversion } from "src/models/Conversion";
 import { ConversionService } from "services/interfaces/ConversionService";
-import { DependencyInjection } from "models/utils/DependencyInjection";
+import { DependencyInjection } from "src/models/utils/DependencyInjection";
 import MobileUserPerformanceWidget from "./performance/MobilePerformanceWidget";
 import MobileAnnouncementsWidget from "./announcements/MobileAnnouncementsWidget";
 

@@ -1,8 +1,8 @@
-import { User } from "models/User";
+import { User } from "src/models/User";
 import EmailService from "services/interfaces/EmailService";
 import FeatureFlagService from "services/interfaces/FeatureFlagService";
 import axios from "axios";
-import { formatDateStringWithTime } from "models/utils/Date";
+import { formatDateStringWithTime } from "src/models/utils/Date";
 
 class EmailTwilioService implements EmailService {
   private sendgridTemplateId?: string;

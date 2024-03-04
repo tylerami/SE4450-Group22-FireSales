@@ -11,11 +11,11 @@ import { Flex } from "@chakra-ui/react";
 import ManualRecordConversionsWidgetContent from "./manual/ManualRecordConversionsWidgetContent";
 import BulkRecordConversionsWidgetContent from "./bulk/BulkRecordConversionsWidgetContent";
 import { CompensationGroupService } from "services/interfaces/CompensationGroupService";
-import { DependencyInjection } from "models/utils/DependencyInjection";
-import { CompensationGroup } from "models/CompensationGroup";
+import { DependencyInjection } from "src/models/utils/DependencyInjection";
+import { CompensationGroup } from "src/models/CompensationGroup";
 import { UserContext } from "components/auth/UserProvider";
 import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
-import { Conversion } from "models/Conversion";
+import { Conversion } from "src/models/Conversion";
 
 const ENABLE_BULK_MODE = false;
 
@@ -41,6 +41,7 @@ const RecordConversionsWidget = ({
     DependencyInjection.compensationGroupService();
 
   const [recordMode, setRecordMode] = useState<RecordMode>(RecordMode.manual);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [compGroupHistory, setCompGroupHistory] = useState<CompensationGroup[]>(
     []
   );
@@ -59,6 +60,7 @@ const RecordConversionsWidget = ({
       }
       const compGroupHistory = await compGroupService.getHistory(currentUser);
       setCompGroupHistory(compGroupHistory);
+      setIsLoading(false);
     };
 
     fetchCompGroupHistory();
@@ -110,20 +112,7 @@ const RecordConversionsWidget = ({
       </Flex>
       {!minimizeRecordConversion && (
         <React.Fragment>
-          {compGroupHistory.length > 0 ? (
-            recordMode === RecordMode.manual ? (
-              <ManualRecordConversionsWidgetContent
-                conversions={conversions}
-                compGroupHistory={compGroupHistory}
-                refresh={refresh}
-              />
-            ) : (
-              <BulkRecordConversionsWidgetContent
-                compensationGroup={latestCompGroup}
-                refresh={refresh}
-              />
-            )
-          ) : (
+          {isLoading ? (
             <Flex
               w="100%"
               h="10em"
@@ -132,6 +121,17 @@ const RecordConversionsWidget = ({
             >
               <Spinner size="lg" />
             </Flex>
+          ) : recordMode === RecordMode.manual ? (
+            <ManualRecordConversionsWidgetContent
+              conversions={conversions}
+              compGroupHistory={compGroupHistory}
+              refresh={refresh}
+            />
+          ) : (
+            <BulkRecordConversionsWidgetContent
+              compensationGroup={latestCompGroup}
+              refresh={refresh}
+            />
           )}
         </React.Fragment>
       )}

@@ -13,13 +13,13 @@ import {
 import React, { useEffect, useState } from "react";
 
 import { Button } from "@chakra-ui/react";
-import { Client } from "models/Client";
-import { getReferralLinkTypeLabel } from "models/enums/ReferralLinkType";
-import { formatMoney } from "models/utils/Money";
-import { AffiliateDeal } from "models/AffiliateDeal";
+import { Client } from "src/models/Client";
+import { getReferralLinkTypeLabel } from "src/models/enums/ReferralLinkType";
+import { formatMoney } from "src/models/utils/Money";
+import { AffiliateDeal } from "src/models/AffiliateDeal";
 import ImageComponent from "components/utils/ImageComponent";
 import { ClientService } from "services/interfaces/ClientService";
-import { DependencyInjection } from "models/utils/DependencyInjection";
+import { DependencyInjection } from "src/models/utils/DependencyInjection";
 
 type Props = {
   client: Client;

@@ -10,17 +10,17 @@ import {
 } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 import { Flex } from "@chakra-ui/react";
-import { DependencyInjection } from "models/utils/DependencyInjection";
+import { DependencyInjection } from "src/models/utils/DependencyInjection";
 import CompensationGroupEditor from "./editor/CompensationGroupEditor";
-import { CompensationGroup } from "models/CompensationGroup";
+import { CompensationGroup } from "src/models/CompensationGroup";
 import { CompensationGroupService } from "services/interfaces/CompensationGroupService";
 import CompensationGroupDetailsTile from "./display/CompensationGroupDetailsTile";
 import { UserService } from "services/interfaces/UserService";
 import { ConversionService } from "services/interfaces/ConversionService";
 import { ClientService } from "services/interfaces/ClientService";
-import { Client } from "models/Client";
-import { Conversion } from "models/Conversion";
-import { User } from "models/User";
+import { Client } from "src/models/Client";
+import { Conversion } from "src/models/Conversion";
+import { User } from "src/models/User";
 import { FiSearch } from "react-icons/fi";
 
 type Props = {};

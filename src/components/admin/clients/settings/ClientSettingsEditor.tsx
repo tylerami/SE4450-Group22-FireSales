@@ -12,11 +12,11 @@ import { Image, Box, Text, Flex } from "@chakra-ui/react";
 import { CloseIcon } from "@chakra-ui/icons";
 import { FaPlus, FaTrash } from "react-icons/fa";
 import { ClientService } from "services/interfaces/ClientService";
-import { DependencyInjection } from "models/utils/DependencyInjection";
-import { Client } from "models/Client";
+import { DependencyInjection } from "src/models/utils/DependencyInjection";
+import { Client } from "src/models/Client";
 import useSuccessNotification from "components/utils/SuccessNotification";
-import { ReferralLinkType } from "models/enums/ReferralLinkType";
-import { AffiliateDeal } from "models/AffiliateDeal";
+import { ReferralLinkType } from "src/models/enums/ReferralLinkType";
+import { AffiliateDeal } from "src/models/AffiliateDeal";
 import ClientAffiliateDealsTable from "./ClientAffiliateDealsTable";
 
 type Props = {

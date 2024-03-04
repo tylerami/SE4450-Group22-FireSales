@@ -12,24 +12,20 @@ import React, { useCallback, useContext, useState } from "react";
 import {
   PaymentMethod,
   getPaymentMethodLabel,
-} from "models//enums/PaymentMethod";
+} from "src/models/enums/PaymentMethod";
 import UserPaymentHistory from "./UserPaymentHistory";
 import { UserContext } from "components/auth/UserProvider";
 import { UserService } from "services/interfaces/UserService";
-import { DependencyInjection } from "models/utils/DependencyInjection";
+import { DependencyInjection } from "src/models/utils/DependencyInjection";
 import useSuccessNotification from "components/utils/SuccessNotification";
-import { User } from "models/User";
-import { DayOfTheWeek } from "models/enums/Timeframe";
-import { PayoutPreferrences } from "models/PayoutPreferrences";
+import { User } from "src/models/User";
+import { PayoutPreferrences } from "src/models/PayoutPreferrences";
 
 type Props = {};
 
 const PaymentSettingsWidget = (props: Props) => {
   const { currentUser, setCurrentUser } = useContext(UserContext);
 
-  const [payoutDay, setPayoutDay] = useState<DayOfTheWeek | null>(
-    currentUser?.payoutPreferrences?.preferredPayoutDay || null
-  );
   const [paymentType, setPaymentType] = useState<PaymentMethod>(
     currentUser?.payoutPreferrences?.preferredMethod || PaymentMethod.etransfer
   );
@@ -46,12 +42,11 @@ const PaymentSettingsWidget = (props: Props) => {
     console.log("generating payment preferrences");
     return new PayoutPreferrences({
       preferredMethod: paymentType,
-      preferredPayoutDay: payoutDay ?? undefined,
       addressByMethod: {
         [paymentType]: payoutAddress,
       },
     });
-  }, [currentUser, paymentType, payoutDay, payoutAddress]);
+  }, [currentUser, paymentType, payoutAddress]);
 
   const saveChanges = async () => {
     if (!currentUser) return;
@@ -145,24 +140,6 @@ const PaymentSettingsWidget = (props: Props) => {
           </InputGroup>
         </Flex>
       )}
-      <Flex width={"48%"} flexDirection={"column"}>
-        <Text color="gray" fontSize="0.8em">
-          Preferred payout day
-        </Text>
-        <Box h={1}></Box>
-
-        <Select
-          color={!payoutDay ? "gray" : "black"}
-          placeholder="Choose an option..."
-          onChange={(e) => setPayoutDay(DayOfTheWeek[e.target.value])}
-        >
-          {Object.values(DayOfTheWeek).map((dayOfWeek, i) => (
-            <option key={i} value={dayOfWeek}>
-              {dayOfWeek}
-            </option>
-          ))}
-        </Select>
-      </Flex>
 
       <UserPaymentHistory />
     </Flex>

@@ -1,4 +1,4 @@
-import { Payout } from "models/Payout";
+import { Payout } from "src/models/Payout";
 import {
   CollectionReference,
   Firestore,

@@ -2,8 +2,8 @@ import { Switch, Input, InputGroup, InputLeftElement } from "@chakra-ui/react";
 import React from "react";
 import { Table, Thead, Tbody, Tr, Th, Td, Icon } from "@chakra-ui/react";
 import { FaDollarSign } from "react-icons/fa";
-import { getReferralLinkTypeLabel } from "models/enums/ReferralLinkType";
-import { AffiliateLink } from "models/AffiliateLink";
+import { getReferralLinkTypeLabel } from "src/models/enums/ReferralLinkType";
+import { AffiliateLink } from "src/models/AffiliateLink";
 
 type Props = {
   affiliateLinks: Partial<AffiliateLink>[];

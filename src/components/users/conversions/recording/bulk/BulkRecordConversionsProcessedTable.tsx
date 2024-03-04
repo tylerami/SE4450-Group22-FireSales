@@ -13,14 +13,14 @@ import {
   Thead,
   Tr,
 } from "@chakra-ui/react";
-import { Conversion } from "models/Conversion";
-import { formatDateString } from "models/utils/Date";
+import { Conversion } from "src/models/Conversion";
+import { formatDateString } from "src/models/utils/Date";
 import {
   CheckCircleIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
 } from "@chakra-ui/icons";
-import { formatMoney } from "models/utils/Money";
+import { formatMoney } from "src/models/utils/Money";
 
 // ----------------------------------------------------------------------------
 // NOT IN USE

@@ -1,20 +1,20 @@
 import { Table, Thead, Tr, Tbody, Td, Th, Heading } from "@chakra-ui/react";
 import React from "react";
 
-import { formatMoney } from "models/utils/Money";
-import { Client } from "models/Client";
-import RetentionIncentive from "models/RetentionIncentive";
+import { formatMoney } from "src/models/utils/Money";
+import { Client } from "src/models/Client";
+import RetentionIncentive from "src/models/RetentionIncentive";
 import {
   Conversion,
   conversionsWithType,
   filterConversionsByDateInterval,
-} from "models/Conversion";
+} from "src/models/Conversion";
 import {
   firstDayOfCurrentMonth,
   getCurrentMonthWithYear as getCurrentMonthWithYearAbbreviation,
-} from "models/utils/Date";
-import { ConversionType } from "models/enums/ConversionType";
-import { User } from "models/User";
+} from "src/models/utils/Date";
+import { ConversionType } from "src/models/enums/ConversionType";
+import { User } from "src/models/User";
 
 const CompGroupRetentionIncentivesTable = ({
   retentionIncentives,

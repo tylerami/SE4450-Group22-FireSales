@@ -1,21 +1,24 @@
 import React, { useContext, useState } from "react";
 import { Button, Input, InputGroup, Spinner } from "@chakra-ui/react";
 import { Box, Text, Flex } from "@chakra-ui/react";
-import { Conversion, ConversionAttachmentGroup } from "models/Conversion";
+import { Conversion, ConversionAttachmentGroup } from "src/models/Conversion";
 import { generateSampleClients } from "__mocks__/models/Client.mock";
-import { findClosestMatch } from "models/utils/String";
-import { Client } from "models/Client";
+import { findClosestMatch } from "src/models/utils/String";
+import { Client } from "src/models/Client";
 import { UserContext } from "components/auth/UserProvider";
-import { CompensationGroup } from "models/CompensationGroup";
-import { ReferralLinkType } from "models/enums/ReferralLinkType";
-import { AffiliateLink } from "models/AffiliateLink";
-import { Customer } from "models/Customer";
+import { CompensationGroup } from "src/models/CompensationGroup";
+import { ReferralLinkType } from "src/models/enums/ReferralLinkType";
+import { AffiliateLink } from "src/models/AffiliateLink";
+import { Customer } from "src/models/Customer";
 import { ConversionService } from "services/interfaces/ConversionService";
-import { DependencyInjection } from "models/utils/DependencyInjection";
+import { DependencyInjection } from "src/models/utils/DependencyInjection";
 import BulkRecordConversionsInstructions from "./BulkRecordConversionsInstructions";
 import BulkRecordConversionsProcessedTable from "./BulkRecordConversionsProcessedTable";
-import { parseDateString } from "models/utils/Date";
-import { filterCsvHeaders, getCsvFileContent } from "models/utils/CsvParser";
+import { parseDateString } from "src/models/utils/Date";
+import {
+  filterCsvHeaders,
+  getCsvFileContent,
+} from "src/models/utils/CsvParser";
 
 // ----------------------------------------------------------------------------
 // NOT IN USE

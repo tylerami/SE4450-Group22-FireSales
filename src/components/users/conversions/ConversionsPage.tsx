@@ -4,8 +4,8 @@ import RecordConversionsWidget from "./recording/RecordConversionsWidget";
 import ConversionHistoryWidget from "./history/ConversionHistoryWidget";
 import { UserContext } from "components/auth/UserProvider";
 import { ConversionService } from "services/interfaces/ConversionService";
-import { DependencyInjection } from "models/utils/DependencyInjection";
-import { Conversion } from "models/Conversion";
+import { DependencyInjection } from "src/models/utils/DependencyInjection";
+import { Conversion } from "src/models/Conversion";
 
 type Props = {};
 

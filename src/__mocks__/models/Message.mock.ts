@@ -1,4 +1,4 @@
-import { Message } from "models/Message";
+import { Message } from "src/models/Message";
 
 const messageSample1 = new Message({
   senderUid: "user123",

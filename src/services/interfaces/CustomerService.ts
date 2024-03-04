@@ -1,4 +1,4 @@
-import { Customer } from "models/Customer";
+import { Customer } from "src/models/Customer";
 
 export interface CustomerService {
   create(customer: Customer): Promise<Customer>;

@@ -1,4 +1,4 @@
-import { User } from "models/User";
+import { User } from "src/models/User";
 import { Providers, auth } from "config/firebase";
 import {
   User as FirebaseUser,
@@ -10,7 +10,7 @@ import {
 } from "firebase/auth";
 import { UserService } from "services/interfaces/UserService";
 import { AuthService } from "services/interfaces/AuthService";
-import { DependencyInjection } from "models/utils/DependencyInjection";
+import { DependencyInjection } from "src/models/utils/DependencyInjection";
 
 /**
  * Implementation of the AuthService interface using Firebase authentication.

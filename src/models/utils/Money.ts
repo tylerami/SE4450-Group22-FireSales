@@ -1,4 +1,4 @@
-import { Currency } from "models/enums/Currency";
+import { Currency } from "src/models/enums/Currency";
 
 export const formatMoney = (value: number, currency?: Currency) => {
   let formattedValue: string;

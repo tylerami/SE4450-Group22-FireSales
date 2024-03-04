@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useContext } from "react";
 import { Flex } from "@chakra-ui/react";
-import { Conversion } from "models/Conversion";
-import { DependencyInjection } from "models/utils/DependencyInjection";
+import { Conversion } from "src/models/Conversion";
+import { DependencyInjection } from "src/models/utils/DependencyInjection";
 import { UserContext } from "components/auth/UserProvider";
 import { CompensationGroupService } from "services/interfaces/CompensationGroupService";
-import { CompensationGroup } from "models/CompensationGroup";
+import { CompensationGroup } from "src/models/CompensationGroup";
 import { ClientService } from "services/interfaces/ClientService";
-import { Client } from "models/Client";
+import { Client } from "src/models/Client";
 import MobileSelectedConversionPanel from "./MobileSelectedConversionPanel";
 import MobileConversionBrowserPanel from "./MobileConversionBrowserPanel";
 

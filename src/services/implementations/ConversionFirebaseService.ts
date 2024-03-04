@@ -1,4 +1,4 @@
-import { Conversion } from "models/Conversion";
+import { Conversion } from "src/models/Conversion";
 import { ConversionService } from "services/interfaces/ConversionService";
 import {
   CollectionReference,

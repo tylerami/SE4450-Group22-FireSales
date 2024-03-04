@@ -19,9 +19,9 @@ import { FcGoogle } from "react-icons/fc";
 import { authService } from "services/implementations/AuthFirebaseService";
 import { useGlobalState } from "components/utils/GlobalState";
 import { ConversionService } from "services/interfaces/ConversionService";
-import { DependencyInjection } from "models/utils/DependencyInjection";
+import { DependencyInjection } from "src/models/utils/DependencyInjection";
 import { UserContext } from "components/auth/UserProvider";
-import { User } from "models/User";
+import { User } from "src/models/User";
 import Logo from "components/common/Logo";
 import { CompensationGroupService } from "services/interfaces/CompensationGroupService";
 

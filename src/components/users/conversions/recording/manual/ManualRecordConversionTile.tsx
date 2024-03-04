@@ -21,27 +21,27 @@ import {
   conversionsWithLink,
   conversionsWithType,
   filterConversionsByDateInterval,
-} from "models///Conversion";
+} from "src/models/Conversion";
 import { FaDollarSign } from "react-icons/fa";
-import { AffiliateLink } from "models/AffiliateLink";
+import { AffiliateLink } from "src/models/AffiliateLink";
 import { UserContext } from "components/auth/UserProvider";
 import {
   CompensationGroup,
   validVersionAtTime as compGroupAtTime,
-} from "models/CompensationGroup";
-import { Customer } from "models/Customer";
+} from "src/models/CompensationGroup";
+import { Customer } from "src/models/Customer";
 import { CustomerService } from "services/interfaces/CustomerService";
-import { DependencyInjection } from "models/utils/DependencyInjection";
-import { formatMoney } from "models/utils/Money";
+import { DependencyInjection } from "src/models/utils/DependencyInjection";
+import { formatMoney } from "src/models/utils/Money";
 import {
   endOfDay,
   firstDayOfCurrentMonth,
   parseDateString,
-} from "models/utils/Date";
+} from "src/models/utils/Date";
 import {
   ConversionType,
   getConversionTypeLabel,
-} from "models/enums/ConversionType";
+} from "src/models/enums/ConversionType";
 
 type Props = {
   conversions: Conversion[];

@@ -11,10 +11,10 @@ import {
 } from "@chakra-ui/react";
 import AffiliateLinksContainer from "./AffiliateLinksContainer";
 import { UserContext } from "components/auth/UserProvider";
-import { DependencyInjection } from "models/utils/DependencyInjection";
-import { Client } from "models/Client";
-import { CompensationGroup } from "models/CompensationGroup";
-import { AffiliateLink } from "models/AffiliateLink";
+import { DependencyInjection } from "src/models/utils/DependencyInjection";
+import { Client } from "src/models/Client";
+import { CompensationGroup } from "src/models/CompensationGroup";
+import { AffiliateLink } from "src/models/AffiliateLink";
 import { ChevronLeftIcon, ChevronRightIcon } from "@chakra-ui/icons";
 
 // Custom hook for fetching data

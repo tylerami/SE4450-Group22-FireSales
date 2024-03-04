@@ -13,8 +13,8 @@ import { FaDollarSign, FaTrash } from "react-icons/fa";
 import {
   ReferralLinkType,
   getReferralLinkTypeLabel,
-} from "models/enums/ReferralLinkType";
-import { AffiliateDeal } from "models/AffiliateDeal";
+} from "src/models/enums/ReferralLinkType";
+import { AffiliateDeal } from "src/models/AffiliateDeal";
 
 type Props = {
   affiliateDeals: Partial<AffiliateDeal>[];

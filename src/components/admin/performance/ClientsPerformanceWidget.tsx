@@ -13,7 +13,7 @@ import {
 } from "@chakra-ui/react";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 
-import { Timeframe, getTimeframeLabel } from "models/enums/Timeframe";
+import { Timeframe, getTimeframeLabel } from "src/models/enums/Timeframe";
 import {
   Conversion,
   averageBetSize,
@@ -23,23 +23,23 @@ import {
   totalCostOfConversions,
   totalGrossProfit,
   totalRevenue,
-} from "models/Conversion";
+} from "src/models/Conversion";
 import { ConversionService } from "services/interfaces/ConversionService";
-import { DependencyInjection } from "models/utils/DependencyInjection";
-import { Client, getAllAffiliateDeals } from "models/Client";
-import { CompensationGroup } from "models/CompensationGroup";
+import { DependencyInjection } from "src/models/utils/DependencyInjection";
+import { Client, getAllAffiliateDeals } from "src/models/Client";
+import { CompensationGroup } from "src/models/CompensationGroup";
 import { ClientService } from "services/interfaces/ClientService";
 import { CompensationGroupService } from "services/interfaces/CompensationGroupService";
 import {
   ReferralLinkType,
   getReferralLinkTypeLabel,
-} from "models/enums/ReferralLinkType";
-import { formatMoney } from "models/utils/Money";
+} from "src/models/enums/ReferralLinkType";
+import { formatMoney } from "src/models/utils/Money";
 import ClientsPerformanceChart from "./ClientsPerformanceChart";
-import { AffiliateDeal } from "models/AffiliateDeal";
+import { AffiliateDeal } from "src/models/AffiliateDeal";
 import PerformanceMetricBox from "components/common/PerformanceMetricBox";
 import Filter, { FilterDefinition } from "components/utils/Filter";
-import { ConversionType } from "models/enums/ConversionType";
+import { ConversionType } from "src/models/enums/ConversionType";
 
 type Props = {};
 

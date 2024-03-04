@@ -1,4 +1,4 @@
-import { Client } from "models/Client";
+import { Client } from "src/models/Client";
 import { ClientService } from "services/interfaces/ClientService";
 import {
   CollectionReference,

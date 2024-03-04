@@ -1,6 +1,6 @@
-import { ConversionStatus } from "models/enums/ConversionStatus";
-import { Conversion } from "models/Conversion";
-import { Currency } from "models/enums/Currency";
+import { ConversionStatus } from "src/models/enums/ConversionStatus";
+import { Conversion } from "src/models/Conversion";
+import { Currency } from "src/models/enums/Currency";
 import { generateAffiliateLinks } from "./AffiliateLink.mock";
 import { customerSample } from "./Customer.mock";
 import { sampleMessages } from "./Message.mock";

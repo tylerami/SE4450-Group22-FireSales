@@ -1,4 +1,4 @@
-import { Conversion } from "models/Conversion";
+import { Conversion } from "src/models/Conversion";
 
 export interface ConversionService {
   create(conversion: Conversion, attachments?: File[]): Promise<Conversion>;

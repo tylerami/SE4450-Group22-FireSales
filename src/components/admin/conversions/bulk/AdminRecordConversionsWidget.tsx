@@ -8,9 +8,9 @@ import {
   Spinner,
 } from "@chakra-ui/react";
 import { Box, Text, Flex } from "@chakra-ui/react";
-import { Client } from "models/Client";
+import { Client } from "src/models/Client";
 import { ConversionService } from "services/interfaces/ConversionService";
-import { DependencyInjection } from "models/utils/DependencyInjection";
+import { DependencyInjection } from "src/models/utils/DependencyInjection";
 import AdminRecordConversionsProcessedTable from "./AdminRecordConversionsProcessedTable";
 import AdminRecordConversionsInstructions from "./AdminRecordConversionsInstructions";
 import { ClientService } from "services/interfaces/ClientService";
@@ -20,8 +20,8 @@ import {
   filterCsvHeaders,
   getCsvFileContent as getCsvRows,
   mapCsvRowToConversion,
-} from "models/utils/CsvParser";
-import { Conversion, ConversionAttachmentGroup } from "models/Conversion";
+} from "src/models/utils/CsvParser";
+import { Conversion, ConversionAttachmentGroup } from "src/models/Conversion";
 
 type Props = {};
 

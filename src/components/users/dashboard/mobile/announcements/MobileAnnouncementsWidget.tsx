@@ -9,10 +9,10 @@ import {
   Button,
 } from "@chakra-ui/react";
 import { ChevronLeftIcon, ChevronRightIcon } from "@chakra-ui/icons";
-import Announcement from "models/Announcement";
+import Announcement from "src/models/Announcement";
 import { FaExclamationCircle } from "react-icons/fa";
 import AnnouncementService from "services/interfaces/AnnouncementService";
-import { DependencyInjection } from "models/utils/DependencyInjection";
+import { DependencyInjection } from "src/models/utils/DependencyInjection";
 import { UserContext } from "components/auth/UserProvider";
 import MobileAnnouncementTile from "./MobileAnnouncementTile";
 

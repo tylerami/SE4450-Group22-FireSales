@@ -10,10 +10,10 @@ import React, { useContext, useEffect, useRef, useState } from "react";
 
 import { ArrowUpIcon } from "@chakra-ui/icons";
 import ConversionMessageTile from "./ConversionMessageTile";
-import { Message } from "models/Message";
-import { Conversion } from "models/Conversion";
+import { Message } from "src/models/Message";
+import { Conversion } from "src/models/Conversion";
 import { ConversionService } from "services/interfaces/ConversionService";
-import { DependencyInjection } from "models/utils/DependencyInjection";
+import { DependencyInjection } from "src/models/utils/DependencyInjection";
 import { UserContext } from "components/auth/UserProvider";
 import useSuccessNotification from "components/utils/SuccessNotification";
 import useErrorNotification from "components/utils/ErrorNotification";

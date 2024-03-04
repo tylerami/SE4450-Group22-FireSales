@@ -13,21 +13,24 @@ import {
   Thead,
   Tr,
 } from "@chakra-ui/react";
-import { Conversion, filterConversionsByTimeframe } from "models/Conversion";
+import {
+  Conversion,
+  filterConversionsByTimeframe,
+} from "src/models/Conversion";
 import { ChevronLeftIcon, ChevronRightIcon } from "@chakra-ui/icons";
-import { formatDateString } from "models/utils/Date";
-import { Timeframe, getTimeframeLabel } from "models/enums/Timeframe";
-import { CompensationGroup } from "models/CompensationGroup";
-import { Client } from "models/Client";
+import { formatDateString } from "src/models/utils/Date";
+import { Timeframe, getTimeframeLabel } from "src/models/enums/Timeframe";
+import { CompensationGroup } from "src/models/CompensationGroup";
+import { Client } from "src/models/Client";
 import {
   ReferralLinkType,
   getReferralLinkTypeLabel,
-} from "models/enums/ReferralLinkType";
+} from "src/models/enums/ReferralLinkType";
 import Filter, { FilterDefinition } from "components/utils/Filter";
 import {
   ConversionStatus,
   getConversionStatusLabel,
-} from "models/enums/ConversionStatus";
+} from "src/models/enums/ConversionStatus";
 
 enum SortBy {
   BetSize = "Bet Size",

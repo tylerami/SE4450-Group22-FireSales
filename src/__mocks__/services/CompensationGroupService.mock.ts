@@ -1,7 +1,7 @@
-import { CompensationGroup } from "models/CompensationGroup";
+import { CompensationGroup } from "src/models/CompensationGroup";
 import { generateSampleCompensationGroups } from "__mocks__/models/CompensationGroup.mock";
 import { CompensationGroupService } from "services/interfaces/CompensationGroupService";
-import { User } from "models/User";
+import { User } from "src/models/User";
 
 export class MockCompensationGroupService implements CompensationGroupService {
   getHistory(user: User): Promise<CompensationGroup[]> {

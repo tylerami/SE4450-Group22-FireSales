@@ -1,4 +1,4 @@
-import { Customer } from "models/Customer";
+import { Customer } from "src/models/Customer";
 
 // Sample Data for Customer
 export const customerSample = new Customer({

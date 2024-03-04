@@ -11,17 +11,17 @@ import React, { useEffect, useState } from "react";
 import { Box, Text, Flex } from "@chakra-ui/react";
 import { CloseIcon } from "@chakra-ui/icons";
 import { ClientService } from "services/interfaces/ClientService";
-import { DependencyInjection } from "models/utils/DependencyInjection";
-import { Client, getAllAffiliateDeals } from "models/Client";
+import { DependencyInjection } from "src/models/utils/DependencyInjection";
+import { Client, getAllAffiliateDeals } from "src/models/Client";
 import useSuccessNotification from "components/utils/SuccessNotification";
-import { ReferralLinkType } from "models/enums/ReferralLinkType";
-import { CompensationGroup } from "models/CompensationGroup";
-import { AffiliateLink } from "models/AffiliateLink";
+import { ReferralLinkType } from "src/models/enums/ReferralLinkType";
+import { CompensationGroup } from "src/models/CompensationGroup";
+import { AffiliateLink } from "src/models/AffiliateLink";
 import { CompensationGroupService } from "services/interfaces/CompensationGroupService";
-import { AffiliateDeal } from "models/AffiliateDeal";
+import { AffiliateDeal } from "src/models/AffiliateDeal";
 import CompGroupEditorAffiliateLinksTable from "./CompGroupEditorAffiliateLinksTable";
 import CompGroupEditorRetentionBonusesTable from "./CompGroupEditorRetentionBonusesTable";
-import RetentionIncentive from "models/RetentionIncentive";
+import RetentionIncentive from "src/models/RetentionIncentive";
 
 type Props = {
   exisitingGroup?: CompensationGroup | null;

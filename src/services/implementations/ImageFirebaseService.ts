@@ -6,7 +6,7 @@ import {
   uploadBytes,
   UploadResult,
 } from "firebase/storage";
-import { Conversion } from "@models/Conversion";
+import { Conversion } from "src/models/Conversion";
 
 /**
  * Returns the path for storing conversion attachments in Firebase Storage.

@@ -1,4 +1,4 @@
-import { Conversion } from "models/Conversion";
+import { Conversion } from "src/models/Conversion";
 import { sampleConversions } from "__mocks__/models/Conversion.mock";
 import { ConversionService } from "services/interfaces/ConversionService";
 

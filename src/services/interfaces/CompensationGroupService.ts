@@ -1,5 +1,5 @@
-import { CompensationGroup } from "models/CompensationGroup";
-import { User } from "models/User";
+import { CompensationGroup } from "src/models/CompensationGroup";
+import { User } from "src/models/User";
 
 export interface CompensationGroupService {
   create(compensationGroup: CompensationGroup): Promise<CompensationGroup>;

@@ -1,10 +1,10 @@
 import React, { useContext, useEffect, useState, useMemo } from "react";
 import { Flex, Heading, Spinner, Alert } from "@chakra-ui/react";
 import { UserContext } from "components/auth/UserProvider";
-import { DependencyInjection } from "models/utils/DependencyInjection";
-import { Client } from "models/Client";
-import { CompensationGroup } from "models/CompensationGroup";
-import { AffiliateLink } from "models/AffiliateLink";
+import { DependencyInjection } from "src/models/utils/DependencyInjection";
+import { Client } from "src/models/Client";
+import { CompensationGroup } from "src/models/CompensationGroup";
+import { AffiliateLink } from "src/models/AffiliateLink";
 import MobileAffiliateLinksContainer from "./MobileAffiliateLinksContainer";
 
 // Custom hook for fetching data

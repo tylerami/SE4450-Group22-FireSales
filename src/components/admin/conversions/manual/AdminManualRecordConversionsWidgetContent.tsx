@@ -7,15 +7,15 @@ import {
   ConversionAttachmentGroup,
   conversionsWithLink,
   filterConversionsByDateInterval,
-} from "models/Conversion";
-import { CompensationGroup } from "models/CompensationGroup";
+} from "src/models/Conversion";
+import { CompensationGroup } from "src/models/CompensationGroup";
 import { ConversionService } from "services/interfaces/ConversionService";
-import { DependencyInjection } from "models/utils/DependencyInjection";
+import { DependencyInjection } from "src/models/utils/DependencyInjection";
 import { RiSubtractLine } from "react-icons/ri";
 import useSuccessNotification from "components/utils/SuccessNotification";
 import useErrorNotification from "components/utils/ErrorNotification";
-import { ConversionType } from "models/enums/ConversionType";
-import { firstDayOfCurrentMonth } from "models/utils/Date";
+import { ConversionType } from "src/models/enums/ConversionType";
+import { firstDayOfCurrentMonth } from "src/models/utils/Date";
 
 const AdminManualRecordConversionsWidgetContent = ({
   conversions: existingConversions,

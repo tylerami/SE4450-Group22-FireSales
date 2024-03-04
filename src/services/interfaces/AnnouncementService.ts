@@ -1,4 +1,4 @@
-import Announcement from "models/Announcement";
+import Announcement from "src/models/Announcement";
 
 interface AnnouncementService {
   getAll(): Promise<Announcement[]>;

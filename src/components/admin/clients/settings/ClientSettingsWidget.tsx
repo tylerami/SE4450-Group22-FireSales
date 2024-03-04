@@ -1,10 +1,10 @@
 import { Button, Heading, Spacer, Spinner } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 import { Flex } from "@chakra-ui/react";
-import { Client } from "models/Client";
+import { Client } from "src/models/Client";
 import ClientSettingsEditor from "./ClientSettingsEditor";
 import { ClientService } from "services/interfaces/ClientService";
-import { DependencyInjection } from "models/utils/DependencyInjection";
+import { DependencyInjection } from "src/models/utils/DependencyInjection";
 import ClientDetailsTile from "./ClientDetailsTile";
 
 type Props = {};

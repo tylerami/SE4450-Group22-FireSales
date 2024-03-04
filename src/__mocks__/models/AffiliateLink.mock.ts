@@ -1,6 +1,6 @@
-import { Client } from "models/Client";
-import { AffiliateLink } from "models/AffiliateLink";
-import { ReferralLinkType } from "models/enums/ReferralLinkType";
+import { Client } from "src/models/Client";
+import { AffiliateLink } from "src/models/AffiliateLink";
+import { ReferralLinkType } from "src/models/enums/ReferralLinkType";
 import { sampleClients } from "./Client.mock";
 
 const clients: Client[] = sampleClients;

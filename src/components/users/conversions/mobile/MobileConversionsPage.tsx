@@ -3,11 +3,11 @@ import { Box, Flex, Heading, Text } from "@chakra-ui/react";
 
 import { UserContext } from "components/auth/UserProvider";
 import { ConversionService } from "services/interfaces/ConversionService";
-import { DependencyInjection } from "models/utils/DependencyInjection";
-import { Conversion } from "models/Conversion";
+import { DependencyInjection } from "src/models/utils/DependencyInjection";
+import { Conversion } from "src/models/Conversion";
 import MobileRecordConversionsWidget from "./recording/MobileRecordConversionsWidget";
 import { CompensationGroupService } from "services/interfaces/CompensationGroupService";
-import { CompensationGroup } from "models/CompensationGroup";
+import { CompensationGroup } from "src/models/CompensationGroup";
 
 type Props = {};
 
